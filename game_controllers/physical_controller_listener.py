@@ -1,0 +1,98 @@
+from game_controllers.utils import ControllerInput, InputType
+from agents.observers import InputsObserver
+from inputs import get_gamepad
+import threading
+
+class PhysicalControllerListener:
+    """
+    PhysicalControllerListener class listens to the inputs of a Physical Controller and notifies its subscribers with Controller Inputs.
+    It runs in a separate thread.
+    """
+    
+    def __init__(self):
+        self.subscribers : list[InputsObserver] = []
+        self.running : bool = False
+        self.listener_thread : threading.Thread = None
+    
+    def subscribe(self, subscriber : InputsObserver) -> None:
+        """
+        Adds a subscriber to the list of subscribers
+        """
+        self.subscribers.append(subscriber)
+        
+    def notify_all(self, input : ControllerInput) -> None:
+        """
+        Notifies all subscribers of an input
+        """
+        for subscriber in self.subscribers:
+            subscriber.update_from_controller(input)
+    
+    def start_listening(self) -> None:
+        """
+        Starts listening to the physical controller inputs and notifies its subscribers
+        """
+        if self.listener_thread is None or not self.listener_thread.is_alive():
+            self.running = True
+            self.listener_thread = threading.Thread(target=self._listen_loop, daemon=True)
+            self.listener_thread.start()
+            
+    def stop_listening(self) -> None:
+        """
+        Stops listening for inputs
+        """
+        self.running = False
+        if self.listener_thread:
+            self.listener_thread.join() 
+
+    def _listen_loop(self) -> None:
+        """
+        The loop that listens for controller inputs
+        """
+        while self.running:
+            try:
+                events = get_gamepad()
+            except Exception as e:
+                print(f"Error while getting gamepad events: {e}")
+                return
+            
+            for event in events:
+                if event.ev_type == "Sync":
+                    continue
+                
+                observed = self.event_to_input(event)
+                if observed:
+                    self.notify_all(observed)
+                        
+    def event_to_input(self, event) -> ControllerInput:
+        """
+        Converts an event from the physical controller to a Controller Input
+        """
+        if event.code not in self.INPUT_TYPES_MAP:
+            return None  # Ignore unmapped inputs
+        
+        input_type = self.INPUT_TYPES_MAP[event.code]
+        input_value = event.state
+        return ControllerInput(input_type, input_value)
+        
+        
+    INPUT_TYPES_MAP = {
+        "BTN_SOUTH":InputType.BTN_A,
+        "BTN_EAST": InputType.BTN_B,
+        "BTN_NORTH": InputType.BTN_Y,
+        "BTN_WEST": InputType.BTN_X,
+        "BTN_TR": InputType.BUMPER_RIGHT,
+        "BTN_TL": InputType.BUMPER_LEFT,
+        "BTN_THUMBR": InputType.THUMB_RIGHT,
+        "BTN_THUMBL": InputType.THUMB_LEFT,
+        "ABS_HAT0X": InputType.DIR_PAD_X,
+        "ABS_HAT0Y": InputType.DIR_PAD_Y,
+        "ABS_RZ": InputType.TRIGGER_RIGHT,
+        "ABS_Z": InputType.TRIGGER_LEFT,
+        "ABS_RX": InputType.STICK_RIGHT_X,
+        "ABS_RY": InputType.STICK_RIGHT_Y,
+        "ABS_X": InputType.STICK_LEFT_X,
+        "ABS_Y": InputType.STICK_LEFT_Y,
+        "BTN_START": InputType.BTN_BACK,
+        "BTN_SELECT": InputType.BTN_START,
+    }
+    
