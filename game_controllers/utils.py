@@ -35,6 +35,14 @@ class ControllerInput:
     type : InputType
     val : int
     
+@dataclass
+class ControllerInputMapValue:
+    """
+    ControllerInputMapValue stores the value of an input, the associated confidence/assistance level and the timestamp of acquisition
+    """
+    val : int
+    level : float
+    timestamp : float
         
 class ControllerInputsMap:
     """
@@ -42,18 +50,23 @@ class ControllerInputsMap:
     """
     
     def __init__(self):
-        self.inputs_map = { input : (0, 0) for input in InputType }
+        self.inputs_map = { input : ControllerInputMapValue(0, 0, 0) for input in InputType }
         
-    def set(self, input : ControllerInput, timestamp : float = time.time()) -> None:
+    def set(self, input : ControllerInput, level : float, timestamp : float | None = None) -> None:
         """
         Updates the value of an input
         """
-        self.inputs_map[input.type] = (input.val, timestamp)
+        if timestamp is None:
+            timestamp = time.time()
+            
+        if input.type == InputType.STICK_RIGHT_X:
+            print(f"Setting {input.type} with value {input.val} and time {timestamp}")
+        self.inputs_map[input.type] = ControllerInputMapValue(val = input.val, level = level, timestamp = timestamp)
         
-    def get(self, input : InputType) -> tuple[ControllerInput, float]:
+    def get(self, input : InputType) -> tuple[ControllerInput, ControllerInputMapValue]:
         """
-        Returns the ControllerInput and the timestamp of acquisition of the input
+        Returns the ControllerInput and the ControllerInputMapValue associated with the input
         """
         x = self.inputs_map[input]
-        return ControllerInput(input, x[0]), x[1]
+        return ControllerInput(type = input, val = x.val), x
     
