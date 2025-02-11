@@ -38,6 +38,8 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         #print(f"Received input {input.type} with value {input.val} from Copilot")        
         last_input = self.copilot_inputs_map.get(input.type)
         if input.val == 0 and last_input[0].val == input.val:
+            if input.type not in self.virtual_controller.STICKS:
+                self.copilot_inputs_map.set(input, confidence_level)
             return # Avoid sending a zero-input twice
         
         self.copilot_inputs_map.set(input, confidence_level)
@@ -61,6 +63,7 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         (pilot_input, pilot_input_details) = self.pilot_inputs_map.get(type)
         (copilot_input, copilot_input_details) = self.copilot_inputs_map.get(type)
         
+        print(f"Pilot: {pilot_input.val}, {pilot_input_details.level} - Copilot: {copilot_input.val} {copilot_input_details.level}")
         I = pilot_input_details.level > 1 - copilot_input_details.level # Indicator Function I{c > 1 - b}
         if I:
             self.virtual_controller.execute(copilot_input)

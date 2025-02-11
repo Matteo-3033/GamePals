@@ -40,12 +40,11 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         inputs = []
         messageData = json.loads(message)
         distance = messageData['distance']
+        # Confidence is inversely proportional to the distance of the target from the player
+        confidence_level = Math.linear_mapping(distance, (0, max(distance, 1000)), (1, 0)) 
         if messageData['entityType'] == 'Monster':
-            # Confidence is inversely proportional to the distance of the monster from the player
-            confidence_level = Math.linear_mapping(distance, (0, max(distance, 1000)), (1, 0)) 
             inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 255))
         else:
-            confidence_level = 1.0
             inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 0))
             
         if inputs:      
@@ -95,7 +94,9 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         """
         if distance_on_screen > 10000: # The current limit to activate aim lock
             return 0
-        p = 10 - 0.008 * distance_3d
-        i = int((distance_on_screen / max(distance_on_screen, p)) * 32767)
+        p1 = Math.exponential_mapping(distance_on_screen, (0, max(distance_on_screen, 60)), (0, 1), p = 0.2)
+        p2 = Math.exponential_mapping(distance_3d, (0, max(distance_3d, 1000)), (0, 1), p = 0.2)
+        p = min(p1, p2)
+        i = int(p * 32767)
         return i
         
