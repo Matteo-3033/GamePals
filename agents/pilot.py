@@ -1,6 +1,6 @@
 from game_controllers.physical_controller_listener import PhysicalControllerListener
 from agents.observers import InputsObserver, PilotInputsObserver
-from game_controllers.utils import ControllerInput
+from game_controllers.utils import ControllerInput, InputType
 
 class Pilot(InputsObserver):
     """
@@ -39,6 +39,8 @@ class Pilot(InputsObserver):
         Receives Controller Inputs from the Physical Controller and notifies its subscribers with the Assistance Level
         """
         assistance_level = 1.0 # This will be replaced by the actual value from the Configuration
+        if input.type == InputType.TRIGGER_RIGHT: # Shoot Button
+            assistance_level = 0.5
         self.notify_all(input, assistance_level)
         
         

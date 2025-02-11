@@ -1,6 +1,6 @@
 from agents.copilot import Copilot
 from doom.observers import GameStateObserver
-from doom.utils import GameStateMessage, MessageType
+from doom.utils import GameStateMessage, Math, MessageType
 from game_controllers.utils import ControllerInput, InputType
 from doom.game_state_listener import GameStateListener
 import json
@@ -38,11 +38,14 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         Processes the AIMED_AT message and notifies subscribers
         """
         inputs = []
-        confidence_level = 1.0 # This will be replaced by the actual value
         messageData = json.loads(message)
+        distance = messageData['distance']
         if messageData['entityType'] == 'Monster':
+            # Confidence is inversely proportional to the distance of the monster from the player
+            confidence_level = Math.linear_mapping(distance, (0, max(distance, 1000)), (1, 0)) 
             inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 255))
         else:
+            confidence_level = 1.0
             inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 0))
             
         if inputs:      
@@ -77,7 +80,7 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
             return
         
         angle = math.atan2(closest['relativePitch'], closest['relativeAngle'])
-        (x, y) = ExpertSystemCopilot.polar_to_cartesian(intensity, angle)
+        (x, y) = Math.polar_to_cartesian(intensity, angle)
         inputs.append(ControllerInput(type=InputType.STICK_RIGHT_X, val = x))
         inputs.append(ControllerInput(type=InputType.STICK_RIGHT_Y, val = y))
             
@@ -85,10 +88,7 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
             for input in inputs:
                 self.notify_all(input, confidence_level)
                 
-    
-    def polar_to_cartesian(rho : float, theta : float) -> tuple[float, float]:
-        return (rho * math.cos(theta), rho * math.sin(theta))
-    
+        
     def aim_pull_intensity(distance_on_screen : float, distance_3d : float) -> int:
         """
         Returns the intensity of the pull towards the enemy, based on the distance on the screen and the 3D distance

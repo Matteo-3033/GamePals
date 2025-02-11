@@ -59,8 +59,6 @@ class ControllerInputsMap:
         if timestamp is None:
             timestamp = time.time()
             
-        if input.type == InputType.STICK_RIGHT_X:
-            print(f"Setting {input.type} with value {input.val} and time {timestamp}")
         self.inputs_map[input.type] = ControllerInputMapValue(val = input.val, level = level, timestamp = timestamp)
         
     def get(self, input : InputType) -> tuple[ControllerInput, ControllerInputMapValue]:

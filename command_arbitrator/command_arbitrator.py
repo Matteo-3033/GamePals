@@ -27,8 +27,6 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         Receives Controller Inputs
         """
         #print(f"Received input {input.type} with value {input.val} from Pilot")
-        if input.type == InputType.STICK_RIGHT_X:
-            print("Coming from Pilot...")
         self.pilot_inputs_map.set(input, assistance_level)
         self.merge_inputs(input.type)
             
@@ -37,8 +35,7 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         """
         Receives Controller Inputs
         """
-        #print(f"Received input {input.type} with value {input.val} from Copilot")
-        
+        #print(f"Received input {input.type} with value {input.val} from Copilot")        
         last_input = self.copilot_inputs_map.get(input.type)
         if input.val == 0 and last_input[0].val == input.val:
             return # Avoid sending a zero-input twice
@@ -46,25 +43,12 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         self.copilot_inputs_map.set(input, confidence_level)
         self.merge_inputs(input.type)
         
-        # if (input.type in self.virtual_controller.STICKS): # Input is from a Stick
-            
-        #     if input.type == InputType.STICK_LEFT_X or input.type == InputType.STICK_LEFT_Y: # Left Stick
-        #         x_val = self.copilot_inputs_map.get(InputType.STICK_LEFT_X)[0]
-        #         y_val = self.copilot_inputs_map.get(InputType.STICK_LEFT_Y)[0]
-        #     else: # Right Stick 
-        #         x_val = self.copilot_inputs_map.get(InputType.STICK_RIGHT_X)[0]
-        #         y_val = self.copilot_inputs_map.get(InputType.STICK_RIGHT_Y)[0]
-                
-        #     self.virtual_controller.execute_stick(input_x = x_val, input_y = y_val)
-            
-        # else: # Input is not from a Stick
-        #     self.virtual_controller.execute(input)
             
     def merge_inputs(self, type : InputType) -> None:
         """
         Merges the inputs from the Pilot and Copilot
         """
-        if (type in self.virtual_controller.STICKS): # Input is from a Stick
+        if (type in self.virtual_controller.STICKS): 
             self.merge_continuous_inputs(type)
         else:
             self.merge_binary_inputs(type)
@@ -77,12 +61,12 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         (pilot_input, pilot_input_details) = self.pilot_inputs_map.get(type)
         (copilot_input, copilot_input_details) = self.copilot_inputs_map.get(type)
         
-        # Send the most recent input atm
-        if pilot_input_details.timestamp > copilot_input_details.timestamp:
-            self.virtual_controller.execute(pilot_input)
-        else:
+        I = pilot_input_details.level > 1 - copilot_input_details.level # Indicator Function I{c > 1 - b}
+        if I:
             self.virtual_controller.execute(copilot_input)
-        
+        else:
+            self.virtual_controller.execute(pilot_input)
+
     
     def merge_continuous_inputs(self, type : InputType) -> None:
         """
@@ -103,10 +87,10 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         most_recent_pilot = max(pilot_input_x_details.timestamp, pilot_input_y_details.timestamp)
         most_recent_copilot = max(copilot_input_x_details.timestamp, copilot_input_y_details.timestamp)
         
-        #print(most_recent_pilot, most_recent_copilot, copilot_input_x)
-        
         if most_recent_pilot > most_recent_copilot:
             self.virtual_controller.execute_stick(input_x = pilot_input_x, input_y = pilot_input_y)
         else:
             self.virtual_controller.execute_stick(input_x = copilot_input_x, input_y = copilot_input_y)
+            
+            
         
