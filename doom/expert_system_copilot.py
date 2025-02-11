@@ -3,6 +3,7 @@ from doom.observers import GameStateObserver
 from doom.utils import GameStateMessage, MessageType
 from game_controllers.utils import ControllerInput, InputType
 from doom.game_state_listener import GameStateListener
+import json
 
 class ExpertSystemCopilot(Copilot, GameStateObserver):
     """
@@ -29,7 +30,8 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         confidence_level = 1.0 # This will be replaced by the actual value
         match state.type:
             case MessageType.AIMED_AT:
-                if "Monster" in state.message:
+                messageData = json.loads(state.message)
+                if messageData['entityType'] == 'Monster':
                     inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 255))
                 else:
                     inputs.append(ControllerInput(type=InputType.TRIGGER_RIGHT, val = 0))
