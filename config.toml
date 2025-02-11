@@ -1,0 +1,19 @@
+[AssistanceLevels]
+A = 1.0
+B = 1.0
+Y = 1.0
+X = 1.0
+Bumper_Right = 1.0
+Bumper_Left = 1.0
+Thumb_Right = 1.0
+Thumb_Left = 1.0
+DirPad_X = 1.0
+DirPad_Y = 1.0
+Trigger_Right = 0.5
+Trigger_Left = 1.0
+Stick_Right_X = 1.0
+Stick_Right_Y = 1.0
+Stick_Left_X = 1.0
+Stick_Left_Y = 1.0
+Back = 0.0
+Start = 0.0

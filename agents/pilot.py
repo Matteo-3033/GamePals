@@ -1,6 +1,7 @@
 from game_controllers.physical_controller_listener import PhysicalControllerListener
 from agents.observers import InputsObserver, PilotInputsObserver
 from game_controllers.utils import ControllerInput, InputType
+import tomllib
 
 class Pilot(InputsObserver):
     """
@@ -9,11 +10,14 @@ class Pilot(InputsObserver):
     TODO: Implement the actual Assistance Level Configuration
     """
     
-    def __init__(self):
+    def __init__(self, config_file_path : str):
         self.controller_listener : PhysicalControllerListener = PhysicalControllerListener()
         self.subscribers : list[PilotInputsObserver] = []
-        # The Pilot will also hold the Player's Assistance Configuration
         self.controller_listener.subscribe(self)
+        
+        with open(config_file_path, 'rb') as config_file:
+            config = tomllib.load(config_file)
+            self.assistance_levels = config["AssistanceLevels"]
         
     def start(self) -> None:
         """
@@ -38,9 +42,7 @@ class Pilot(InputsObserver):
         """
         Receives Controller Inputs from the Physical Controller and notifies its subscribers with the Assistance Level
         """
-        assistance_level = 1.0 # This will be replaced by the actual value from the Configuration
-        if input.type == InputType.TRIGGER_RIGHT: # Shoot Button
-            assistance_level = 0.5
+        assistance_level = self.assistance_levels[input.type]
         self.notify_all(input, assistance_level)
         
         
