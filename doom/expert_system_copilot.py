@@ -57,6 +57,9 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         confidence_level = 1.0 # This will be replaced by the actual value
         monsters = json.loads(message)
         
+        # Filter for monsters only in the FOV (optional)
+        #monsters = [m for m in monsters if m['inFOV']]
+        
         if len(monsters) == 0:
             inputs.append(ControllerInput(type=InputType.STICK_RIGHT_X, val = 0))
             inputs.append(ControllerInput(type=InputType.STICK_RIGHT_Y, val = 0))
@@ -65,11 +68,13 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
                     self.notify_all(input, confidence_level)
             return
         
+        
         closest = min(monsters, key = lambda m: math.hypot(m['relativeAngle'], m['relativePitch'])) # Closest to the crosshair, not to the player
         distance = math.hypot(closest['relativeAngle'], closest['relativePitch'])
         
-        intensity = int((distance / max(distance, 2)) * 32767)  # Intensity is really low if distance < 2 (avoids screen shaking)
-        print(f"Distance: {distance} Intensity: {intensity}")
+        intensity = ExpertSystemCopilot.aim_pull_intensity(distance, closest['distance'])
+        if intensity == 0:
+            return
         
         angle = math.atan2(closest['relativePitch'], closest['relativeAngle'])
         (x, y) = ExpertSystemCopilot.polar_to_cartesian(intensity, angle)
@@ -83,3 +88,14 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
     
     def polar_to_cartesian(rho : float, theta : float) -> tuple[float, float]:
         return (rho * math.cos(theta), rho * math.sin(theta))
+    
+    def aim_pull_intensity(distance_on_screen : float, distance_3d : float) -> int:
+        """
+        Returns the intensity of the pull towards the enemy, based on the distance on the screen and the 3D distance
+        """
+        if distance_on_screen > 10000: # The current limit to activate aim lock
+            return 0
+        p = 10 - 0.008 * distance_3d
+        i = int((distance_on_screen / max(distance_on_screen, p)) * 32767)
+        return i
+        

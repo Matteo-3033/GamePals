@@ -63,7 +63,7 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
             if input.type == InputType.STICK_LEFT_X or input.type == InputType.STICK_LEFT_Y: # Left Stick
                 x_val = self.copilot_inputs_map.get(InputType.STICK_LEFT_X)[0]
                 y_val = self.copilot_inputs_map.get(InputType.STICK_LEFT_Y)[0]
-            else: # Right Stick
+            else: # Right Stick 
                 x_val = self.copilot_inputs_map.get(InputType.STICK_RIGHT_X)[0]
                 y_val = self.copilot_inputs_map.get(InputType.STICK_RIGHT_Y)[0]
                 
