@@ -63,8 +63,7 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         (pilot_input, pilot_input_details) = self.pilot_inputs_map.get(type)
         (copilot_input, copilot_input_details) = self.copilot_inputs_map.get(type)
         
-        print(f"Pilot: {pilot_input.val}, {pilot_input_details.level} - Copilot: {copilot_input.val} {copilot_input_details.level}")
-        I = pilot_input_details.level > 1 - copilot_input_details.level # Indicator Function I{c > 1 - b}
+        I = copilot_input_details.level > 1 - pilot_input_details.level # Indicator Function I{c > 1 - b}
         if I:
             self.virtual_controller.execute(copilot_input)
         else:
@@ -90,10 +89,25 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         most_recent_pilot = max(pilot_input_x_details.timestamp, pilot_input_y_details.timestamp)
         most_recent_copilot = max(copilot_input_x_details.timestamp, copilot_input_y_details.timestamp)
         
-        if most_recent_pilot > most_recent_copilot:
-            self.virtual_controller.execute_stick(input_x = pilot_input_x, input_y = pilot_input_y)
-        else:
-            self.virtual_controller.execute_stick(input_x = copilot_input_x, input_y = copilot_input_y)
-            
-            
         
+        #print(f"Pilot: {pilot_input_x} - Copilot: {copilot_input_x}")
+        
+        if most_recent_pilot - most_recent_copilot > 1: 
+            self.virtual_controller.execute_stick(input_x = pilot_input_x, input_y = pilot_input_y)
+        else: 
+            alpha_x = self.alpha(pilot_input_x_details.level, copilot_input_x_details.level)
+            alpha_y = self.alpha(pilot_input_y_details.level, copilot_input_y_details.level)
+            combined_x = (1 - alpha_x) * pilot_input_x.val + (alpha_x) * copilot_input_x.val
+            combined_y = (1 - alpha_y) * pilot_input_y.val + (alpha_y) * copilot_input_y.val
+            self.virtual_controller.execute_stick(
+                input_x = ControllerInput(type = pilot_input_x.type, val = combined_x), 
+                input_y = ControllerInput(type = pilot_input_y.type, val = combined_y)
+            )
+            
+            
+            
+    def alpha(self, beta : float, c : float) -> float:
+        """
+        Returns the value of the Blending Factor Alpha given Assistance Level Beta and Confidence Level C
+        """
+        return beta * c

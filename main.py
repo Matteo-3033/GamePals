@@ -1,7 +1,7 @@
 from command_arbitrator.command_arbitrator import CommandArbitrator
 from agents.pilot import Pilot
-import time
 from doom.expert_system_copilot import ExpertSystemCopilot
+import time
 
 pilot = Pilot(config_file_path = "config.toml") # Primary Agent
 copilot = ExpertSystemCopilot(log_file_path = "../Doom/log.txt") # Secondary Agent
