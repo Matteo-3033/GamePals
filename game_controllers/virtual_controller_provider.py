@@ -49,9 +49,9 @@ class VirtualControllerProvider():
             raise ValueError("The inputs must be on the same stick")
         
         if input_x.type == InputType.STICK_LEFT_X:
-            self.gamepad.left_joystick(x_value = input_x.val, y_value = input_y.val)
+            self.gamepad.left_joystick(x_value = int(input_x.val), y_value = int(input_y.val))
         else:
-            self.gamepad.right_joystick(x_value = input_x.val, y_value = input_y.val)
+            self.gamepad.right_joystick(x_value = int(input_x.val), y_value = int(input_y.val))
             
         self.gamepad.update()
 

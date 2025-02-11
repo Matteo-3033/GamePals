@@ -52,6 +52,10 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         """
         #print(f"Received input {input.type} with value {input.val} from Copilot")
         
+        last_input = self.copilot_inputs_map.get(input.type)
+        if input.val == 0 and last_input[0].val == input.val:
+            return # Don't lock the player in (0, 0) position 
+        
         self.copilot_inputs_map.set(input)
         
         if (input.type in self.virtual_controller.STICKS): # Input is from a Stick
