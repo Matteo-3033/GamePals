@@ -18,11 +18,19 @@ class Pilot(InputsObserver):
         with open(config_file_path, 'rb') as config_file:
             config = tomllib.load(config_file)
             self.assistance_levels = config["AssistanceLevels"]
+            
+
         
     def start(self) -> None:
         """
         Starts listening to the physical controller inputs and notifies its subscribers
         """
+        
+        # Notify all subscribers of the Assistance Levels (using zero-value inputs)
+        for key, value in self.assistance_levels.items():
+            self.notify_all(ControllerInput(type = InputType(key), val = 0), value)
+        
+        
         self.controller_listener.start_listening()
         
     def subscribe(self, subscriber : PilotInputsObserver) -> None:
