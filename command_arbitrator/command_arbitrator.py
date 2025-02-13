@@ -64,6 +64,10 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         (copilot_input, copilot_input_details) = self.copilot_inputs_map.get(type)
         
         I = copilot_input_details.level > 1 - pilot_input_details.level # Indicator Function I{c > 1 - b}
+        
+        if type == InputType.BTN_X:
+            print(f"Pilot: {pilot_input.val} {pilot_input_details.level} - Copilot: {copilot_input.val} {copilot_input_details.level} - I: {I}")
+        
         if I:
             self.virtual_controller.execute(copilot_input)
         else:
