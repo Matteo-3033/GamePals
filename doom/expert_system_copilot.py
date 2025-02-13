@@ -68,7 +68,6 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         monsters.sort(key = lambda m: ExpertSystemCopilot.proximity_factor(m)) # Sort by proximity factor
         target = monsters[0]
         target_proximity_factor = ExpertSystemCopilot.proximity_factor(target)
-        target_distance_3d = target['distance']
         target_distance_screen = math.hypot(target['relativeAngle'], target['relativePitch'])
         
         # 1. Run or Walk
@@ -85,40 +84,24 @@ class ExpertSystemCopilot(Copilot, GameStateObserver):
         intensity = int(target_proximity_factor * 32767)
         if intensity == 0: return
         (x, y) = Math.polar_to_cartesian(intensity, angle)
-        inputs.append(ControllerInput(type=InputType.STICK_RIGHT_X, val = x))
-        inputs.append(ControllerInput(type=InputType.STICK_RIGHT_Y, val = y))
-            
-        dist_screen1 = math.hypot(monsters[0]['relativeAngle'], monsters[0]['relativePitch'])
-        dist_screen2 = math.hypot(monsters[1]['relativeAngle'], monsters[1]['relativePitch']) if len(monsters) > 1 else 0
-        closest_monsters_diff = dist_screen2 - dist_screen1
+
+        # dist_screen1 = math.hypot(monsters[0]['relativeAngle'], monsters[0]['relativePitch'])
+        # dist_screen2 = math.hypot(monsters[1]['relativeAngle'], monsters[1]['relativePitch']) if len(monsters) > 1 else 0
+        # closest_monsters_diff = dist_screen2 - dist_screen1
+        # c2 = Math.linear_mapping(closest_monsters_diff, (0, max(closest_monsters_diff, 50)), (1, 0))
+        # confidence_level = min(1.0, c1 * 0.6 + c2 * 0.4)
         
-        c1 = 1 - intensity / 32767 # Inverse of the intensity
-        c2 = Math.linear_mapping(closest_monsters_diff, (0, max(closest_monsters_diff, 50)), (1, 0))
-        confidence_level = min(1.0, c1 * 0.6 + c2 * 0.4)
-        
-        if inputs:      
-            for input in inputs:
-                self.notify_all(input, confidence_level)
-                
-        
-    def aim_pull_intensity(distance_on_screen : float, distance_3d : float) -> int:
-        """
-        Returns the intensity of the pull towards the enemy, based on the distance on the screen and the 3D distance.
-        Intensity is the most when the enemy is the furthest (on the screen or in 3D).
-        """
-        p1 = Math.exponential_mapping(distance_on_screen, (0, max(distance_on_screen, 60)), (0, 1), p = 0.25)
-        p2 = Math.exponential_mapping(distance_3d, (0, max(distance_3d, 1000)), (0, 1), p = 0.25)
-        p = min(p1, p2)
-        i = int(p * 32767)
-        return i
-    
+        confidence_level = 1 - target_proximity_factor # Confidence is the most when the target is the closest
+        self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_X, val = x), confidence_level)
+        self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_Y, val = y), confidence_level)
+
     
     @staticmethod
     def proximity_factor(monster : dict[str, any]) -> float:
         """
         Returns the proximity factor of a Monster, based on their distance on the screen (from the crosshair)
         and their 3D distance (from the player).
-        The factor is the most when the enemy is the closest, either on the screen or in 3D.
+        The factor is the most when the enemy is the furthest, either on the screen or in 3D.
         """
         distance_on_screen = math.hypot(monster['relativeAngle'], monster['relativePitch'])
         distance_3d = monster['distance']
