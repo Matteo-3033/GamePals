@@ -7,34 +7,21 @@ class AimerCopilot(DoomCopilot):
     def __init__(self):
         super().__init__()
         
-        
     def receive_game_state(self, game_state : dict[str, any]) -> None:
         """
-        AimerCopilot checks 
+        AimerCopilot checks the closest monster and aims at it.
         """
         monsters = game_state['MONSTERS']
         
         if len(monsters) == 0:
             self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_X, val = 0.0), 0.0)
             self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_Y, val = 0.0), 0.0)
-            self.notify_all(ControllerInput(type=InputType.BTN_X, val = 1), 1.0)
             return
         
         monsters.sort(key = lambda m: AimerCopilot.proximity_factor(m)) # Sort by proximity factor
         target = monsters[0]
         target_proximity_factor = AimerCopilot.proximity_factor(target)
-        target_distance_screen = math.hypot(target['relativeAngle'], target['relativePitch'])
-        
-        # 1. Run or Walk
-        
-        if (target_distance_screen > 10):
-            confidence_level = target_proximity_factor
-            self.notify_all(ControllerInput(type=InputType.BTN_X, val = 1), confidence_level)
-        else:
-            self.notify_all(ControllerInput(type=InputType.BTN_X, val = 0), 1.0) 
-        
-        # 2. Aim
-        
+     
         angle = math.atan2(target['relativePitch'], target['relativeAngle'])
         intensity = int(target_proximity_factor * 32767)
         if intensity == 0: return
@@ -49,7 +36,6 @@ class AimerCopilot(DoomCopilot):
         confidence_level = 1 - target_proximity_factor # Confidence is the most when the target is the closest
         self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_X, val = x), confidence_level)
         self.notify_all(ControllerInput(type=InputType.STICK_RIGHT_Y, val = y), confidence_level)
-    
     
     @staticmethod
     def proximity_factor(monster : dict[str, any]) -> float:

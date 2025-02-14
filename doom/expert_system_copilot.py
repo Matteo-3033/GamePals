@@ -1,5 +1,6 @@
 from agents.copilot import Copilot
 from agents.observers import CopilotInputsObserver
+from doom.copilots.runner_copilot import RunnerCopilot
 from doom.copilots.aimer_copilot import AimerCopilot
 from doom.copilots.shooter_copilot import ShooterCopilot
 from doom.observers import GameStateObserver
@@ -20,6 +21,7 @@ class ExpertSystemCopilot(Copilot, CopilotInputsObserver, GameStateObserver):
         self.game_state_listener.subscribe(self)
         
         # Register Copilots here
+        self.register_copilot(RunnerCopilot())
         self.register_copilot(ShooterCopilot())
         self.register_copilot(AimerCopilot())
         
