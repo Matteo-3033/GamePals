@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from doom.utils import GameStateMessage
+from doom.utils import GameLogMessage
 
 
 class GameStateObserver(ABC):
@@ -9,8 +9,9 @@ class GameStateObserver(ABC):
     """
     
     @abstractmethod
-    def update_from_game_state(self, input: GameStateMessage) -> None:
+    def update_from_game_state(self, input: GameLogMessage) -> None:
         """
         Receives Game State Updates
         """
         pass
+

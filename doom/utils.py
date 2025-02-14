@@ -1,15 +1,30 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import StrEnum
 import math
+from agents.copilot import Copilot
 
 class MessageType(StrEnum):
-    AIMED_AT = "AIMED_AT" # The Object aimed at by the Player
-    MONSTERS = "MONSTERS" # The Monsters on the Screen
+    GAMESTATE = "GAMESTATE" # The Game State of the Game, in the form of a JSON
+    SPAWN = "SPAWN" # Notifies that the Player has spawned (or respawned)
 
 @dataclass
-class GameStateMessage:
+class GameLogMessage:
     type : MessageType
-    message : str
+    json : str
+    
+
+class DoomCopilot(Copilot, ABC):
+    """
+    The DoomCopilot class represents a Software Agent Copilot dedicated to a specific action for the game Ultimate Doom.
+    """
+    
+    @abstractmethod
+    def receive_game_state(self, game_state : dict[str, any]) -> None:
+        """
+        Receives the updated Game State, on which the Copilot will decide and notify the action to take.
+        """
+        pass
     
     
 class Math:

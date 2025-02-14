@@ -1,7 +1,7 @@
 
 import threading
 from doom.observers import GameStateObserver
-from doom.utils import GameStateMessage
+from doom.utils import GameLogMessage
 
 
 class GameStateListener:
@@ -24,7 +24,7 @@ class GameStateListener:
         """
         self.subscribers.append(subscriber)
         
-    def notify_all(self, state : GameStateMessage) -> None:
+    def notify_all(self, state : GameLogMessage) -> None:
         """
         Notifies all subscribers of an input
         """
@@ -64,6 +64,6 @@ class GameStateListener:
                     message_type = line.split(" ")[0]
                     message_data = line[len(message_type) + 1:]
 
-                    state = GameStateMessage(message_type, message_data)             
+                    state = GameLogMessage(message_type, message_data)             
                     self.notify_all(state)       
                     
