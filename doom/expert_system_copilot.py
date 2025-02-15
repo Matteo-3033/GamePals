@@ -12,12 +12,12 @@ class ExpertSystemCopilot(Copilot, CopilotInputsObserver, GameStateObserver):
     """
     The ExpertSystemCopilot class represents the implementation of a Software Agent Copilot for the game Ultimate Doom.
     It represents a Rule-Based System that reads the Game State and notifies its subscribers with some Controller Inputs.
-    """
+    """ 
     
     def __init__(self, log_file_path : str):
         super().__init__()
         self.copilots : list[DoomCopilot] = []
-        self.game_state_listener = GameStateListener(log_file_path)
+        self.game_state_listener : GameStateListener = GameStateListener(log_file_path)
         self.game_state_listener.subscribe(self)
         
         # Register Copilots here

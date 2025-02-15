@@ -7,7 +7,7 @@ class VirtualControllerProvider():
     """
 
     def __init__(self):
-        self.gamepad = vg.VX360Gamepad()
+        self.gamepad : vg.VX360Gamepad = vg.VX360Gamepad()
     
     def execute(self, input : ControllerInput) -> None:
         """
