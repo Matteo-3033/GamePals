@@ -19,10 +19,15 @@ class PilotInputsObserver(ABC):
     The PilotInputsObserver interface represents a class that receives Controller Inputs from the Pilot
     """
     
-    @abstractmethod
-    def update_from_pilot(self, input: ControllerInput, assistance_level : float) -> None:
+    def input_from_pilot(self, input: ControllerInput, assistance_level : float) -> None:
         """
         Receives Controller Inputs and the Assistance Level requested by the Pilot
+        """
+        pass
+    
+    def message_from_pilot(self, message: str) -> None:
+        """
+        Receives a message from the Pilot
         """
         pass
   
@@ -32,9 +37,16 @@ class CopilotInputsObserver(ABC):
     The CopilotInputsObserver interface represents a class that receives Controller Inputs from the Copilot
     """
     
-    @abstractmethod
-    def update_from_copilot(self, input: ControllerInput, confidence_level : float) -> None:
+    def input_from_copilot(self, input: ControllerInput, confidence_level : float) -> None:
         """
         Receives Controller Inputs and the Confidence Level provided by the Copilot
         """
         pass
+    
+    
+    def message_from_copilot(self, message: str) -> None:
+        """
+        Receives a message from the Copilot
+        """
+        pass
+    

@@ -1,9 +1,10 @@
+from typing import override
 from game_controllers.physical_controller_listener import PhysicalControllerListener
-from agents.observers import InputsObserver, PilotInputsObserver
+from agents.observers import CopilotInputsObserver, InputsObserver, PilotInputsObserver
 from game_controllers.utils import ControllerInput, InputType
 import tomllib
 
-class Pilot(InputsObserver):
+class Pilot(InputsObserver, CopilotInputsObserver):
     """
     The Pilot class represents the Pilot in the Shared Control System.
     The Pilot listens to the physical controller inputs and notifies its subscribers with Inputs and Assistance Levels.
@@ -44,7 +45,7 @@ class Pilot(InputsObserver):
         Notifies all subscribers of an input
         """
         for subscriber in self.subscribers:
-            subscriber.update_from_pilot(input, assistance_level)
+            subscriber.input_from_pilot(input, assistance_level)
     
     def update_from_controller(self, input : ControllerInput) -> None:
         """
@@ -53,4 +54,9 @@ class Pilot(InputsObserver):
         assistance_level = self.assistance_levels[input.type]
         self.notify_all(input, assistance_level)
         
-        
+    @override
+    def message_from_copilot(self, message):
+        """
+        Receives a message from the Copilot
+        """
+        print(f"[Pilot] Received message from Copilot: {message}")

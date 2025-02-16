@@ -22,18 +22,18 @@ class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
         self.pilot.subscribe(self)
         self.copilot.subscribe(self)
     
-    def update_from_pilot(self, input : ControllerInput, assistance_level : float) -> None:
+    def input_from_pilot(self, input : ControllerInput, assistance_level : float) -> None:
         """
-        Receives Controller Inputs
+        Receives Pilot Inputs
         """
         #print(f"Received input {input.type} with value {input.val} from Pilot")
         self.pilot_inputs_map.set(input, assistance_level)
         self.merge_inputs(input.type)
             
         
-    def update_from_copilot(self, input : ControllerInput, confidence_level : float) -> None:
+    def input_from_copilot(self, input : ControllerInput, confidence_level : float) -> None:
         """
-        Receives Controller Inputs
+        Receives Copilot Inputs
         """
         #print(f"Received input {input.type} with value {input.val} from Copilot")        
         last_input = self.copilot_inputs_map.get(input.type)

@@ -38,7 +38,7 @@ class ExpertSystemCopilot(Copilot, CopilotInputsObserver, GameStateObserver):
         """
         self.game_state_listener.start_listening()
         
-    def update_from_copilot(self, input, confidence_level):
+    def input_from_copilot(self, input, confidence_level):
         """
         Receives updates from the DoomCopilots and notifies its subscribers with those inputs 
         """
