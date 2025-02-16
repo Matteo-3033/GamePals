@@ -1,6 +1,7 @@
 from typing import override
 from agents.copilot import Copilot
 from agents.observers import CopilotObserver
+from agents.input_source import CopilotInputData
 from doom.copilots.runner_copilot import RunnerCopilot
 from doom.copilots.aimer_copilot import AimerCopilot
 from doom.copilots.shooter_copilot import ShooterCopilot
@@ -40,10 +41,12 @@ class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
         """
         self.game_state_listener.start_listening()
         
-    def input_from_copilot(self, input, confidence_level):
+    def input_from_copilot(self, data : CopilotInputData) -> None:
         """
         Receives updates from the DoomCopilots and notifies its subscribers with those inputs 
         """
+        input = data.input
+        confidence_level = data.confidence_level
         return super().notify_all(input, confidence_level)
         
     def update_from_game_state(self, state: GameLogMessage) -> None:

@@ -1,53 +1,46 @@
+from agents.input_source import InputData, InputSource
 from game_controllers.utils import ControllerInput, InputType
-from agents.observers import InputsObserver
+from agents.observers import InputObserver
 from inputs import get_gamepad
 import threading
 
 class PhysicalControllerListener:
     """
-    PhysicalControllerListener class listens to the inputs of a Physical Controller and notifies its subscribers with Controller Inputs.
+    The PhysicalControllerListener class is a particular Input Source for InputData.
+    
+    It listens to the inputs of a Physical Controller and notifies its subscribers with Controller Inputs.
+    
     It runs in a separate thread.
     """
     
     def __init__(self):
-        self.subscribers : list[InputsObserver] = []
+        self.input_source : InputSource[InputData] = InputSource[InputData]()
         self.running : bool = False
         self.listener_thread : threading.Thread = None
     
-    def subscribe(self, subscriber : InputsObserver) -> None:
-        """
-        Adds a subscriber to the list of subscribers
-        """
-        self.subscribers.append(subscriber)
+    def subscribe(self, subscriber : InputObserver) -> None:
+        """ Adds a subscriber to the list of subscribers """
+        subscriber.subscribe_to_input_source(self.input_source)
         
     def notify_all(self, input : ControllerInput) -> None:
-        """
-        Notifies all subscribers of an input
-        """
-        for subscriber in self.subscribers:
-            subscriber.update_from_controller(input)
+        """ Notifies all subscribers of an input, wrapped in an InputData object """
+        self.input_source.notify_all(InputData(input))
     
     def start_listening(self) -> None:
-        """
-        Starts listening to the physical controller inputs and notifies its subscribers
-        """
+        """  Starts listening to the physical controller inputs and notifies its subscribers """
         if self.listener_thread is None or not self.listener_thread.is_alive():
             self.running = True
             self.listener_thread = threading.Thread(target=self._listen_loop, daemon=True)
             self.listener_thread.start()
             
     def stop_listening(self) -> None:
-        """
-        Stops listening for inputs
-        """
+        """ Stops listening for inputs """
         self.running = False
         if self.listener_thread:
             self.listener_thread.join() 
 
     def _listen_loop(self) -> None:
-        """
-        The loop that listens for controller inputs
-        """
+        """ The loop that listens for controller inputs """
         while self.running:
             try:
                 events = get_gamepad()
@@ -64,9 +57,7 @@ class PhysicalControllerListener:
                     self.notify_all(observed)
                         
     def event_to_input(self, event) -> ControllerInput:
-        """
-        Converts an event from the physical controller to a Controller Input
-        """
+        """ Converts an event from the physical controller to a Controller Input """
         if event.code not in self.INPUT_TYPES_MAP:
             return None  # Ignore unmapped inputs
         

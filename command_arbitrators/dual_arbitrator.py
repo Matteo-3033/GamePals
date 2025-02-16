@@ -1,18 +1,21 @@
-from game_controllers.virtual_controller_provider import VirtualControllerProvider
+from command_arbitrators.command_arbitrator import CommandArbitrator
+from agents.input_source import CopilotInputData, PilotInputData
 from game_controllers.utils import ControllerInput, ControllerInputsMap, InputType
 from agents.observers import CopilotObserver, PilotObserver
 from agents.copilot import Copilot
 from agents.pilot import Pilot
 
-class CommandArbitrator(PilotObserver, CopilotObserver):
+class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
     """
-    The CommandArbitrator class arbitrates between the inputs from the Pilot and the Copilot, then it sends the final command to a Virtual Controller.
+    The DualArbitrator class is an implementation of a CommandArbitrator.
+    
+    It arbitrates between the inputs from a Pilot and a Copilot.
     """
     
     def __init__(self, pilot : Pilot, copilot : Copilot):
+        super().__init__()
         self.pilot : Pilot = pilot
         self.copilot : Copilot = copilot
-        self.virtual_controller : VirtualControllerProvider = VirtualControllerProvider()
         
         # Latest Inputs from the Pilot and Copilot
         self.pilot_inputs_map : ControllerInputsMap = ControllerInputsMap()
@@ -22,25 +25,34 @@ class CommandArbitrator(PilotObserver, CopilotObserver):
         self.pilot.subscribe(self)
         self.copilot.subscribe(self)
     
-    def input_from_pilot(self, input : ControllerInput, assistance_level : float) -> None:
+    def input_from_pilot(self, data : PilotInputData) -> None:
         """
-        Receives Pilot Inputs
+        Receives Pilot Inputs as ControllerInput and Assistance Level.
+        It then merges the inputs from the Pilot and Copilot and executes an action.
         """
         #print(f"Received input {input.type} with value {input.val} from Pilot")
+        input = data.input
+        assistance_level = data.assistance_level
+
         self.pilot_inputs_map.set(input, assistance_level)
         self.merge_inputs(input.type)
             
         
-    def input_from_copilot(self, input : ControllerInput, confidence_level : float) -> None:
+    def input_from_copilot(self, data : CopilotInputData) -> None:
         """
-        Receives Copilot Inputs
+        Receives Copilot Inputs as ControllerInput and Confidence Level.
+        It then merges the inputs from the Pilot and Copilot and executes an action.
         """
         #print(f"Received input {input.type} with value {input.val} from Copilot")        
+        input = data.input
+        confidence_level = data.confidence_level
+        
+        # Avoid sending a zero-input twice
         last_input = self.copilot_inputs_map.get(input.type)
         if input.val == 0 and last_input[0].val == input.val:
             if input.type not in self.virtual_controller.STICKS:
                 self.copilot_inputs_map.set(input, confidence_level)
-            return # Avoid sending a zero-input twice
+            return 
         
         self.copilot_inputs_map.set(input, confidence_level)
         self.merge_inputs(input.type)
@@ -66,9 +78,9 @@ class CommandArbitrator(PilotObserver, CopilotObserver):
         I = copilot_input_details.level > 1 - pilot_input_details.level # Indicator Function I{c > 1 - b}
         
         if I:
-            self.virtual_controller.execute(copilot_input)
+            self.execute_binary_command(copilot_input)
         else:
-            self.virtual_controller.execute(pilot_input)
+            self.execute_binary_command(pilot_input)
 
     
     def merge_continuous_inputs(self, type : InputType) -> None:
@@ -94,17 +106,16 @@ class CommandArbitrator(PilotObserver, CopilotObserver):
         #print(f"Pilot: {pilot_input_x} - Copilot: {copilot_input_x}")
         
         if most_recent_pilot - most_recent_copilot > 1: 
-            self.virtual_controller.execute_stick(input_x = pilot_input_x, input_y = pilot_input_y)
+            self.execute_continuous_command(input_x = pilot_input_x, input_y = pilot_input_y)
         else: 
             alpha_x = self.alpha(pilot_input_x_details.level, copilot_input_x_details.level)
             alpha_y = self.alpha(pilot_input_y_details.level, copilot_input_y_details.level)
             combined_x = (1 - alpha_x) * pilot_input_x.val + (alpha_x) * copilot_input_x.val
             combined_y = (1 - alpha_y) * pilot_input_y.val + (alpha_y) * copilot_input_y.val
-            self.virtual_controller.execute_stick(
+            self.execute_continuous_command(
                 input_x = ControllerInput(type = pilot_input_x.type, val = combined_x), 
                 input_y = ControllerInput(type = pilot_input_y.type, val = combined_y)
             )
-            
             
             
     def alpha(self, beta : float, c : float) -> float:
