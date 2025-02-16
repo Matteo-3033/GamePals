@@ -1,10 +1,10 @@
 from game_controllers.virtual_controller_provider import VirtualControllerProvider
 from game_controllers.utils import ControllerInput, ControllerInputsMap, InputType
-from agents.observers import CopilotInputsObserver, PilotInputsObserver
+from agents.observers import CopilotObserver, PilotObserver
 from agents.copilot import Copilot
 from agents.pilot import Pilot
 
-class CommandArbitrator(PilotInputsObserver, CopilotInputsObserver):
+class CommandArbitrator(PilotObserver, CopilotObserver):
     """
     The CommandArbitrator class arbitrates between the inputs from the Pilot and the Copilot, then it sends the final command to a Virtual Controller.
     """

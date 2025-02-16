@@ -14,17 +14,19 @@ class InputsObserver(ABC):
         pass
 
 
-class PilotInputsObserver(ABC):
+class PilotObserver(ABC):
     """
-    The PilotInputsObserver interface represents a class that receives Controller Inputs from the Pilot
+    The PilotObserver interface represents a class that receives Controller Inputs and messages from the Pilot
     """
     
+    @abstractmethod
     def input_from_pilot(self, input: ControllerInput, assistance_level : float) -> None:
         """
         Receives Controller Inputs and the Assistance Level requested by the Pilot
         """
         pass
     
+    @abstractmethod
     def message_from_pilot(self, message: str) -> None:
         """
         Receives a message from the Pilot
@@ -32,18 +34,19 @@ class PilotInputsObserver(ABC):
         pass
   
   
-class CopilotInputsObserver(ABC):
+class CopilotObserver(ABC):
     """
-    The CopilotInputsObserver interface represents a class that receives Controller Inputs from the Copilot
+    The CopilotObserver interface represents a class that receives Controller Inputs and messages from the Copilot
     """
     
+    @abstractmethod
     def input_from_copilot(self, input: ControllerInput, confidence_level : float) -> None:
         """
         Receives Controller Inputs and the Confidence Level provided by the Copilot
         """
         pass
     
-    
+    @abstractmethod
     def message_from_copilot(self, message: str) -> None:
         """
         Receives a message from the Copilot

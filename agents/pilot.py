@@ -1,27 +1,28 @@
+from abc import ABC
 from typing import override
 from game_controllers.physical_controller_listener import PhysicalControllerListener
-from agents.observers import CopilotInputsObserver, InputsObserver, PilotInputsObserver
+from agents.observers import CopilotObserver, InputsObserver, PilotObserver
 from game_controllers.utils import ControllerInput, InputType
 import tomllib
 
-class Pilot(InputsObserver, CopilotInputsObserver):
+class Pilot(InputsObserver, CopilotObserver, ABC):
     """
     The Pilot class represents the Pilot in the Shared Control System.
     The Pilot listens to the physical controller inputs and notifies its subscribers with Inputs and Assistance Levels.
-    TODO: Implement the actual Assistance Level Configuration
+    It also receives messages (and inputs) from the Copilot.
+    It needs to be extended by any Class that wants to cover the Role of the Pilot 
     """
     
     def __init__(self, config_file_path : str):
         self.controller_listener : PhysicalControllerListener = PhysicalControllerListener()
-        self.subscribers : list[PilotInputsObserver] = []
-        self.controller_listener.subscribe(self)
+        self.subscribers : list[PilotObserver] = []
+        self.assistance_levels : dict[str, float] = {}
         
+        self.controller_listener.subscribe(self)
         with open(config_file_path, 'rb') as config_file:
             config = tomllib.load(config_file)
             self.assistance_levels = config["AssistanceLevels"]
             
-
-        
     def start(self) -> None:
         """
         Starts listening to the physical controller inputs and notifies its subscribers
@@ -34,7 +35,7 @@ class Pilot(InputsObserver, CopilotInputsObserver):
         
         self.controller_listener.start_listening()
         
-    def subscribe(self, subscriber : PilotInputsObserver) -> None:
+    def subscribe(self, subscriber : PilotObserver) -> None:
         """
         Adds a subscriber to the list of subscribers
         """

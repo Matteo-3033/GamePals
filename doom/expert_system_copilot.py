@@ -1,5 +1,6 @@
+from typing import override
 from agents.copilot import Copilot
-from agents.observers import CopilotInputsObserver
+from agents.observers import CopilotObserver
 from doom.copilots.runner_copilot import RunnerCopilot
 from doom.copilots.aimer_copilot import AimerCopilot
 from doom.copilots.shooter_copilot import ShooterCopilot
@@ -8,7 +9,7 @@ from doom.utils import DoomCopilot, GameLogMessage, MessageType
 from doom.game_state_listener import GameStateListener
 import json
 
-class ExpertSystemCopilot(Copilot, CopilotInputsObserver, GameStateObserver):
+class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
     """
     The ExpertSystemCopilot class represents the implementation of a Software Agent Copilot for the game Ultimate Doom.
     It represents a Rule-Based System that reads the Game State and notifies its subscribers with some Controller Inputs.
@@ -32,6 +33,7 @@ class ExpertSystemCopilot(Copilot, CopilotInputsObserver, GameStateObserver):
         self.copilots.append(copilot)
         copilot.subscribe(self)
         
+    @override
     def start(self) -> None:
         """
         Starts listening to the physical controller inputs and notifies its subscribers
