@@ -1,4 +1,4 @@
-from agents import PilotInputData, CopilotInputData
+from agents import PilotInputData, CopilotInputData, MessageData
 from agents.copilot import Copilot
 from agents.observers.copilot_observer import CopilotObserver
 from agents.observers.pilot_observer import PilotObserver
@@ -118,3 +118,9 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         """
         return 1.0
         # return beta * c
+
+    def message_from_pilot(self, data: MessageData) -> None:
+        pass
+
+    def message_from_copilot(self, data: MessageData) -> None:
+        pass

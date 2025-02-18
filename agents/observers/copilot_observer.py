@@ -21,4 +21,4 @@ class CopilotObserver(ABC):
     def subscribe_to_copilot(self, copilot) -> None:
         """ Subscribes to a Pilot """
         copilot.copilot_inputs_source.subscribe(self.input_from_copilot)
-        copilot.copilots_metacommands_source.subscribe(self.message_from_copilot)
+        copilot.copilot_metacommands_source.subscribe(self.message_from_copilot)
