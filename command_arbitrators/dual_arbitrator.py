@@ -26,6 +26,10 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         # Receive Updates from the Pilot and Copilot
         self.pilot.subscribe(self)
         self.copilot.subscribe(self)
+        
+        # Connect Pilot and Copilot
+        self.pilot.subscribe(self.copilot)
+        self.copilot.subscribe(self.pilot)
 
     def input_from_pilot(self, data: PilotInputData) -> None:
         """
