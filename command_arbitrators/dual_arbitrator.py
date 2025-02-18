@@ -44,7 +44,7 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         Receives Copilot Inputs as ControllerInput and Confidence Level.
         It then merges the inputs from the Pilot and Copilot and executes an action.
         """
-        # print(f"Received input {input.type} with value {input.val} from Copilot")
+        #print(f"Received input {data.input.type} with value {data.input.val} from Copilot")
         input = data.input
         confidence_level = data.confidence_level
 

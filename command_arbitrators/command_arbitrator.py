@@ -18,10 +18,12 @@ class CommandArbitrator(ABC):
         """
         Executes a single-value command on the Virtual Controller
         """
+        print(f"Executing {input}")
         self.virtual_controller.execute(input)
 
     def execute_continuous_command(self, input_x: ControllerInput, input_y: ControllerInput) -> None:
         """
         Executes a 2-axis command on the Virtual Controller
         """
+        print(f"Executing {input_x} {input_y} ")
         self.virtual_controller.execute_stick(input_x, input_y)

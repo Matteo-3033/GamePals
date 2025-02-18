@@ -11,7 +11,7 @@ class ControllerInputsMap:
     def __init__(self):
         self.inputs_map = {input: ControllerInputRecord(0, 0, 0) for input in InputType}
 
-    def set(self, input: ControllerInput, level: float, timestamp: float | None = None) -> None:
+    def set(self, input: ControllerInput, level: float = 1.0, timestamp: float | None = None) -> None:
         """
         Updates the value of an input
         """
