@@ -1,3 +1,5 @@
+import time
+
 import vgamepad as vg
 
 from game_controllers import ControllerInput, InputType
@@ -56,6 +58,22 @@ class VirtualControllerProvider:
             self.gamepad.right_joystick(x_value = int(input_x.val), y_value = int(input_y.val))
 
         self.gamepad.update()
+
+    def reset_controls(self):
+        """ Releases all buttons (except sticks) of the Virtual Controller """
+        time.sleep(0.5) # This looks unnecessary, but it's needed for it to work even when the level is reset
+        for btn in self.BTN_TO_VGBUTTON.values():
+            self.gamepad.release_button(btn)
+
+        for btn in self.DPAD_TO_VGBUTTON.values():
+            self.gamepad.release_button(btn)
+
+        self.gamepad.left_trigger(0)
+        self.gamepad.right_trigger(0)
+
+        self.gamepad.update()
+        print("Gamepad was reset")
+        time.sleep(0.1)
 
     BTN_TO_VGBUTTON = {
         InputType.BTN_A: vg.XUSB_BUTTON.XUSB_GAMEPAD_A,

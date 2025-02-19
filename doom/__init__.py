@@ -5,7 +5,7 @@ from enum import StrEnum
 
 class MessageType(StrEnum):
     GAMESTATE = "GAMESTATE"  # The Game State of the Game, in the form of a JSON
-    SPAWN = "SPAWN"  # Notifies that the Player has spawned (or respawned)
+    RESET = "RESET"  # Notifies that the Player has either spawned, respawned, unpaused or any other event that resets the controls
 
 
 @dataclass

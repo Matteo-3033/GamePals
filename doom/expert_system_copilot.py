@@ -11,6 +11,7 @@ from doom.copilots.runner_copilot import RunnerCopilot
 from doom.copilots.shooter_copilot import ShooterCopilot
 from doom.gamestate_listener import GameStateListener
 from doom.observers.gamestate_observer import GameStateObserver
+from game_controllers import InputType, ControllerInput
 
 
 class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
@@ -57,8 +58,11 @@ class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
         Receives Game State Updates and notifies its subscribers with Controller Inputs and Confidence Levels
         """
         match state.type:
-            case MessageType.SPAWN:
-                pass  # Here should go a reset of all Button Inputs
+
+            case MessageType.RESET:
+                # Reset all Controls
+                self.notify_metacommand("RESET")
+
             case MessageType.GAMESTATE:
                 game_state = json.loads(state.json)
                 for copilot in self.copilots:

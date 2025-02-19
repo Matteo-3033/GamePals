@@ -26,7 +26,7 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         # Receive Updates from the Pilot and Copilot
         self.pilot.subscribe(self)
         self.copilot.subscribe(self)
-        
+
         # Connect Pilot and Copilot
         self.pilot.subscribe(self.copilot)
         self.copilot.subscribe(self.pilot)
@@ -67,11 +67,11 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         Merges the inputs from the Pilot and Copilot
         """
         if type in self.virtual_controller.STICKS:
-            self.merge_continuous_inputs(type)
+            self._merge_continuous_inputs(type)
         else:
-            self.merge_binary_inputs(type)
+            self._merge_binary_inputs(type)
 
-    def merge_binary_inputs(self, type: InputType) -> None:
+    def _merge_binary_inputs(self, type: InputType) -> None:
         """
         Merges the binary inputs from the Pilot and Copilot
         """
@@ -85,7 +85,7 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         else:
             self.execute_binary_command(pilot_input)
 
-    def merge_continuous_inputs(self, type: InputType) -> None:
+    def _merge_continuous_inputs(self, type: InputType) -> None:
         """
         Merges the continuous inputs from the Pilot and Copilot
         """
@@ -127,4 +127,5 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         pass
 
     def message_from_copilot(self, data: MessageData) -> None:
-        pass
+        if data.message == "RESET":
+            self.virtual_controller.reset_controls()

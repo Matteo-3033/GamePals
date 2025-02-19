@@ -61,9 +61,11 @@ class GameStateListener:
                 if line and line.startswith(self.LOG_FILE_GAME_STATE_PREFIX):
                     line = line[len(GameStateListener.LOG_FILE_GAME_STATE_PREFIX):]
 
-                    message_type = line.split(" ")[0]
+                    message_type = line.split(" ")[0].strip()
                     message_data = line[len(message_type) + 1:]
 
                     if message_type in MessageType:
                         state = GameLogMessage(MessageType(message_type), message_data)
                         self.notify_all(state)
+                    else:
+                        print("Unrecognized message type: " + message_type)
