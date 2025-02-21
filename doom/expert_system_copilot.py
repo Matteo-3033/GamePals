@@ -11,7 +11,6 @@ from doom.copilots.runner_copilot import RunnerCopilot
 from doom.copilots.shooter_copilot import ShooterCopilot
 from doom.gamestate_listener import GameStateListener
 from doom.observers.gamestate_observer import GameStateObserver
-from game_controllers import InputType, ControllerInput
 
 
 class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
