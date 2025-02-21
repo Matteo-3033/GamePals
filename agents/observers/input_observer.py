@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from agents import InputData
+from agents import ActorData
 
 
 class InputObserver(ABC):
@@ -9,7 +9,7 @@ class InputObserver(ABC):
     """
 
     @abstractmethod
-    def input_from_source(self, data: InputData) -> None:
+    def input_from_source(self, data: ActorData) -> None:
         """ Receives Inputs from the Input Source"""
         pass
 

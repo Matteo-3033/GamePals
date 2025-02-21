@@ -1,4 +1,4 @@
-from agents import InputData
+from agents import ActorData
 from agents.input_source import InputSource
 from command_arbitrators.command_arbitrator import CommandArbitrator
 from game_controllers import InputType
@@ -15,12 +15,12 @@ class EqualArbitrator(CommandArbitrator):
 
     def __init__(self):
         super().__init__()
-        self.sources : list[InputSource[InputData]] = []
+        self.sources : list[InputSource[ActorData]] = []
         self.latest_inputs_map : ControllerInputsMap = ControllerInputsMap()
 
-    def receive_input(self, data : InputData) -> None:
+    def receive_input(self, data : ActorData) -> None:
         """ Receives an Input from an Input Source and sends it to the Virtual Controller """
-        self.latest_inputs_map.set(data.input)
+        self.latest_inputs_map.set(data.c_input)
         if type in self.virtual_controller.STICKS:
             is_left_stick = type == InputType.STICK_LEFT_X or type == InputType.STICK_LEFT_Y
             type_x = InputType.STICK_LEFT_X if is_left_stick else InputType.STICK_RIGHT_X
@@ -31,9 +31,9 @@ class EqualArbitrator(CommandArbitrator):
 
             self.execute_continuous_command(input_x, input_y)
         else:
-            self.execute_binary_command(data.input)
+            self.execute_binary_command(data.c_input)
 
-    def add_source(self, source: InputSource[InputData]) -> None:
+    def add_source(self, source: InputSource[ActorData]) -> None:
         """ Adds a new Input Source to the Arbitrator """
         self.sources.append(source)
         source.subscribe(self.receive_input)

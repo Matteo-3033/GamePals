@@ -1,10 +1,11 @@
-from abc import ABC
-
+from agents import MessageData, ActorData
+from agents.actor import Actor
+from agents.observers.actor_observer import ActorObserver
 from game_controllers import ControllerInput
 from game_controllers.virtual_controller_provider import VirtualControllerProvider
 
 
-class CommandArbitrator(ABC):
+class CommandArbitrator(ActorObserver):
     """
     The CommandArbitrator class is an abstract Arbitrator.
 
@@ -13,6 +14,25 @@ class CommandArbitrator(ABC):
 
     def __init__(self) -> None:
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
+        self.actors: list[Actor] = []
+
+    def add_actor(self, actor: Actor) -> None:
+        """ Adds an Actor to the Architecture """
+        self.actors.append(actor)
+        actor.subscribe(self)  # Subscribe the Arbitrator to all the Actors
+
+    def start(self) -> None:
+        """ Starts the Actors and the Arbitration Process """
+        for actor in self.actors:
+            actor.start()
+
+    def receive_input_update(self, data: ActorData) -> None:
+        """ Receives Input and Confidence Level from one of its Actors """
+        pass
+
+    def receive_message_update(self, data: MessageData) -> None:
+        """ Receives a Message from one of its Actors """
+        pass
 
     def execute_binary_command(self, input: ControllerInput) -> None:
         """

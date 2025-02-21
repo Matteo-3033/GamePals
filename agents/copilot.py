@@ -55,7 +55,7 @@ class Copilot(PilotObserver, ABC):
         Receives Controller Inputs and the Assistance Level sent by the Pilot.
         The Inputs are stored in the Pilot Inputs Map.
         """
-        self.pilot_inputs_map.set(data.input, data.assistance_level)
+        self.pilot_inputs_map.set(data.c_input, data.assistance_level)
 
     def message_from_pilot(self, data: MessageData) -> None:
         """ Receives a message from the Pilot. Messages are usually Metacommands """

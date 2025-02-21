@@ -37,7 +37,7 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         It then merges the inputs from the Pilot and Copilot and executes an action.
         """
         # print(f"Received input {input.type} with value {input.val} from Pilot")
-        input = data.input
+        input = data.c_input
         assistance_level = data.assistance_level
 
         self.pilot_inputs_map.set(input, assistance_level)
@@ -49,7 +49,7 @@ class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
         It then merges the inputs from the Pilot and Copilot and executes an action.
         """
         #print(f"Received input {data.input.type} with value {data.input.val} from Copilot")
-        input = data.input
+        input = data.c_input
         confidence_level = data.confidence_level
 
         # Avoid sending a zero-input twice

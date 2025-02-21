@@ -14,3 +14,14 @@ copilot.start() # Start the Copilot
 
 while True:
     time.sleep(1) # Keep the main thread alive
+
+
+"""
+Architecture rework in progress.
+
+TODO:
+> Adjust the assistance input file to specify which inputs are controlled by the player 
+> Add some more config to specify controls of the copilots
+> Write the Command Arbitrator
+
+"""

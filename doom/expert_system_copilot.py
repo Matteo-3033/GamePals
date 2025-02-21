@@ -1,7 +1,7 @@
 import json
 from typing import override
 
-from agents import CopilotInputData, MessageData
+from agents import MessageData
 from agents.copilot import Copilot
 from agents.observers.copilot_observer import CopilotObserver
 from doom import GameLogMessage, MessageType
@@ -48,7 +48,7 @@ class ExpertSystemCopilot(Copilot, CopilotObserver, GameStateObserver):
         """
         Receives updates from the DoomCopilots and notifies its subscribers with those inputs
         """
-        input = data.input
+        input = data.c_input
         confidence_level = data.confidence_level
         return self.notify_inputs(input, confidence_level)
 

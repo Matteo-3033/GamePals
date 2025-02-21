@@ -2,8 +2,7 @@ import threading
 import inputs
 
 from agents import InputData
-from agents.input_source import InputSource
-from agents.observers.input_observer import InputObserver
+from agents.observers.controller_observer import ControllerObserver
 from game_controllers import ControllerInput, InputType
 
 
@@ -17,17 +16,19 @@ class PhysicalControllerListener:
     """
 
     def __init__(self):
-        self.input_source : InputSource[InputData] = InputSource[InputData]()
+        self.subscribers : list[ControllerObserver] = []
         self.running : bool = False
         self.listener_thread : threading.Thread = None
 
-    def subscribe(self, subscriber : InputObserver) -> None:
+    def subscribe(self, subscriber : ControllerObserver) -> None:
         """ Adds a subscriber to the list of subscribers """
-        subscriber.subscribe_to_input_source(self.input_source)
+        self.subscribers.append(subscriber)
 
-    def notify_all(self, input : ControllerInput) -> None:
+    def notify_all(self, c_input : ControllerInput) -> None:
         """ Notifies all subscribers of an input, wrapped in an InputData object """
-        self.input_source.notify_all(InputData(input))
+        data = InputData(c_input)
+        for subscriber in self.subscribers:
+            subscriber.receive_controller_input(data)
 
     def start_listening(self) -> None:
         """  Starts listening to the physical controller inputs and notifies its subscribers """
@@ -59,7 +60,7 @@ class PhysicalControllerListener:
                 if observed:
                     self.notify_all(observed)
 
-    def event_to_input(self, event) -> ControllerInput:
+    def event_to_input(self, event) -> ControllerInput | None:
         """ Converts an event from the physical controller to a Controller Input """
         if event.code not in self.INPUT_TYPES_MAP:
             return None  # Ignore unmapped inputs

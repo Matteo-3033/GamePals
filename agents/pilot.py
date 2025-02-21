@@ -1,6 +1,6 @@
 import tomllib
 
-from agents import PilotInputData, MessageData, InputData, CopilotInputData
+from agents import PilotInputData, MessageData, ActorData, CopilotInputData
 from agents.input_source import InputSource
 from agents.observers.copilot_observer import CopilotObserver
 from agents.observers.input_observer import InputObserver
@@ -67,12 +67,12 @@ class Pilot(InputObserver, CopilotObserver):
 
         self.controller_listener.start_listening()
 
-    def input_from_source(self, data : InputData) -> None:
+    def input_from_source(self, data : ActorData) -> None:
         """
         Receives Controller Inputs from the Physical Controller and notifies its subscribers with the Assistance Level
         """
-        assistance_level = self.assistance_levels[data.input.type]
-        self.notify_inputs(data.input, assistance_level)
+        assistance_level = self.assistance_levels[data.c_input.type]
+        self.notify_inputs(data.c_input, assistance_level)
 
     def input_from_copilot(self, data : CopilotInputData) -> None:
         """
