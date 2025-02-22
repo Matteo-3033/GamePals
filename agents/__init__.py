@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from game_controllers import ControllerInput
+from input_sources import ControllerInput
 
 @dataclass
 class SourceData:
@@ -20,6 +20,3 @@ class ActorData(SourceData):
 class MessageData(SourceData):
     message: str
 
-@dataclass
-class GameState:
-    pass

@@ -1,8 +1,8 @@
 from agents import MessageData, ActorData
 from agents.actor import Actor
 from agents.observers.actor_observer import ActorObserver
-from game_controllers import ControllerInput
-from game_controllers.virtual_controller_provider import VirtualControllerProvider
+from input_sources import ControllerInput
+from input_sources.virtual_controller_provider import VirtualControllerProvider
 
 
 class CommandArbitrator(ActorObserver):

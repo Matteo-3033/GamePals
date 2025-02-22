@@ -3,7 +3,7 @@ import math
 from doom import Math
 from doom.copilots import proximity_factor
 from doom.copilots.doom_copilot import DoomCopilot
-from game_controllers import ControllerInput, InputType
+from input_sources import ControllerInput, InputType
 
 
 class AimerCopilot(DoomCopilot):

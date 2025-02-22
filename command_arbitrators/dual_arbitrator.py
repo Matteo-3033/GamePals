@@ -4,8 +4,8 @@ from agents.observers.copilot_observer import CopilotObserver
 from agents.observers.pilot_observer import PilotObserver
 from agents.pilot import Pilot
 from command_arbitrators.command_arbitrator import CommandArbitrator
-from game_controllers import InputType, ControllerInput
-from game_controllers.controller_inputs_map import ControllerInputsMap
+from input_sources import InputType, ControllerInput
+from input_sources.controller_inputs_map import ControllerInputsMap
 
 class DualArbitrator(CommandArbitrator, PilotObserver, CopilotObserver):
     """

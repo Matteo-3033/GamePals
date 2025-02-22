@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from agents import GameState
+from input_sources import GameState
 
 
 class GameStateObserver(ABC):

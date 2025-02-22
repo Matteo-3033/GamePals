@@ -1,8 +1,8 @@
 from agents import ActorData
 from agents.input_source import InputSource
 from command_arbitrators.command_arbitrator import CommandArbitrator
-from game_controllers import InputType
-from game_controllers.controller_inputs_map import ControllerInputsMap
+from input_sources import InputType
+from input_sources.controller_inputs_map import ControllerInputsMap
 
 
 class EqualArbitrator(CommandArbitrator):

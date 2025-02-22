@@ -3,7 +3,7 @@ import inputs
 
 from agents import InputData
 from agents.observers.controller_observer import ControllerObserver
-from game_controllers import ControllerInput, InputType
+from input_sources import ControllerInput, InputType
 
 
 class PhysicalControllerListener:

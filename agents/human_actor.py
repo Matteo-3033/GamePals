@@ -3,8 +3,8 @@ import tomllib
 from agents import InputData, MessageData, ActorData
 from agents.actor import Actor
 from agents.observers.controller_observer import ControllerObserver
-from game_controllers import InputType, ControllerInput
-from game_controllers.physical_controller_listener import PhysicalControllerListener
+from input_sources import InputType, ControllerInput
+from input_sources.physical_controller_listener import PhysicalControllerListener
 
 
 class HumanActor(Actor, ControllerObserver):
@@ -38,8 +38,8 @@ class HumanActor(Actor, ControllerObserver):
     def get_controlled_inputs(self) -> list[InputType]:
         """ Returns the list of Input Types that the Actor is controlling. """
 
-        # Currently considers as controlled all inputs which have a Confidence = 1.0
-        return [t for t, val in self.confidence_levels.items() if val == 1.0]
+        # Currently considers as controlled all inputs which have a Confidence > 0.0 (Assistance < 1.0)
+        return [t for t, conf in self.confidence_levels.items() if conf > 0.0]
 
     def receive_controller_input(self, data: InputData) -> None:
         """ Receives an Input from the Controller and notifies it with the associated confidence level """

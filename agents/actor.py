@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from agents import MessageData, ActorData
 from agents.observers.actor_observer import ActorObserver
-from game_controllers import ControllerInput, InputType
+from input_sources import ControllerInput, InputType
 
 
 class Actor(ActorObserver, ABC):

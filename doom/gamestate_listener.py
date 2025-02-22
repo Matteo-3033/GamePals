@@ -1,7 +1,8 @@
 import threading
 
+from agents import GameState
+from agents.observers.game_state_observer import GameStateObserver
 from doom import GameLogMessage, MessageType
-from doom.observers.gamestate_observer import GameStateObserver
 
 
 class GameStateListener:
@@ -24,12 +25,12 @@ class GameStateListener:
         """
         self.subscribers.append(subscriber)
 
-    def notify_all(self, state: GameLogMessage) -> None:
+    def notify_all(self, state: GameState) -> None:
         """
         Notifies all subscribers of an input
         """
         for subscriber in self.subscribers:
-            subscriber.update_from_game_state(state)
+            subscriber.receive_game_state_update(state)
 
     def start_listening(self) -> None:
         """
@@ -65,7 +66,7 @@ class GameStateListener:
                     message_data = line[len(message_type) + 1:]
 
                     if message_type in MessageType:
-                        state = GameLogMessage(MessageType(message_type), message_data)
+                        state = GameState(MessageType(message_type), message_data)
                         self.notify_all(state)
                     else:
                         print("Unrecognized message type: " + message_type)

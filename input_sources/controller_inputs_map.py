@@ -1,6 +1,6 @@
 import time
 
-from game_controllers import ControllerInputRecord, InputType, ControllerInput
+from input_sources import ControllerInputRecord, InputType, ControllerInput
 
 
 class ControllerInputsMap:

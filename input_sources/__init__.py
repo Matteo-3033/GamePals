@@ -33,9 +33,15 @@ class ControllerInput:
     type: InputType
     val: int
 
+
 @dataclass
 class ControllerInputRecord:
     """ ControllerInputRecord stores the value of an input, the associated confidence/assistance level and the timestamp of acquisition """
     val: int
     level: float
     timestamp: float
+
+
+@dataclass
+class GameState:
+    pass
