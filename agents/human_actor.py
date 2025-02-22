@@ -23,7 +23,8 @@ class HumanActor(Actor, ControllerObserver):
 
         with open(config_file_path, 'rb') as config_file:
             config = tomllib.load(config_file)
-            self.confidence_levels = 1 - config["AssistanceLevels"]  # Confidence is the complement of Assistance
+            # Confidence is the complement of Assistance
+            self.confidence_levels = {t: 1 - v for t, v in config["AssistanceLevels"].items()}
 
     def start(self) -> None:
         """ Starts listening to the Physical Controller."""

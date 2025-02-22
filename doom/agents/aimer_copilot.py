@@ -11,7 +11,7 @@ from input_sources import ControllerInput, InputType
 class AimerCopilot(SWAgentActor):
 
     def get_controlled_inputs(self) -> list[InputType]:
-        return [InputType.BTN_X]  # Run button
+        return [InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y]  # Aim buttons
 
     def receive_input_update(self, data: ActorData) -> None:
         # Ignore other Actors inputs

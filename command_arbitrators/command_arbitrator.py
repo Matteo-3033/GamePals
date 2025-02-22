@@ -62,15 +62,15 @@ class CommandArbitrator(ActorObserver):
         """ Merges Continuous Inputs and sends the final Input to the Virtual Controller """
 
         # Currently assuming complementary controls
-        is_left_stick = type == InputType.STICK_LEFT_X or type == InputType.STICK_LEFT_Y
+        is_left_stick = input_type == InputType.STICK_LEFT_X or input_type == InputType.STICK_LEFT_Y
         input_type_x = InputType.STICK_LEFT_X if is_left_stick else InputType.STICK_RIGHT_X
         input_type_y = InputType.STICK_LEFT_Y if is_left_stick else InputType.STICK_RIGHT_Y
 
         policy_x = self.policy_manager.get_policy(input_type_x)
-        input_values_x = [self.input_maps[actor_id].get(input_type) for actor_id in policy_x.actors.keys()]
+        input_values_x = [self.input_maps[actor_id].get(input_type_x) for actor_id in policy_x.actors.keys()]
 
         policy_y = self.policy_manager.get_policy(input_type_y)
-        input_values_y = [self.input_maps[actor_id].get(input_type) for actor_id in policy_y.actors.keys()]
+        input_values_y = [self.input_maps[actor_id].get(input_type_y) for actor_id in policy_y.actors.keys()]
 
         if len(input_values_x) == 1 and len(input_values_y) == 1:
             c_input_x = input_values_x[0][0]
