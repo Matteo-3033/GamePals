@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 from agents.observers.game_state_observer import GameStateObserver
 from input_sources import GameState
 
 
-class GameStateListener:
+class GameStateListener(ABC):
 
     def __init__(self):
         self.subscribers: list[GameStateObserver] = []
@@ -21,4 +21,8 @@ class GameStateListener:
     @abstractmethod
     def start_listening(self):
         """ Starts listening for Game State Updates """
+        pass
+
+    def stop_listening(self):
+        """ Stops listening for Game State Updates """
         pass

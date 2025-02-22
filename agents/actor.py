@@ -1,9 +1,12 @@
+import uuid
 from abc import ABC, abstractmethod
+from typing import NewType
 
 from agents import MessageData, ActorData
 from agents.observers.actor_observer import ActorObserver
 from input_sources import ControllerInput, InputType
 
+ActorID = NewType("ActorID", str)
 
 class Actor(ActorObserver, ABC):
     """
@@ -13,7 +16,11 @@ class Actor(ActorObserver, ABC):
     """
 
     def __init__(self):
+        self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
+
+    def get_id(self) -> ActorID:
+        return self.id
 
     def subscribe(self, subscriber: ActorObserver) -> None:
         """ Adds a new subscriber to the list """
@@ -21,13 +28,13 @@ class Actor(ActorObserver, ABC):
 
     def notify_input(self, input_data : ControllerInput, confidence : float) -> None:
         """ Notifies all the subscribers with an InputData """
-        data = ActorData(input_data, confidence)
+        data = ActorData(self.id, input_data, confidence)
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 
     def notify_message(self, message : str) -> None:
         """ Notifies all subscribers with a MessageData """
-        data = MessageData(message)
+        data = MessageData(self.id, message)
         for subscriber in self.subscribers:
             subscriber.receive_message_update(data)
 

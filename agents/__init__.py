@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from agents.actor import ActorID
 from input_sources import ControllerInput
 
 @dataclass
@@ -12,11 +13,13 @@ class InputData(SourceData):
 
 @dataclass
 class ActorData(SourceData):
+    actor_id : ActorID
     c_input : ControllerInput
     confidence : float
 
 
 @dataclass
 class MessageData(SourceData):
+    actor_id : ActorID
     message: str
 

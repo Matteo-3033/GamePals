@@ -12,6 +12,7 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
 
     The inputs it produces are generated based on the current Game State, whose updates it receives.
     """
+
     def __init__(self, game_state: GameStateListener):
         super().__init__()
         self.game_state = game_state
@@ -29,6 +30,6 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
             self.notify_input(c_input, confidence)
 
     @abstractmethod
-    def game_state_to_inputs(self, game_state : GameState) -> list[tuple[ControllerInput, float]]:
+    def game_state_to_inputs(self, game_state: GameState) -> list[tuple[ControllerInput, float]]:
         """ Produces inputs given a Game State """
         pass

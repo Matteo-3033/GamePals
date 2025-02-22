@@ -2,6 +2,8 @@ import math
 from dataclasses import dataclass
 from enum import StrEnum
 
+from input_sources import GameState
+
 
 class MessageType(StrEnum):
     GAMESTATE = "GAMESTATE"  # The Game State of the Game, in the form of a JSON
@@ -9,7 +11,7 @@ class MessageType(StrEnum):
 
 
 @dataclass
-class GameLogMessage:
+class DoomGameState(GameState):
     type: MessageType
     json: str
 
