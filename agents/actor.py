@@ -2,11 +2,12 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import NewType
 
-from agents import MessageData, ActorData
+from agents import MessageData, ActorData, ArbitratorData
 from agents.observers.actor_observer import ActorObserver
 from input_sources import ControllerInput, InputType
 
 ActorID = NewType("ActorID", str)
+
 
 class Actor(ActorObserver, ABC):
     """
@@ -26,13 +27,13 @@ class Actor(ActorObserver, ABC):
         """ Adds a new subscriber to the list """
         self.subscribers.append(subscriber)
 
-    def notify_input(self, input_data : ControllerInput, confidence : float) -> None:
+    def notify_input(self, input_data: ControllerInput, confidence: float) -> None:
         """ Notifies all the subscribers with an InputData """
         data = ActorData(self.id, input_data, confidence)
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 
-    def notify_message(self, message : str) -> None:
+    def notify_message(self, message: str) -> None:
         """ Notifies all subscribers with a MessageData """
         data = MessageData(self.id, message)
         for subscriber in self.subscribers:
@@ -46,4 +47,9 @@ class Actor(ActorObserver, ABC):
     @abstractmethod
     def get_controlled_inputs(self) -> list[InputType]:
         """ Returns the list of Input Types that the Actor is controlling. """
+        pass
+
+    @abstractmethod
+    def get_arbitrator_updates(self, data : ArbitratorData) -> None:
+        """ Receives updates from the arbitrator it's connected to """
         pass

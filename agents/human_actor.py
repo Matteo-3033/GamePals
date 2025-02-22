@@ -1,6 +1,6 @@
 import tomllib
 
-from agents import InputData, MessageData, ActorData
+from agents import InputData, MessageData, ActorData, ArbitratorData
 from agents.actor import Actor
 from agents.observers.controller_observer import ControllerObserver
 from input_sources import InputType, ControllerInput
@@ -53,4 +53,8 @@ class HumanActor(Actor, ControllerObserver):
 
     def receive_message_update(self, data: MessageData) -> None:
         """ Receives Messages from other Actors """
+        pass
+
+    def get_arbitrator_updates(self, data: ArbitratorData) -> None:
+        """ Receives updates from the arbitrator it's connected to """
         pass

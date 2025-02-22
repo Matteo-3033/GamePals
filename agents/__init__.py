@@ -10,19 +10,25 @@ if TYPE_CHECKING:
 class SourceData:
     pass
 
+
 @dataclass
 class InputData(SourceData):
-    c_input : "input_sources.ControllerInput"
+    c_input: "input_sources.ControllerInput"
+
 
 @dataclass
 class ActorData(SourceData):
-    actor_id : "agents.actor.ActorID"
-    c_input : "input_sources.ControllerInput"
-    confidence : float
+    actor_id: "agents.actor.ActorID"
+    c_input: "input_sources.ControllerInput"
+    confidence: float
 
 
 @dataclass
 class MessageData(SourceData):
-    actor_id : "agents.actor.ActorID"
+    actor_id: "agents.actor.ActorID"
     message: str
 
+
+@dataclass
+class ArbitratorData(SourceData):
+    pass

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from agents import ArbitratorData
 from agents.actor import Actor
 from agents.observers.game_state_observer import GameStateObserver
 from input_sources import GameState, ControllerInput
@@ -32,4 +33,8 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     @abstractmethod
     def game_state_to_inputs(self, game_state: GameState) -> list[tuple[ControllerInput, float]]:
         """ Produces inputs given a Game State """
+        pass
+
+    def get_arbitrator_updates(self, data: ArbitratorData) -> None:
+        """ Receives updates from the arbitrator it's connected to """
         pass
