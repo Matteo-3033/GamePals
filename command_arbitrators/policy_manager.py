@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from unittest import case
 
 from agents.actor import Actor, ActorID
 from input_sources import InputType
