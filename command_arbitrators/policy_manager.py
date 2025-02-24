@@ -44,18 +44,11 @@ class PolicyManager:
     def __init__(self, policies_types: dict[InputType, PolicyType]) -> None:
         self.policies_map: dict[InputType, PolicyMapEntry] = {}
 
-        # Assert Policies Validity
         for input_type in InputType:
-
             if input_type not in policies_types:
                 raise ValueError(f"Policy type is incomplete: it does not include {input_type}")
+
             specified_policy = policies_types[input_type]
-
-            if input_type.is_binary() and specified_policy not in BinaryPolicyType:
-                raise ValueError(f"Policy for the input {input_type} is invalid")
-            elif input_type.is_continuous() and specified_policy not in ContinuousPolicyType:
-                raise ValueError(f"Policy for the input {input_type} is invalid")
-
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
 
     def register_actor(self, actor: Actor, role: PolicyRole) -> None:

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum
+from unittest import case
 
 
 class InputType(StrEnum):
@@ -26,14 +27,14 @@ class InputType(StrEnum):
     BTN_BACK = "Back"  # Values are {0, 1}
     BTN_START = "Start"  # Values are {0, 1}
 
-    def is_continuous(self) -> bool:
-        """ Returns whether the InputType is a Continuous Input """
-        return self.value in [InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y, InputType.STICK_LEFT_X, InputType.STICK_LEFT_Y]
-
-    def is_binary(self) -> bool:
-        """ Returns whether the InputType is a Binary Input """
-        return not self.is_continuous()
-
+    def get_max_abs_value(self) -> int:
+        match self:
+            case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
+                return 255
+            case InputType.STICK_LEFT_X | InputType.STICK_RIGHT_X | InputType.STICK_LEFT_Y | InputType.STICK_RIGHT_Y:
+                return 32767
+            case _:
+                return 1
 
 @dataclass
 class ControllerInput:
