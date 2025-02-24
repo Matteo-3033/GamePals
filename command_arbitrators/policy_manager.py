@@ -9,6 +9,7 @@ class PolicyType(StrEnum):
     # Leave Empty. See https://docs.python.org/3/howto/enum.html#restricted-enum-subclassing
     pass
 
+
 class BinaryPolicyType(PolicyType):
     POLICY_EXCLUSIVITY = "POLICY_BIN_EXCLUSIVITY"  # Only one Actor allowed for that Command
     POLICY_AND = "POLICY_BIN_AND"
@@ -56,8 +57,6 @@ class PolicyManager:
                 raise ValueError(f"Policy for the input {input_type} is invalid")
 
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
-
-
 
     def register_actor(self, actor: Actor, role: PolicyRole) -> None:
         inputs = actor.get_controlled_inputs()

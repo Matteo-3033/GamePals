@@ -33,11 +33,11 @@ class VirtualControllerProvider:
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(input.type, 1)])
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(input.type, -1)])
 
-        elif input.type in self.TRIGGERS: # Triggers (values are in [0, 255])
+        elif input.type in self.TRIGGERS: # Triggers (values are in [0, 255] or [0, 1])
             if input.type == InputType.TRIGGER_LEFT:
-                self.gamepad.left_trigger(input.val)
+                self.gamepad.left_trigger_float(input.val)
             else:
-                self.gamepad.right_trigger(input.val)
+                self.gamepad.right_trigger_float(input.val)
 
         self.gamepad.update()
 

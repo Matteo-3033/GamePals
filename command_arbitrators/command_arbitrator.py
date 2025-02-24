@@ -79,6 +79,26 @@ class CommandArbitrator(ActorObserver):
                 c_input = ControllerInput(input_type, val)
                 self.execute_single_value_command(c_input)
 
+            case BinaryPolicyType.POLICY_AND:
+                val = True
+                for input_entry in input_entries:
+                    curr = input_entry.input_details.val != 0 # False if 0, True otherwise
+                    val = val & curr
+
+                c_input = ControllerInput(input_type, 1 if val else 0)
+                self.execute_single_value_command(c_input)
+
+            case BinaryPolicyType.POLICY_OR:
+                val = False
+                for input_entry in input_entries:
+                    curr = input_entry.input_details.val != 0  # False if 0, True otherwise
+                    val = val | curr
+
+                c_input = ControllerInput(input_type, 1 if val else 0)
+                self.execute_single_value_command(c_input)
+
+            # Add new Policies here...
+
             case _:
                 raise ValueError(f"Merging for Policy Type {policy_type} currently not implemented")
 
@@ -111,16 +131,18 @@ class CommandArbitrator(ActorObserver):
                 c_input_y = ControllerInput(input_type_y, val_y)
                 self.execute_double_value_command(c_input_x, c_input_y)
 
+            # Add new Policies here ...
+
             case _:
                 raise ValueError(
                     f"Merging for Policy Type {policy_type_x} currently not implemented")
 
     def execute_single_value_command(self, c_input: ControllerInput) -> None:
         """ Executes a single-value command on the Virtual Controller """
-        print(f"Executing {c_input}")
+        #print(f"Executing {c_input}")
         self.virtual_controller.execute(c_input)
 
     def execute_double_value_command(self, input_x: ControllerInput, input_y: ControllerInput) -> None:
         """ Executes a 2-axis command on the Virtual Controller """
-        print(f"Executing {input_x} {input_y} ")
+        #print(f"Executing {input_x} {input_y} ")
         self.virtual_controller.execute_stick(input_x, input_y)
