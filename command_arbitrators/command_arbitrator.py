@@ -54,6 +54,8 @@ class CommandArbitrator(ActorObserver):
     def receive_message_update(self, data: MessageData) -> None:
         """ Receives a Message from one of its Actors """
         print(f"[CommandArbitrator] Received Message: {data}")
+        if "RESET" in data.message:
+            self.virtual_controller.reset_controls()
 
     def _merge_binary_input(self, input_type : InputType) -> None:
         """ Merges Binary Inputs and sends the final Input to the Virtual Controller """
