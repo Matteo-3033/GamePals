@@ -1,30 +1,21 @@
 # Video Games Copilot Architecture
 
-This repository provides the building blocks of a **Video Games Copilot Architecture**, where multiple **Input Sources** share control over a game instance.  
-Two Architecture implementations are provided:
-- A **Pilot-Copilot Architecture**, where a **primary player** Pilot defines how they want assistance from a Copilot, which can be either a **secondary player** or a **software agent**.
-- A **Multiple-Sources Architecture**, where inputs from a deliberate number of Input Sources are combined into a single Source.
+This repository defines a **Video Games Copilot Architecture**, a flexible framework that enables shared control over a game instance.   
+The architecture is built around a **Command Arbitrator**, which merges inputs from multiple **Actors** — either human 
+players or software agents — into a single control stream.
 
 ## Project Structure
 
-The project is organized into the following directories:
+- **agents/** – Defines the core **Actor** classes, including **Human Actors** (physical controllers) and **Software Agent Actors** (extendable for AI-based control). Also contains an **observers/** submodule for tracking actor, controller, and game state inputs.
 
-- **agents/** – Contains the Input Source class, the Pilot and an abstract class for a Copilot implementation.
+- **command\_arbitrators/** – Implements the **Command Arbitrator**, responsible for merging inputs from multiple Actors, and a **Policy Manager** that handles arbitration policies.
 
-  - **agents/observers** - Contains the Observer classes, to listen to generic Inputs, Pilot Inputs or Copilot Inputs.
+- **doom/** – Implements Doom-specific agents, including **Copilots** (extensions of the **Software Agent Actor**) and a **Doom State Listener** for game state monitoring.
 
-- **command\_arbitrators/** – Manages command arbitration between Input Sources. In particular, a Pilot-Copilot Arbitrator and a Multi-Source Arbitrator are provided.
+- **sources/** – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
 
-- **doom/** – Implements a rule-based software agent specifically for Doom.
-
-  - **doom/copilots** - Implements the action-specific Copilots for Doom.
-
-  - **doom/observers** - Contains the Observer Classes for the Doom package.
-
-- **game\_controllers/** – Handles both virtual and physical game controller inputs and outputs.
-
-This architecture aims to enhance accessibility and gameplay experiences by allowing flexible shared control between humans and Software Agents or other players.
-
-The following schematic illustrates the interaction between the components of the Architecture:
+This architecture is designed for flexibility, allowing seamless integration of multiple human and AI-controlled inputs 
+to enhance accessibility and gameplay experiences.
 
 ![Copilot Architecture](assets/architecture.png)
+
