@@ -4,7 +4,7 @@ from enum import StrEnum
 
 class InputType(StrEnum):
     """
-    Enum class representing a Type of Input in a XBOX 360 Controller
+    Enum class representing a Type of Input in an XBOX 360 Controller
     """
 
     BTN_A = "A"  # Values are {0, 1}
@@ -25,6 +25,14 @@ class InputType(StrEnum):
     STICK_LEFT_Y = "Stick_Left_Y"  # Values are in [-32768, 32767]
     BTN_BACK = "Back"  # Values are {0, 1}
     BTN_START = "Start"  # Values are {0, 1}
+
+    def is_continuous(self) -> bool:
+        """ Returns whether the InputType is a Continuous Input """
+        return self.value in [InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y, InputType.STICK_LEFT_X, InputType.STICK_LEFT_Y]
+
+    def is_binary(self) -> bool:
+        """ Returns whether the InputType is a Binary Input """
+        return not self.is_continuous()
 
 
 @dataclass

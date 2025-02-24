@@ -1,7 +1,10 @@
+import tomllib
+
 from agents import MessageData, ActorData
 from agents.actor import Actor, ActorID
 from agents.observers.actor_observer import ActorObserver
-from command_arbitrators.policy_manager import PolicyManager, PolicyRole, PolicyType
+from command_arbitrators.policy_manager import PolicyManager, PolicyRole, PolicyType, BinaryPolicyType, \
+    ContinuousPolicyType
 from input_sources import ControllerInput, InputType
 from input_sources.controller_inputs_map import ControllerInputsMap
 from input_sources.virtual_controller_provider import VirtualControllerProvider
@@ -16,11 +19,15 @@ class CommandArbitrator(ActorObserver):
      The Arbitrator can communicate to its Actors via their get_arbitrator_updates method.
      """
 
-    def __init__(self) -> None:
+    def __init__(self, config_file_path : str) -> None:
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = {}
         self.input_maps : dict[ActorID, ControllerInputsMap] = {}
-        self.policy_manager = PolicyManager()
+
+        with open(config_file_path, 'rb') as config_file:
+            config = tomllib.load(config_file)
+            self.policy_manager = PolicyManager(config["PolicyTypes"])
+
 
     def add_actor(self, actor: Actor, role : PolicyRole) -> None:
         """ Adds an Actor to the Architecture """
@@ -56,7 +63,7 @@ class CommandArbitrator(ActorObserver):
 
         match policy.policy_type:
 
-            case PolicyType.POLICY_EXCLUSIVITY:
+            case BinaryPolicyType.POLICY_EXCLUSIVITY:
                 c_input = input_values[0][0]
                 self.execute_single_value_command(c_input)
 
@@ -79,7 +86,7 @@ class CommandArbitrator(ActorObserver):
 
         match (policy_x.policy_type, policy_y.policy_type):
 
-            case (PolicyType.POLICY_EXCLUSIVITY, PolicyType.POLICY_EXCLUSIVITY):
+            case (ContinuousPolicyType.POLICY_EXCLUSIVITY, ContinuousPolicyType.POLICY_EXCLUSIVITY):
                 c_input_x = input_values_x[0][0]
                 c_input_y = input_values_y[0][0]
                 self.execute_double_value_command(c_input_x, c_input_y)

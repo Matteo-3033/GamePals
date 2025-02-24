@@ -18,7 +18,7 @@ copilot_1 = ShooterCopilot(game_state_listener)  # Secondary Agent 1
 copilot_2 = RunnerCopilot(game_state_listener)  # Secondary Agent 2
 copilot_3 = AimerCopilot(game_state_listener)  # Secondary Agent 3
 
-arbitrator = CommandArbitrator()
+arbitrator = CommandArbitrator(config_file_path="config.toml")
 arbitrator.add_actor(pilot, PolicyRole.PILOT)
 arbitrator.add_actor(copilot_1, PolicyRole.COPILOT)
 arbitrator.add_actor(copilot_2, PolicyRole.COPILOT)
