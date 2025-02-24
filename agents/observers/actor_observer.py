@@ -10,7 +10,7 @@ class ActorObserver(ABC):
 
     @abstractmethod
     def receive_input_update(self, data: ActorData) -> None:
-        """ Receives Controller Inputs and the Assistance Level sent by an Actor """
+        """ Receives Controller Inputs and the Confidence Level sent by an Actor """
         pass
 
     @abstractmethod

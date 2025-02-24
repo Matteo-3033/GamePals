@@ -8,7 +8,7 @@ from doom.agents.reset_copilot import ResetCopilot
 from doom.agents.runner_copilot import RunnerCopilot
 from doom.agents.shooter_copilot import ShooterCopilot
 from doom.doom_state_listener import DoomStateListener
-from input_sources.physical_controller_listener import PhysicalControllerListener
+from sources.physical_controller_listener import PhysicalControllerListener
 
 # Listeners
 controller_listener = PhysicalControllerListener(gamepad_number=0)

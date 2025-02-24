@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from agents import ArbitratorData
 from agents.actor import Actor
 from agents.observers.game_state_observer import GameStateObserver
-from input_sources import GameState, ControllerInput
-from input_sources.game_state_listener import GameStateListener
+from sources import GameState, ControllerInput
+from sources.game_state_listener import GameStateListener
 
 
 class SWAgentActor(Actor, GameStateObserver, ABC):

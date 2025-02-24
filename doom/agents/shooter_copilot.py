@@ -3,7 +3,7 @@ import json
 from agents import MessageData, ActorData
 from agents.sw_agent_actor import SWAgentActor
 from doom import Math, DoomGameState, MessageType
-from input_sources import ControllerInput, InputType, GameState
+from sources import ControllerInput, InputType, GameState
 
 
 class ShooterCopilot(SWAgentActor):

@@ -1,12 +1,12 @@
 import threading
 
 from doom import MessageType, DoomGameState
-from input_sources.game_state_listener import GameStateListener
+from sources.game_state_listener import GameStateListener
 
 
 class DoomStateListener(GameStateListener):
     """
-    DoomStateListener is aGameStateListener implementation that reads the Ultimate Doom log files and notifies its subscribers with Game State updates.
+    DoomStateListener is a GameStateListener implementation that reads the Ultimate Doom log files and notifies its subscribers with Game State updates.
     It runs in a separate thread.
     """
 

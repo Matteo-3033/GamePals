@@ -10,5 +10,5 @@ class ControllerObserver(ABC):
 
     @abstractmethod
     def receive_controller_input(self, data: InputData) -> None:
-        """ Receives Inputs from the Input Source"""
+        """ Receives Inputs from the Input Source """
         pass

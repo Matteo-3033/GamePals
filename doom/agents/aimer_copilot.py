@@ -5,7 +5,7 @@ from agents import ActorData, MessageData
 from agents.sw_agent_actor import SWAgentActor
 from doom import Math, DoomGameState, MessageType
 from doom.agents import proximity_factor
-from input_sources import ControllerInput, InputType
+from sources import ControllerInput, InputType
 
 
 class AimerCopilot(SWAgentActor):

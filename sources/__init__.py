@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import StrEnum
-from unittest import case
 
 
 class InputType(StrEnum):
@@ -27,7 +26,11 @@ class InputType(StrEnum):
     BTN_BACK = "Back"  # Values are {0, 1}
     BTN_START = "Start"  # Values are {0, 1}
 
-    def get_max_abs_value(self) -> int:
+    def get_max_value(self) -> int:
+        """
+        Returns the max value the InputType admits.
+        It's needed to specify what represents a "True" value in a Binary Merge logic.
+        """
         match self:
             case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
                 return 255
@@ -35,6 +38,7 @@ class InputType(StrEnum):
                 return 32767
             case _:
                 return 1
+
 
 @dataclass
 class ControllerInput:
@@ -53,4 +57,5 @@ class ControllerInputRecord:
 
 @dataclass
 class GameState:
+    """ GameState is the Superclass of any Game State dataclass being sent to SW Agents """
     pass

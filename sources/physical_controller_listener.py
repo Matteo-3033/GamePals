@@ -3,36 +3,36 @@ from inputs import devices
 
 from agents import InputData
 from agents.observers.controller_observer import ControllerObserver
-from input_sources import ControllerInput, InputType
+from sources import ControllerInput, InputType
 
 
 class PhysicalControllerListener:
     """
-    The PhysicalControllerListener class is a particular Input Source for InputData.
-
-    It listens to the inputs of a Physical Controller and notifies its subscribers with Controller Inputs.
+    The PhysicalControllerListener class listens to the inputs of a Physical Controller and
+    notifies its subscribers with Controller Inputs.
 
     It runs in a separate thread.
     """
 
-    def __init__(self, gamepad_number : int):
-        self.subscribers : list[ControllerObserver] = []
-        self.running : bool = False
-        self.listener_thread : threading.Thread = None
+    def __init__(self, gamepad_number: int):
+        # gamepad_number is the index of the device in the inputs.devices.gamepads list
+        self.subscribers: list[ControllerObserver] = []
+        self.running: bool = False
+        self.listener_thread: threading.Thread = None
         self.gamepad = devices.gamepads[gamepad_number]
 
-    def subscribe(self, subscriber : ControllerObserver) -> None:
+    def subscribe(self, subscriber: ControllerObserver) -> None:
         """ Adds a subscriber to the list of subscribers """
         self.subscribers.append(subscriber)
 
-    def notify_all(self, c_input : ControllerInput) -> None:
+    def notify_all(self, c_input: ControllerInput) -> None:
         """ Notifies all subscribers of an input, wrapped in an InputData object """
         data = InputData(c_input)
         for subscriber in self.subscribers:
             subscriber.receive_controller_input(data)
 
     def start_listening(self) -> None:
-        """  Starts listening to the physical controller inputs and notifies its subscribers """
+        """  Starts listening to the physical controller inputs and notifying its subscribers """
         if self.listener_thread is None or not self.listener_thread.is_alive():
             self.running = True
             self.listener_thread = threading.Thread(target=self._listen_loop, daemon=True)
@@ -70,9 +70,9 @@ class PhysicalControllerListener:
         input_value = event.state
         return ControllerInput(input_type, input_value)
 
-
+    # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
     INPUT_TYPES_MAP = {
-        "BTN_SOUTH" :InputType.BTN_A,
+        "BTN_SOUTH": InputType.BTN_A,
         "BTN_EAST": InputType.BTN_B,
         "BTN_NORTH": InputType.BTN_Y,
         "BTN_WEST": InputType.BTN_X,

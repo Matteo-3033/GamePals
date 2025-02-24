@@ -5,16 +5,21 @@ from agents import MessageData, ActorData
 from agents.actor import Actor, ActorID
 from agents.observers.actor_observer import ActorObserver
 from command_arbitrators.policy_manager import PolicyManager, PolicyRole, BinaryPolicyType, ContinuousPolicyType
-from input_sources import ControllerInput, InputType, ControllerInputRecord
-from input_sources.controller_inputs_map import ControllerInputsMap
-from input_sources.virtual_controller_provider import VirtualControllerProvider
+from sources import ControllerInput, InputType, ControllerInputRecord
+from sources.controller_inputs_map import ControllerInputsMap
+from sources.virtual_controller_provider import VirtualControllerProvider
 
 
 @dataclass
 class InputEntry:
+    """
+    InputEntry contains all the information needed from an Actor to perform a merge.
+
+    In particular, a Merging Method should be created based on a PolicyType and a list of InputEntry.
+    """
     actor_id: ActorID
     actor_role: PolicyRole
-    input_details: ControllerInputRecord
+    input_details: ControllerInputRecord  # Contains Value, Confidence Level and a Timestamp of last acquisition
 
 
 class CommandArbitrator(ActorObserver):
@@ -51,7 +56,7 @@ class CommandArbitrator(ActorObserver):
         """ Receives Input and Confidence Level from one of its Actors """
         self.input_maps[data.actor_id].set(data.c_input, data.confidence)
 
-        # Choose Merge Function
+        # Choose Merge Function (Binary or Continuous, based on the Policy Type)
 
         input_type = data.c_input.type
         policy_type = self.policy_manager.get_policy(input_type).policy_type
@@ -84,12 +89,11 @@ class CommandArbitrator(ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_binary_inputs(
-            self,
-            input_type: InputType
-    ) -> ControllerInput:
-        """ Merges the Input Entries for the given Input Type, based on the specified Policy Type.
-         It then returns the resulting ControllerInput """
+    def _merge_binary_inputs(self, input_type: InputType) -> ControllerInput:
+        """
+        Merges the Input Entries for the given Input Type, based on the specified Policy Type.
+        It then returns the resulting ControllerInput
+        """
         policy_info = self.policy_manager.get_policy(input_type)
         policy_type = policy_info.policy_type
         input_entries = [InputEntry(actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1])
@@ -107,7 +111,7 @@ class CommandArbitrator(ActorObserver):
                     curr = input_entry.input_details.val != 0  # False if 0, True otherwise
                     val = val & curr
 
-                return ControllerInput(input_type, input_type.get_max_abs_value() if val else 0)
+                return ControllerInput(input_type, input_type.get_max_value() if val else 0)
 
             case BinaryPolicyType.POLICY_OR:
                 val = False
@@ -115,17 +119,18 @@ class CommandArbitrator(ActorObserver):
                     curr = input_entry.input_details.val != 0  # False if 0, True otherwise
                     val = val | curr
 
-                return ControllerInput(input_type, input_type.get_max_abs_value() if val else 0)
+                return ControllerInput(input_type, input_type.get_max_value() if val else 0)
+
+            # More Binary Policies can be added here...
 
             case _:
                 raise ValueError(f"Merging for Policy Type {policy_type} currently not implemented")
 
-    def _merge_continuous_inputs(
-            self,
-            input_type: InputType
-    ) -> ControllerInput:
-        """ Merges the Input Entries for the given Input Type, based on the specified Policy Type.
-         It then returns the resulting ControllerInput """
+    def _merge_continuous_inputs(self, input_type: InputType) -> ControllerInput:
+        """
+        Merges the Input Entries for the given Input Type, based on the specified Policy Type.
+        It then returns the resulting ControllerInput
+        """
         policy_info = self.policy_manager.get_policy(input_type)
         policy_type = policy_info.policy_type
         input_entries = [InputEntry(actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1])
@@ -136,6 +141,8 @@ class CommandArbitrator(ActorObserver):
             case ContinuousPolicyType.POLICY_EXCLUSIVITY:
                 val = input_entries[0].input_details.val
                 return ControllerInput(input_type, val)
+
+            # More Continuous Policies can be added here...
 
             case _:
                 raise ValueError(f"Merging for Policy Type {policy_type} currently not implemented")

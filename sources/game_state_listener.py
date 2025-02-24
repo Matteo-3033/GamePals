@@ -1,10 +1,16 @@
 from abc import abstractmethod, ABC
 
 from agents.observers.game_state_observer import GameStateObserver
-from input_sources import GameState
+from sources import GameState
 
 
 class GameStateListener(ABC):
+    """
+    GameStateListener is the Superclass for any Game State listener classes.
+
+    When implementing the architecture for a new game, a GameStateListener class is expected for the SW Agent Actors
+    to be able to receive the Game State successfully.
+    """
 
     def __init__(self):
         self.subscribers: list[GameStateObserver] = []

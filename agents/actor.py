@@ -4,7 +4,7 @@ from typing import NewType
 
 from agents import MessageData, ActorData, ArbitratorData
 from agents.observers.actor_observer import ActorObserver
-from input_sources import ControllerInput, InputType
+from sources import ControllerInput, InputType
 
 ActorID = NewType("ActorID", str)
 
@@ -14,6 +14,8 @@ class Actor(ActorObserver, ABC):
     Actor represents a generic subject of the Architecture.
 
     It's a source of Inputs and Messages, but also reads Inputs and Messages of other Actors.
+
+    An Actor is uniquely identified by its actor ID.
     """
 
     def __init__(self):
@@ -21,6 +23,7 @@ class Actor(ActorObserver, ABC):
         self.subscribers: list[ActorObserver] = []
 
     def get_id(self) -> ActorID:
+        """ Returns the identifier for self """
         return self.id
 
     def subscribe(self, subscriber: ActorObserver) -> None:
@@ -28,20 +31,20 @@ class Actor(ActorObserver, ABC):
         self.subscribers.append(subscriber)
 
     def notify_input(self, input_data: ControllerInput, confidence: float) -> None:
-        """ Notifies all the subscribers with an InputData """
+        """ Notifies all the subscribers with an InputData object """
         data = ActorData(self.id, input_data, confidence)
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 
     def notify_message(self, message: str) -> None:
-        """ Notifies all subscribers with a MessageData """
+        """ Notifies all subscribers with a MessageData object """
         data = MessageData(self.id, message)
         for subscriber in self.subscribers:
             subscriber.receive_message_update(data)
 
     @abstractmethod
     def start(self) -> None:
-        """ Starts the Actor (if needed). """
+        """ Starts the Actor. Called when the Arbitrator is started """
         pass
 
     @abstractmethod
@@ -50,6 +53,6 @@ class Actor(ActorObserver, ABC):
         pass
 
     @abstractmethod
-    def get_arbitrator_updates(self, data : ArbitratorData) -> None:
+    def get_arbitrator_updates(self, data: ArbitratorData) -> None:
         """ Receives updates from the arbitrator it's connected to """
         pass

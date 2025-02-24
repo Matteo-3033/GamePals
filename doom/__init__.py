@@ -2,16 +2,18 @@ import math
 from dataclasses import dataclass
 from enum import StrEnum
 
-import input_sources
+import sources
 
 
 class MessageType(StrEnum):
-    GAMESTATE = "GAMESTATE"  # The Game State of the Game, in the form of a JSON
+    """ The Type of Game State Message """
+    GAMESTATE = "GAMESTATE"  # The State of the Game, in the form of an unparsed JSON
     RESET = "RESET"  # Notifies that the Player has either spawned, respawned, unpaused or any other event that resets the controls
 
 
 @dataclass
-class DoomGameState(input_sources.GameState):
+class DoomGameState(sources.GameState):
+    """ The Game State dataclass for Ultimate Doom """
     type: MessageType
     json: str
 

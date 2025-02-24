@@ -1,34 +1,33 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # Avoid Circular Imports
     import agents.actor
-    import input_sources
+    import sources
 
 
 @dataclass
-class SourceData:
-    pass
+class InputData:
+    """ The wrapper class of the Data sent to a Controller Observer """
+    c_input: "sources.ControllerInput"
 
 
 @dataclass
-class InputData(SourceData):
-    c_input: "input_sources.ControllerInput"
-
-
-@dataclass
-class ActorData(SourceData):
+class ActorData:
+    """ The wrapper class of the Input Data sent to an Actor Observer """
     actor_id: "agents.actor.ActorID"
-    c_input: "input_sources.ControllerInput"
+    c_input: "sources.ControllerInput"
     confidence: float
 
 
 @dataclass
-class MessageData(SourceData):
+class MessageData:
+    """ The wrapper class of the String Data sent to an Actor Observer """
     actor_id: "agents.actor.ActorID"
     message: str
 
 
 @dataclass
-class ArbitratorData(SourceData):
+class ArbitratorData:
+    """ The wrapper class of the Data sent to an Arbitrator Observer [WIP] """
     pass
