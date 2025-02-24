@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from agents import MessageData, ActorData
 from agents.actor import Actor, ActorID
 from agents.observers.actor_observer import ActorObserver
-from command_arbitrators.policy_manager import PolicyManager, PolicyRole, BinaryPolicyType, ContinuousPolicyType, \
-    PolicyType
+from command_arbitrators.policy_manager import PolicyManager, PolicyRole, BinaryPolicyType, ContinuousPolicyType
 from input_sources import ControllerInput, InputType, ControllerInputRecord
 from input_sources.controller_inputs_map import ControllerInputsMap
 from input_sources.virtual_controller_provider import VirtualControllerProvider

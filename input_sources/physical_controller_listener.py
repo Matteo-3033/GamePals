@@ -1,5 +1,5 @@
 import threading
-import inputs
+from inputs import devices
 
 from agents import InputData
 from agents.observers.controller_observer import ControllerObserver
@@ -15,10 +15,11 @@ class PhysicalControllerListener:
     It runs in a separate thread.
     """
 
-    def __init__(self):
+    def __init__(self, gamepad_number : int):
         self.subscribers : list[ControllerObserver] = []
         self.running : bool = False
         self.listener_thread : threading.Thread = None
+        self.gamepad = devices.gamepads[gamepad_number]
 
     def subscribe(self, subscriber : ControllerObserver) -> None:
         """ Adds a subscriber to the list of subscribers """
@@ -47,7 +48,7 @@ class PhysicalControllerListener:
         """ The loop that listens for controller inputs """
         while self.running:
             try:
-                events = inputs.get_gamepad()
+                events = self.gamepad.read()
             except Exception as e:
                 print(f"Error while getting gamepad events: {e}")
                 return

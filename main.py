@@ -11,7 +11,7 @@ from doom.doom_state_listener import DoomStateListener
 from input_sources.physical_controller_listener import PhysicalControllerListener
 
 # Listeners
-controller_listener = PhysicalControllerListener()
+controller_listener = PhysicalControllerListener(gamepad_number=0)
 game_state_listener = DoomStateListener(log_file_path="../Doom/log.txt")
 
 # Agents
@@ -34,4 +34,3 @@ arbitrator.start()
 
 while True:
     time.sleep(1)  # Keep the main thread alive
-
