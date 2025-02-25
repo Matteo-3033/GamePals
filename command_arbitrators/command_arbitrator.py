@@ -142,6 +142,11 @@ class CommandArbitrator(ActorObserver):
                 val = input_entries[0].input_details.val
                 return ControllerInput(input_type, val)
 
+            case ContinuousPolicyType.POLICY_OR:
+                latest_entry = sorted(input_entries, key=lambda x: x.input_details.timestamp, reverse=True)[0]
+                val = latest_entry.input_details.val
+                return ControllerInput(input_type, val)
+
             # More Continuous Policies can be added here...
 
             case _:

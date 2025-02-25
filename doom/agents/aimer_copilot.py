@@ -30,10 +30,7 @@ class AimerCopilot(SWAgentActor):
         monsters = game_data['MONSTERS']
 
         if len(monsters) == 0:
-            return [
-                (ControllerInput(type=InputType.STICK_RIGHT_X, val=0), 0.0),
-                (ControllerInput(type=InputType.STICK_RIGHT_Y, val=0), 0.0),
-            ]
+            return []
 
         monsters.sort(key=lambda m: proximity_factor(m))  # Sort by proximity factor
         target = monsters[0]

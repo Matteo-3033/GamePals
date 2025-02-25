@@ -23,6 +23,7 @@ class BinaryPolicyType(PolicyType):
 class ContinuousPolicyType(PolicyType):
     """ Enumerator for the Continuous Policy Types """
     POLICY_EXCLUSIVITY = "POLICY_CONT_EXCLUSIVITY"  # Only one Actor allowed for that Command
+    POLICY_OR = "POLICY_CONT_OR" # In the Continuous context, "OR" indicates that any Command is forwarded
     POLICY_PRODUCT = "POLICY_CONT_PRODUCT"  # Policy confidence * assistance
 
 
