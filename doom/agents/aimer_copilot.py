@@ -6,9 +6,14 @@ from agents.sw_agent_actor import SWAgentActor
 from doom import Math, DoomGameState, MessageType
 from doom.agents import proximity_factor
 from sources import ControllerInput, InputType
+from sources.game_state_listener import GameStateListener
 
 
 class AimerCopilot(SWAgentActor):
+
+    def __init__(self, game_state: GameStateListener):
+        super().__init__(game_state)
+        self.zero_input_sent = False # Needed to avoid sending zero-value inputs more than once
 
     def get_controlled_inputs(self) -> list[InputType]:
         return [InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y]  # Aim buttons
@@ -30,7 +35,15 @@ class AimerCopilot(SWAgentActor):
         monsters = game_data['MONSTERS']
 
         if len(monsters) == 0:
+            if not self.zero_input_sent:
+                self.zero_input_sent = True
+                return [
+                    (ControllerInput(type=InputType.STICK_RIGHT_X, val=0), 1.0),
+                    (ControllerInput(type=InputType.STICK_RIGHT_Y, val=0), 1.0),
+                ]
             return []
+
+        self.zero_input_sent = False
 
         monsters.sort(key=lambda m: proximity_factor(m))  # Sort by proximity factor
         target = monsters[0]

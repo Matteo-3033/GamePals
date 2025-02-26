@@ -2,7 +2,7 @@
 A = 0.0 # Can only be 0 or 1
 B = 0.0 # Can only be 0 or 1
 Y = 0.0 # Can only be 0 or 1
-X = 1.0 # Can only be 0 or 1
+X = 0.0 # Can only be 0 or 1
 Bumper_Right = 0.0 # Can only be 0 or 1
 Bumper_Left = 0.0 # Can only be 0 or 1
 Thumb_Right = 0.0 # Can only be 0 or 1
@@ -23,7 +23,7 @@ Start = 0.0 # Can only be 0 or 1
 A = "POLICY_BIN_EXCLUSIVITY"
 B = "POLICY_BIN_EXCLUSIVITY"
 Y = "POLICY_BIN_EXCLUSIVITY"
-X = "POLICY_BIN_EXCLUSIVITY"
+X = "POLICY_BIN_OR"
 Bumper_Right = "POLICY_BIN_EXCLUSIVITY"
 Bumper_Left = "POLICY_BIN_EXCLUSIVITY"
 Thumb_Right = "POLICY_BIN_EXCLUSIVITY"

@@ -43,9 +43,10 @@ class CommandArbitrator(ActorObserver):
     def add_actor(self, actor: Actor, role: PolicyRole) -> None:
         """ Adds an Actor to the Architecture """
         self.actors[actor.get_id()] = actor
-        actor.subscribe(self)  # Subscribe the Arbitrator to all the Actors
         self.input_maps[actor.get_id()] = ControllerInputsMap()
         self.policy_manager.register_actor(actor, role)
+        actor.subscribe(self)  # Subscribe the Arbitrator to all the Actors
+
 
     def start(self) -> None:
         """ Starts the Actors and the Arbitration Process """

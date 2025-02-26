@@ -5,6 +5,7 @@ from command_arbitrators.command_arbitrator import CommandArbitrator
 from command_arbitrators.policy_manager import PolicyRole
 from doom.agents.aimer_copilot import AimerCopilot
 from doom.agents.reset_copilot import ResetCopilot
+from doom.agents.run_toggler import RunToggler
 from doom.agents.runner_copilot import RunnerCopilot
 from doom.agents.shooter_copilot import ShooterCopilot
 from doom.doom_state_listener import DoomStateListener
@@ -21,14 +22,16 @@ copilot_1 = ShooterCopilot(game_state_listener)
 copilot_2 = RunnerCopilot(game_state_listener)
 copilot_3 = AimerCopilot(game_state_listener)
 copilot_4 = ResetCopilot(game_state_listener)
+copilot_5 = RunToggler(game_state_listener, pilot = pilot)
 
 # Arbitrator
 arbitrator = CommandArbitrator(config_file_path="config.toml")
 arbitrator.add_actor(pilot, PolicyRole.PILOT)
 arbitrator.add_actor(copilot_1, PolicyRole.COPILOT)
-arbitrator.add_actor(copilot_2, PolicyRole.COPILOT)
+#arbitrator.add_actor(copilot_2, PolicyRole.COPILOT)
 arbitrator.add_actor(copilot_3, PolicyRole.COPILOT)
 arbitrator.add_actor(copilot_4, PolicyRole.PILOT)
+arbitrator.add_actor(copilot_5, PolicyRole.PILOT)
 
 arbitrator.start()
 
