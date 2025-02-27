@@ -23,8 +23,8 @@ copilot_1 = ShooterCopilot(game_state_listener)
 copilot_2 = RunnerCopilot(game_state_listener)
 copilot_3 = AimerCopilot(game_state_listener)
 copilot_4 = ResetCopilot(game_state_listener)
-copilot_5 = RunToggler(game_state_listener, pilot = pilot)
-copilot_6 = InteractCopilot(game_state_listener)
+copilot_5 = RunToggler(game_state_listener, pilot = pilot) # Some Copilots want to listen directly to player inputs
+copilot_6 = InteractCopilot(game_state_listener, pilot = pilot)
 
 # Arbitrator
 arbitrator = CommandArbitrator(config_file_path="config.toml")
