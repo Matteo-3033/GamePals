@@ -41,4 +41,6 @@ class RunToggler(SWAgentActor):
         pass
 
     def game_state_to_inputs(self, game_state: DoomGameState) -> list[tuple[ControllerInput, float]]:
+        if game_state.type == MessageType.RESET:
+            self.running = False
         return []

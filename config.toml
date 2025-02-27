@@ -9,7 +9,7 @@ Thumb_Right = 0.0 # Can only be 0 or 1
 Thumb_Left = 0.0 # Can only be 0 or 1
 DirPad_X = 0.0 # Can only be 0 or 1
 DirPad_Y = 0.0 # Can only be 0 or 1
-Trigger_Right = 1.0 # Can only be 0 or 1
+Trigger_Right = 0.0 # Can only be 0 or 1
 Trigger_Left = 0.0 # Can only be 0 or 1
 Stick_Right_X = 0.0
 Stick_Right_Y = 0.0
@@ -20,7 +20,7 @@ Start = 0.0 # Can only be 0 or 1
 
 # The Policy also determines whether the Input is Merged using Binary or Continuous Logic
 [PolicyTypes]
-A = "POLICY_BIN_EXCLUSIVITY"
+A = "POLICY_BIN_OR"
 B = "POLICY_BIN_EXCLUSIVITY"
 Y = "POLICY_BIN_EXCLUSIVITY"
 X = "POLICY_BIN_OR"
