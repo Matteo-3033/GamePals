@@ -26,8 +26,3 @@ class MessageData:
     actor_id: "agents.actor.ActorID"
     message: str
 
-
-@dataclass
-class ArbitratorData:
-    """ The wrapper class of the Data sent to an Arbitrator Observer [WIP] """
-    pass

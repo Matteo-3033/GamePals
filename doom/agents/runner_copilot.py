@@ -21,6 +21,10 @@ class RunnerCopilot(SWAgentActor):
         # Ignore other Actors messages
         pass
 
+    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+        # Ignore Arbitrated Inputs
+        pass
+
     def game_state_to_inputs(self, game_state: DoomGameState) -> list[tuple[ControllerInput, float]]:
         """ RunnerCopilots checks whether a monster is close to the player. If not, it decides to run """
         if game_state.type != MessageType.GAMESTATE:

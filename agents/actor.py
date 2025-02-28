@@ -2,7 +2,7 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import NewType
 
-from agents import MessageData, ActorData, ArbitratorData
+from agents import MessageData, ActorData
 from agents.observers.actor_observer import ActorObserver
 from sources import ControllerInput, InputType
 
@@ -53,6 +53,8 @@ class Actor(ActorObserver, ABC):
         pass
 
     @abstractmethod
-    def get_arbitrator_updates(self, data: ArbitratorData) -> None:
-        """ Receives updates from the arbitrator it's connected to """
+    def get_arbitrated_inputs(self, input_data : ControllerInput) -> None:
+        """ Receives the final Inputs produced by the Command Arbitrator and sent to the Game """
         pass
+
+

@@ -20,6 +20,10 @@ class ResetCopilot(SWAgentActor):
         # Ignore other Actors messages
         pass
 
+    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+        # Ignore Arbitrated Inputs
+        pass
+
     def game_state_to_inputs(self, game_state: DoomGameState) -> list[tuple[ControllerInput, float]]:
         """ RunnerCopilots sends a reset message if the Game State is Reset """
         if game_state.type == MessageType.RESET:

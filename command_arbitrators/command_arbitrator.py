@@ -47,7 +47,6 @@ class CommandArbitrator(ActorObserver):
         self.policy_manager.register_actor(actor, role)
         actor.subscribe(self)  # Subscribe the Arbitrator to all the Actors
 
-
     def start(self) -> None:
         """ Starts the Actors and the Arbitration Process """
         for _, actor in self.actors.items():
@@ -157,8 +156,16 @@ class CommandArbitrator(ActorObserver):
         """ Executes a single-value command on the Virtual Controller """
         # print(f"Executing {c_input}")
         self.virtual_controller.execute(c_input)
+        self.notify_arbitrated_input(c_input)
 
     def execute_double_value_command(self, input_x: ControllerInput, input_y: ControllerInput) -> None:
         """ Executes a 2-axis command on the Virtual Controller """
         # print(f"Executing {input_x} {input_y} ")
         self.virtual_controller.execute_stick(input_x, input_y)
+        self.notify_arbitrated_input(input_x)
+        self.notify_arbitrated_input(input_y)
+
+    def notify_arbitrated_input(self, input_data : ControllerInput) -> None:
+        """ Notifies all Actors of the Arbitrated Input"""
+        for actor in self.actors.values():
+            actor.get_arbitrated_inputs(input_data)

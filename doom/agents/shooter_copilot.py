@@ -19,6 +19,10 @@ class ShooterCopilot(SWAgentActor):
         # Ignore other Actors messages
         pass
 
+    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+        # Ignore Arbitrated Inputs
+        pass
+
     def game_state_to_inputs(self, game_state: DoomGameState) -> list[tuple[ControllerInput, float]]:
         """ ShooterCopilot checks what the player is aiming at and decides whether to shoot or not. """
         if game_state.type != MessageType.GAMESTATE:
