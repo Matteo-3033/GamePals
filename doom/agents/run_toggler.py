@@ -1,18 +1,14 @@
-import json
-import math
-
 from agents import MessageData, ActorData
 from agents.actor import Actor
 from agents.sw_agent_actor import SWAgentActor
-from doom import Math, DoomGameState, MessageType
-from doom.agents import proximity_factor
-from sources import ControllerInput, InputType, GameState
+from doom import DoomGameState, MessageType
+from sources import ControllerInput, InputType
 from sources.game_state_listener import GameStateListener
 
 
 class RunToggler(SWAgentActor):
     """
-    RunToggler is a Software Agent Actor that transforms the Run input button in a toggle, instead of an hold type
+    RunToggler is a Software Agent Actor that transforms the Run input button in a toggle, instead of a hold type
     of button.
     """
 

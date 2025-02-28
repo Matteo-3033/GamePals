@@ -16,7 +16,7 @@ class DoomStateListener(GameStateListener):
         super().__init__()
         self.log_file_path: str = log_file_path
         self.running: bool = False
-        self.listener_thread: threading.Thread = None
+        self.listener_thread: threading.Thread | None = None
 
     def start_listening(self):
         if self.listener_thread is None or not self.listener_thread.is_alive():

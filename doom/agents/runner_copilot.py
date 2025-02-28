@@ -3,9 +3,9 @@ import math
 
 from agents import MessageData, ActorData
 from agents.sw_agent_actor import SWAgentActor
-from doom import Math, DoomGameState, MessageType
+from doom import DoomGameState, MessageType
 from doom.agents import proximity_factor
-from sources import ControllerInput, InputType, GameState
+from sources import ControllerInput, InputType
 
 
 class RunnerCopilot(SWAgentActor):

@@ -19,22 +19,22 @@ game_state_listener = DoomStateListener(log_file_path="../Doom/log.txt")
 # Agents
 pilot = HumanActor(controller_listener, config_file_path="config.toml")
 
-copilot_1 = ShooterCopilot(game_state_listener)
-copilot_2 = RunnerCopilot(game_state_listener)
-copilot_3 = AimerCopilot(game_state_listener)
-copilot_4 = ResetCopilot(game_state_listener)
-copilot_5 = RunToggler(game_state_listener, pilot = pilot) # Some Copilots want to listen directly to player inputs
-copilot_6 = InteractCopilot(game_state_listener, pilot = pilot)
+shooter_copilot = ShooterCopilot(game_state_listener)
+runner_copilot = RunnerCopilot(game_state_listener)
+aimer_copilot = AimerCopilot(game_state_listener)
+reset_copilot = ResetCopilot(game_state_listener)
+run_toggler = RunToggler(game_state_listener, pilot = pilot) # Some Copilots want to listen directly to player inputs
+interact_copilot = InteractCopilot(game_state_listener, pilot = pilot)
 
 # Arbitrator
 arbitrator = CommandArbitrator(config_file_path="config.toml")
 arbitrator.add_actor(pilot, PolicyRole.PILOT)
-# arbitrator.add_actor(copilot_1, PolicyRole.COPILOT)
-# arbitrator.add_actor(copilot_2, PolicyRole.COPILOT)
-# arbitrator.add_actor(copilot_3, PolicyRole.COPILOT)
-# arbitrator.add_actor(copilot_4, PolicyRole.PILOT)
-# arbitrator.add_actor(copilot_5, PolicyRole.PILOT)
-arbitrator.add_actor(copilot_6, PolicyRole.PILOT)
+arbitrator.add_actor(shooter_copilot, PolicyRole.COPILOT)
+arbitrator.add_actor(runner_copilot, PolicyRole.COPILOT)
+arbitrator.add_actor(aimer_copilot, PolicyRole.COPILOT)
+arbitrator.add_actor(reset_copilot, PolicyRole.PILOT)
+arbitrator.add_actor(run_toggler, PolicyRole.PILOT)
+arbitrator.add_actor(interact_copilot, PolicyRole.PILOT)
 
 arbitrator.start()
 

@@ -71,8 +71,10 @@ class VirtualControllerProvider:
         for btn in self.DPAD_TO_VGBUTTON.values():
             self.gamepad.release_button(btn)
 
-        self.gamepad.left_trigger(0)
-        self.gamepad.right_trigger(0)
+        self.gamepad.left_trigger_float(0.)
+        self.gamepad.right_trigger_float(0.)
+        self.gamepad.left_joystick_float(0., 0.)
+        self.gamepad.right_joystick_float(0., 0.)
 
         self.gamepad.update()
         print("Gamepad was reset")

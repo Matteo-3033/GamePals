@@ -9,7 +9,7 @@ class ControllerInputsMap:
     """
 
     def __init__(self):
-        self.inputs_map = {input: ControllerInputRecord(0, 0, 0) for input in InputType}
+        self.inputs_map = {i: ControllerInputRecord(0, 0, 0) for i in InputType}
 
     def set(self, c_input: ControllerInput, level: float = 1.0, timestamp: float | None = None) -> None:
         """

@@ -18,8 +18,8 @@ class PhysicalControllerListener:
         # gamepad_number is the index of the device in the inputs.devices.gamepads list
         self.subscribers: list[ControllerObserver] = []
         self.running: bool = False
-        self.listener_thread: threading.Thread = None
         self.gamepad = devices.gamepads[gamepad_number]
+        self.listener_thread: threading.Thread | None = None
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
         """ Adds a subscriber to the list of subscribers """
