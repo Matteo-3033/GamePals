@@ -48,7 +48,7 @@ class PhysicalControllerListener:
         """ The loop that listens for controller inputs """
         while self.running:
             try:
-                events = self.gamepad.read()
+                events = self._gamepad_read(timeout = 0.1)
             except Exception as e:
                 print(f"Error while getting gamepad events: {e}")
                 return
@@ -60,6 +60,21 @@ class PhysicalControllerListener:
                 observed = self.event_to_input(event)
                 if observed:
                     self.notify_all(observed)
+
+    def _gamepad_read(self, timeout : float):
+        """ Wraps the function self.gamepad.read() in a separate block, to allow to set a max timeout """
+        events = []
+        def read_gamepad():
+            try:
+                events.append(self.gamepad.read())
+            except Exception as e:
+                print(f"Error while getting gamepad events: {e}")
+
+        thread = threading.Thread(target=read_gamepad, daemon=True)
+        thread.start()
+        thread.join(timeout=timeout)
+
+        return events[0] if events else []
 
     def event_to_input(self, event) -> ControllerInput | None:
         """ Converts an event from the physical controller to a Controller Input """

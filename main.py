@@ -1,4 +1,5 @@
 import time
+from csv import excel
 
 from agents.human_actor import HumanActor
 from command_arbitrators.command_arbitrator import CommandArbitrator
@@ -38,5 +39,11 @@ arbitrator.add_actor(interact_copilot, PolicyRole.PILOT)
 
 arbitrator.start()
 
-while True:
-    time.sleep(1)  # Keep the main thread alive
+try:
+    while True:
+        time.sleep(1)  # Keep the main thread alive
+except KeyboardInterrupt:
+    pass
+finally:
+    game_state_listener.stop_listening()
+    controller_listener.stop_listening()
