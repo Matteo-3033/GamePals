@@ -19,3 +19,20 @@ to enhance accessibility and gameplay experiences.
 
 ![Copilot Architecture](assets/architecture.png)
 
+## Requirements and Setup
+
+To run the architecture successfully, the following tools and packages are required:
+
+- **Windows OS** - The architecture is currently only available for Windows.
+
+- A **Physical GamePad** - This can either be an XBOX Controller or a DualShock Controller (for the latter, [**DS4Windows**](https://ds4-windows.com/) is also a requirement).
+
+- [**HidHide**](https://ds4-windows.com/download/hidhide/) - A tool used to hide the physical controller from the game, ensuring the game receives only inputs from a Virtual Controller.
+
+- [**Python 3.13**](https://www.python.org/downloads/release/python-3130/) - The latest Python version as of February 2025.
+
+- ```requirements.txt``` - The required Python packages can be installed using:
+```bash
+pip install -r requirements.txt
+```
+
