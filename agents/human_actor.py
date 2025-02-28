@@ -51,16 +51,6 @@ class HumanActor(Actor, ControllerObserver):
         confidence = self.confidence_levels[data.c_input.type]
         self.notify_input(data.c_input, confidence)
 
-    def receive_input_update(self, data: ActorData) -> None:
-        """ Receives Inputs from other Actors """
-        pass
-
-    def receive_message_update(self, data: MessageData) -> None:
-        """
-        Receives Messages from other Actors
-        TODO: add a game overlay or some form of voice/visual notification for the Human Actor
-        """
-        pass
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment

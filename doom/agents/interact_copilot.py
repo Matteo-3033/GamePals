@@ -3,13 +3,14 @@ import time
 
 from agents import MessageData, ActorData
 from agents.actor import Actor
+from agents.observers.actor_observer import ActorObserver
 from agents.sw_agent_actor import SWAgentActor
 from doom import DoomGameState, MessageType
 from sources import ControllerInput, InputType
 from sources.game_state_listener import GameStateListener
 
 
-class InteractCopilot(SWAgentActor):
+class InteractCopilot(SWAgentActor, ActorObserver):
     TICKS_TO_INTERACT = 10
     MIN_TIME_BETWEEN_PRESSES = 2  # In Seconds
     TICKS_BETWEEN_PRESS_AND_RELEASE = 4

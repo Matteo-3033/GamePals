@@ -1,7 +1,6 @@
 import json
 import math
 
-from agents import ActorData, MessageData
 from agents.sw_agent_actor import SWAgentActor
 from doom import Math, DoomGameState, MessageType
 from doom.agents import proximity_factor
@@ -17,14 +16,6 @@ class AimerCopilot(SWAgentActor):
 
     def get_controlled_inputs(self) -> list[InputType]:
         return [InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y]  # Aim buttons
-
-    def receive_input_update(self, data: ActorData) -> None:
-        # Ignore other Actors inputs
-        pass
-
-    def receive_message_update(self, data: MessageData) -> None:
-        # Ignore other Actors messages
-        pass
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs

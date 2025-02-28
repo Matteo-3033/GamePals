@@ -9,7 +9,7 @@ from sources import ControllerInput, InputType
 ActorID = NewType("ActorID", str)
 
 
-class Actor(ActorObserver, ABC):
+class Actor(ABC):
     """
     Actor represents a generic subject of the Architecture.
 

@@ -1,6 +1,5 @@
 import json
 
-from agents import MessageData, ActorData
 from agents.sw_agent_actor import SWAgentActor
 from doom import Math, DoomGameState, MessageType
 from sources import ControllerInput, InputType
@@ -10,14 +9,6 @@ class ShooterCopilot(SWAgentActor):
 
     def get_controlled_inputs(self) -> list[InputType]:
         return [InputType.TRIGGER_RIGHT]  # Shoot button
-
-    def receive_input_update(self, data: ActorData) -> None:
-        # Ignore other Actors inputs
-        pass
-
-    def receive_message_update(self, data: MessageData) -> None:
-        # Ignore other Actors messages
-        pass
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs
