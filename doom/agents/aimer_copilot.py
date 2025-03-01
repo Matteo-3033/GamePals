@@ -45,9 +45,8 @@ class AimerCopilot(SWAgentActor):
         target_proximity_factor = proximity_factor(target)
 
         angle = math.atan2(target['relativePitch'], target['relativeAngle'])
-        intensity = int(target_proximity_factor * 32767)
-        if intensity == 0: return []
-        (x, y) = Math.polar_to_cartesian(intensity, angle)
+        if target_proximity_factor == 0: return []
+        (x, y) = Math.polar_to_cartesian(target_proximity_factor, angle)
 
         # dist_screen1 = math.hypot(monsters[0]['relativeAngle'], monsters[0]['relativePitch'])
         # dist_screen2 = math.hypot(monsters[1]['relativeAngle'], monsters[1]['relativePitch']) if len(monsters) > 1 else 0
@@ -57,6 +56,6 @@ class AimerCopilot(SWAgentActor):
 
         confidence_level = 1 - target_proximity_factor  # Confidence is the most when the target is the closest
         return [
-            (ControllerInput(type=InputType.STICK_RIGHT_X, val=int(x)), confidence_level),
-            (ControllerInput(type=InputType.STICK_RIGHT_Y, val=int(y)), confidence_level),
+            (ControllerInput(type=InputType.STICK_RIGHT_X, val=x), confidence_level),
+            (ControllerInput(type=InputType.STICK_RIGHT_Y, val=y), confidence_level),
         ]

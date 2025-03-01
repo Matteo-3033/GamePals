@@ -48,7 +48,7 @@ class PhysicalControllerListener:
         """ The loop that listens for controller inputs """
         while self.running:
             try:
-                events = self._gamepad_read(timeout = 0.1)
+                events = self.gamepad.read()
             except Exception as e:
                 print(f"Error while getting gamepad events: {e}")
                 return
@@ -61,29 +61,25 @@ class PhysicalControllerListener:
                 if observed:
                     self.notify_all(observed)
 
-    def _gamepad_read(self, timeout : float):
-        """ Wraps the function self.gamepad.read() in a separate block, to allow to set a max timeout """
-        events = []
-        def read_gamepad():
-            try:
-                events.append(self.gamepad.read())
-            except Exception as e:
-                print(f"Error while getting gamepad events: {e}")
-
-        thread = threading.Thread(target=read_gamepad, daemon=True)
-        thread.start()
-        thread.join(timeout=timeout)
-
-        return events[0] if events else []
-
     def event_to_input(self, event) -> ControllerInput | None:
         """ Converts an event from the physical controller to a Controller Input """
         if event.code not in self.INPUT_TYPES_MAP:
             return None  # Ignore unmapped inputs
 
         input_type = self.INPUT_TYPES_MAP[event.code]
-        input_value = event.state
+        input_value = self.normalize(input_type, event.state)
         return ControllerInput(input_type, input_value)
+
+    @staticmethod
+    def normalize(input_type : InputType, val : int) -> float:
+        """ Normalizes the value of the input into relative values between -1 and 1 (or 0 and 1) """
+        match input_type:
+            case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
+                return val / 255
+            case InputType.STICK_RIGHT_X | InputType.STICK_RIGHT_Y | InputType.STICK_LEFT_X | InputType.STICK_LEFT_Y:
+                return val / 32767
+            case _:
+                return val
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
     INPUT_TYPES_MAP = {

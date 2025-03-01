@@ -1,5 +1,4 @@
 import time
-from csv import excel
 
 from agents.human_actor import HumanActor
 from command_arbitrators.command_arbitrator import CommandArbitrator
@@ -24,8 +23,8 @@ shooter_copilot = ShooterCopilot(game_state_listener)
 runner_copilot = RunnerCopilot(game_state_listener)
 aimer_copilot = AimerCopilot(game_state_listener)
 reset_copilot = ResetCopilot(game_state_listener)
-run_toggler = RunToggler(game_state_listener, pilot = pilot) # Some Copilots want to listen directly to player inputs
-interact_copilot = InteractCopilot(game_state_listener, pilot = pilot)
+run_toggler = RunToggler(game_state_listener, pilot=pilot)  # Some Copilots want to listen directly to player inputs
+interact_copilot = InteractCopilot(game_state_listener, pilot=pilot)
 
 # Arbitrator
 arbitrator = CommandArbitrator(config_file_path="config.toml")
@@ -46,4 +45,4 @@ except KeyboardInterrupt:
     pass
 finally:
     game_state_listener.stop_listening()
-    controller_listener.stop_listening()
+    controller_listener.stop_listening()  # Known issue: this only really stops after you press an input on the controller

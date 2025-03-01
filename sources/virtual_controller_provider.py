@@ -37,9 +37,9 @@ class VirtualControllerProvider:
 
         elif c_input.type in self.TRIGGERS:  # Triggers (values are in [0, 255])
             if c_input.type == InputType.TRIGGER_LEFT:
-                self.gamepad.left_trigger(c_input.val)
+                self.gamepad.left_trigger_float(c_input.val)
             else:
-                self.gamepad.right_trigger(c_input.val)
+                self.gamepad.right_trigger_float(c_input.val)
 
         self.gamepad.update()
 
@@ -56,9 +56,9 @@ class VirtualControllerProvider:
             raise ValueError("The inputs must be on the same stick")
 
         if c_input_x.type == InputType.STICK_LEFT_X:
-            self.gamepad.left_joystick(x_value=int(c_input_x.val), y_value=int(c_input_y.val))
+            self.gamepad.left_joystick_float(x_value_float=c_input_x.val, y_value_float=c_input_y.val)
         else:
-            self.gamepad.right_joystick(x_value=int(c_input_x.val), y_value=int(c_input_y.val))
+            self.gamepad.right_joystick_float(x_value_float=c_input_x.val, y_value_float=c_input_y.val)
 
         self.gamepad.update()
 

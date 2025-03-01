@@ -27,8 +27,8 @@ class ShooterCopilot(SWAgentActor):
         confidence_level = Math.linear_mapping(distance, (0, max(distance, 1000)), (1, 0))
 
         if aimed_at['entityType'] == 'Monster':
-            c_input = ControllerInput(type=InputType.TRIGGER_RIGHT, val=255)
+            c_input = ControllerInput(type=InputType.TRIGGER_RIGHT, val=1.0)
         else:
-            c_input = ControllerInput(type=InputType.TRIGGER_RIGHT, val=0)
+            c_input = ControllerInput(type=InputType.TRIGGER_RIGHT, val=0.0)
 
         return [(c_input, confidence_level)]
