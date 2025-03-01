@@ -1,9 +1,10 @@
 import time
-
+import logging
 import vgamepad as vg
 
 from sources.controller_inputs import ControllerInput, InputType
 
+logger = logging.getLogger(__name__)
 
 class VirtualControllerProvider:
     """
@@ -77,7 +78,7 @@ class VirtualControllerProvider:
         self.gamepad.right_joystick_float(0., 0.)
 
         self.gamepad.update()
-        print("Gamepad was reset")
+        logger.info("Gamepad was reset")
         time.sleep(0.1)
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad

@@ -1,4 +1,6 @@
 import time
+import logging
+import sys
 
 from agents.human_actor import HumanActor
 from command_arbitrators.command_arbitrator import CommandArbitrator
@@ -11,6 +13,9 @@ from doom.agents.runner_copilot import RunnerCopilot
 from doom.agents.shooter_copilot import ShooterCopilot
 from doom.doom_state_listener import DoomStateListener
 from sources.physical_controller_listener import PhysicalControllerListener
+
+# Logger
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # Listeners
 controller_listener = PhysicalControllerListener(gamepad_number=0)

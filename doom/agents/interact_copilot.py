@@ -1,5 +1,6 @@
 import json
 import time
+import logging
 
 from agents.datas import MessageData, ActorData
 from agents.actor import Actor
@@ -9,6 +10,7 @@ from doom.doom_game_state import DoomGameState, MessageType
 from sources.controller_inputs import ControllerInput, InputType
 from sources.game_state_listener import GameStateListener
 
+logger = logging.getLogger(__name__)
 
 class InteractCopilot(SWAgentActor, ActorObserver):
     TICKS_TO_INTERACT = 10
@@ -36,7 +38,6 @@ class InteractCopilot(SWAgentActor, ActorObserver):
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs
-        print(f"[InteractCopilot] Executed {input_data}")
         pass
 
     def game_state_to_inputs(self, game_state: DoomGameState) -> list[tuple[ControllerInput, float]]:

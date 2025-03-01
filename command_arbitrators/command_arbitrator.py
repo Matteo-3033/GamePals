@@ -1,14 +1,17 @@
 import tomllib
+import logging
 from dataclasses import dataclass
 
 from agents.datas import MessageData, ActorData
 from agents.actor import Actor, ActorID
 from agents.observers.actor_observer import ActorObserver
-from command_arbitrators.policy_manager import PolicyManager, PolicyRole, BinaryPolicyType, ContinuousPolicyType
+from command_arbitrators.policies.policy import Policy
+from command_arbitrators.policy_manager import PolicyManager, PolicyRole
 from sources.controller_inputs import ControllerInput, InputType
 from sources.controller_inputs_map import ControllerInputsMap, ControllerInputRecord
 from sources.virtual_controller_provider import VirtualControllerProvider
 
+logger = logging.getLogger(__name__)
 
 @dataclass
 class InputEntry:
@@ -38,7 +41,11 @@ class CommandArbitrator(ActorObserver):
 
         with open(config_file_path, 'rb') as config_file:
             config = tomllib.load(config_file)
-            self.policy_manager = PolicyManager(config["PolicyTypes"])
+            policies_types = {
+                in_type: Policy.policy_name_to_policy(name)
+                for in_type, name in config["PolicyTypes"].items()
+            }
+            self.policy_manager = PolicyManager(policies_types)
 
     def add_actor(self, actor: Actor, role: PolicyRole) -> None:
         """ Adds an Actor to the Architecture """
@@ -56,111 +63,51 @@ class CommandArbitrator(ActorObserver):
         """ Receives Input and Confidence Level from one of its Actors """
         self.input_maps[data.actor_id].set(data.c_input, data.confidence)
 
-        # Choose Merge Function (Binary or Continuous, based on the Policy Type)
-
         input_type = data.c_input.type
-        policy_type = self.policy_manager.get_policy(input_type).policy_type
-        if policy_type in ContinuousPolicyType:
-            merge_func = self._merge_continuous_inputs
-        elif policy_type in BinaryPolicyType:
-            merge_func = self._merge_binary_inputs
-        else:
-            raise ValueError(f"Policy {policy_type} not recognized.")
-
-        # Execute Merge
 
         if input_type in VirtualControllerProvider.STICKS:  # Input is a Stick (2-Axis required)
             is_left_stick = input_type == InputType.STICK_LEFT_X or input_type == InputType.STICK_LEFT_Y
             input_type_x = InputType.STICK_LEFT_X if is_left_stick else InputType.STICK_RIGHT_X
             input_type_y = InputType.STICK_LEFT_Y if is_left_stick else InputType.STICK_RIGHT_Y
 
-            merge_result_x = merge_func(input_type_x)
-            merge_result_y = merge_func(input_type_y)
+            merge_result_x = self._merge_by_input_type(input_type_x)
+            merge_result_y = self._merge_by_input_type(input_type_y)
 
             self.execute_double_value_command(merge_result_x, merge_result_y)
 
         else:  # Input is not a Stick (1 Axis/Value is enough)
-            merge_result = merge_func(input_type)
+            merge_result = self._merge_by_input_type(input_type)
             self.execute_single_value_command(merge_result)
 
     def receive_message_update(self, data: MessageData) -> None:
         """ Receives a Message from one of its Actors """
-        print(f"[CommandArbitrator] Received Message: {data}")
+        logger.info("Received Message: %s", data)
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_binary_inputs(self, input_type: InputType) -> ControllerInput:
+
+    def _merge_by_input_type(self, input_type: InputType) -> ControllerInput:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
         """
         policy_info = self.policy_manager.get_policy(input_type)
-        policy_type = policy_info.policy_type
+        policy = policy_info.policy_type
         input_entries = [InputEntry(actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1])
                          for actor_id, actor_role in policy_info.actors.items()]
 
-        match policy_type:
-
-            case BinaryPolicyType.POLICY_EXCLUSIVITY:
-                val = input_entries[0].input_details.val
-                return ControllerInput(input_type, val)
-
-            case BinaryPolicyType.POLICY_AND:
-                val = True
-                for input_entry in input_entries:
-                    curr = input_entry.input_details.val != 0  # False if 0, True otherwise
-                    val = val & curr
-
-                return ControllerInput(input_type, input_type.get_max_value() if val else 0)
-
-            case BinaryPolicyType.POLICY_OR:
-                val = False
-                for input_entry in input_entries:
-                    curr = input_entry.input_details.val != 0  # False if 0, True otherwise
-                    val = val | curr
-
-                return ControllerInput(input_type, input_type.get_max_value() if val else 0)
-
-            # More Binary Policies can be added here...
-
-            case _:
-                raise ValueError(f"Merging for Policy Type {policy_type} currently not implemented")
-
-    def _merge_continuous_inputs(self, input_type: InputType) -> ControllerInput:
-        """
-        Merges the Input Entries for the given Input Type, based on the specified Policy Type.
-        It then returns the resulting ControllerInput
-        """
-        policy_info = self.policy_manager.get_policy(input_type)
-        policy_type = policy_info.policy_type
-        input_entries = [InputEntry(actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1])
-                         for actor_id, actor_role in policy_info.actors.items()]
-
-        match policy_type:
-
-            case ContinuousPolicyType.POLICY_EXCLUSIVITY:
-                val = input_entries[0].input_details.val
-                return ControllerInput(input_type, val)
-
-            case ContinuousPolicyType.POLICY_OR:
-                latest_entry = sorted(input_entries, key=lambda x: x.input_details.timestamp, reverse=True)[0]
-                val = latest_entry.input_details.val
-                return ControllerInput(input_type, val)
-
-            # More Continuous Policies can be added here...
-
-            case _:
-                raise ValueError(f"Merging for Policy Type {policy_type} currently not implemented")
+        value = policy.merge_input_entries(input_entries)
+        return ControllerInput(input_type, value)
 
     def execute_single_value_command(self, c_input: ControllerInput) -> None:
         """ Executes a single-value command on the Virtual Controller """
-        # print(f"Executing {c_input}")
+        logger.info("Executing %s", c_input)
         self.virtual_controller.execute(c_input)
         self.notify_arbitrated_input(c_input)
 
     def execute_double_value_command(self, input_x: ControllerInput, input_y: ControllerInput) -> None:
         """ Executes a 2-axis command on the Virtual Controller """
-        # print(f"Executing {input_x} {input_y} ")
+        logger.info("Executing %s %s", input_x, input_y)
         self.virtual_controller.execute_stick(input_x, input_y)
         self.notify_arbitrated_input(input_x)
         self.notify_arbitrated_input(input_y)

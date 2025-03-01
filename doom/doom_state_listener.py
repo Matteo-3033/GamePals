@@ -1,8 +1,10 @@
 import threading
+import logging
 
 from doom.doom_game_state import MessageType, DoomGameState
 from sources.game_state_listener import GameStateListener
 
+logger = logging.getLogger(__name__)
 
 class DoomStateListener(GameStateListener):
     """
@@ -48,4 +50,4 @@ class DoomStateListener(GameStateListener):
                         state = DoomGameState(MessageType(message_type), message_data)
                         self.notify_all(state)
                     else:
-                        print("Unrecognized message type: " + message_type)
+                        logger.warning("Unrecognized message type %s ", message_type)

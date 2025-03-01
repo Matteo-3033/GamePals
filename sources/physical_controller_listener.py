@@ -1,10 +1,12 @@
 import threading
+import logging
 from inputs import devices
 
 from agents.datas import InputData
 from agents.observers.controller_observer import ControllerObserver
 from sources.controller_inputs import ControllerInput, InputType
 
+logger = logging.getLogger(__name__)
 
 class PhysicalControllerListener:
     """
@@ -18,8 +20,11 @@ class PhysicalControllerListener:
         # gamepad_number is the index of the device in the inputs.devices.gamepads list
         self.subscribers: list[ControllerObserver] = []
         self.running: bool = False
-        self.gamepad = devices.gamepads[gamepad_number]
         self.listener_thread: threading.Thread | None = None
+        try:
+            self.gamepad = devices.gamepads[gamepad_number]
+        except IndexError:
+            logger.error("Gamepad %d not found", gamepad_number)
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
         """ Adds a subscriber to the list of subscribers """
@@ -50,7 +55,7 @@ class PhysicalControllerListener:
             try:
                 events = self.gamepad.read()
             except Exception as e:
-                print(f"Error while getting gamepad events: {e}")
+                logger.error("Error while getting gamepad events: %s", e)
                 return
 
             for event in events:

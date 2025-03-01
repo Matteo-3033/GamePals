@@ -26,10 +26,8 @@ class RunToggler(SWAgentActor, ActorObserver):
         if data.c_input.type == InputType.BTN_X:
             if data.c_input.val == 1: # Start Running
                 if self.running:
-                    # print(f"[RunToggler] Stopping the Run")
                     self.notify_input(ControllerInput(InputType.BTN_X, val = 0), 1.0)
                 else:
-                    # print(f"[RunToggler] Starting to Run")
                     self.notify_input(ControllerInput(InputType.BTN_X, val = 1), 1.0)
                 self.running = not self.running
 
