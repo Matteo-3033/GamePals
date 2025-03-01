@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, StrEnum
 
 from agents.actor import Actor, ActorID
-from sources import InputType
+from sources.controller_inputs import InputType
 
 
 class PolicyType(StrEnum):

@@ -1,6 +1,6 @@
 import threading
 
-from doom import MessageType, DoomGameState
+from doom.doom_game_state import MessageType, DoomGameState
 from sources.game_state_listener import GameStateListener
 
 

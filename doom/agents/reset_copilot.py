@@ -1,6 +1,6 @@
 from agents.sw_agent_actor import SWAgentActor
-from doom import DoomGameState, MessageType
-from sources import ControllerInput, InputType
+from doom.doom_game_state import DoomGameState, MessageType
+from sources.controller_inputs import ControllerInput, InputType
 
 
 class ResetCopilot(SWAgentActor):

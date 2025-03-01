@@ -1,12 +1,12 @@
 import tomllib
 from dataclasses import dataclass
 
-from agents import MessageData, ActorData
+from agents.datas import MessageData, ActorData
 from agents.actor import Actor, ActorID
 from agents.observers.actor_observer import ActorObserver
 from command_arbitrators.policy_manager import PolicyManager, PolicyRole, BinaryPolicyType, ContinuousPolicyType
-from sources import ControllerInput, InputType, ControllerInputRecord
-from sources.controller_inputs_map import ControllerInputsMap
+from sources.controller_inputs import ControllerInput, InputType
+from sources.controller_inputs_map import ControllerInputsMap, ControllerInputRecord
 from sources.virtual_controller_provider import VirtualControllerProvider
 
 

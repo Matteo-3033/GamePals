@@ -2,9 +2,9 @@ import json
 import math
 
 from agents.sw_agent_actor import SWAgentActor
-from doom import Math, DoomGameState, MessageType
-from doom.agents import proximity_factor
-from sources import ControllerInput, InputType
+from doom.doom_game_state import DoomGameState, MessageType
+from doom.utils import polar_to_cartesian, proximity_factor
+from sources.controller_inputs import ControllerInput, InputType
 from sources.game_state_listener import GameStateListener
 
 
@@ -46,7 +46,7 @@ class AimerCopilot(SWAgentActor):
 
         angle = math.atan2(target['relativePitch'], target['relativeAngle'])
         if target_proximity_factor == 0: return []
-        (x, y) = Math.polar_to_cartesian(target_proximity_factor, angle)
+        (x, y) = polar_to_cartesian(target_proximity_factor, angle)
 
         # dist_screen1 = math.hypot(monsters[0]['relativeAngle'], monsters[0]['relativePitch'])
         # dist_screen2 = math.hypot(monsters[1]['relativeAngle'], monsters[1]['relativePitch']) if len(monsters) > 1 else 0

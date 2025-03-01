@@ -1,12 +1,12 @@
 import json
 import time
 
-from agents import MessageData, ActorData
+from agents.datas import MessageData, ActorData
 from agents.actor import Actor
 from agents.observers.actor_observer import ActorObserver
 from agents.sw_agent_actor import SWAgentActor
-from doom import DoomGameState, MessageType
-from sources import ControllerInput, InputType
+from doom.doom_game_state import DoomGameState, MessageType
+from sources.controller_inputs import ControllerInput, InputType
 from sources.game_state_listener import GameStateListener
 
 

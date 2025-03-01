@@ -2,9 +2,9 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import NewType
 
-from agents import MessageData, ActorData
+from agents.datas import MessageData, ActorData
 from agents.observers.actor_observer import ActorObserver
-from sources import ControllerInput, InputType
+from sources.controller_inputs import ControllerInput, InputType
 
 ActorID = NewType("ActorID", str)
 

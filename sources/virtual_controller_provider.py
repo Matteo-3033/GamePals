@@ -2,7 +2,7 @@ import time
 
 import vgamepad as vg
 
-from sources import ControllerInput, InputType
+from sources.controller_inputs import ControllerInput, InputType
 
 
 class VirtualControllerProvider:

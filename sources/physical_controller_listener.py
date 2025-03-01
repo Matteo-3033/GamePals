@@ -1,9 +1,9 @@
 import threading
 from inputs import devices
 
-from agents import InputData
+from agents.datas import InputData
 from agents.observers.controller_observer import ControllerObserver
-from sources import ControllerInput, InputType
+from sources.controller_inputs import ControllerInput, InputType
 
 
 class PhysicalControllerListener:

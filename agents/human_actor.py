@@ -1,9 +1,9 @@
 import tomllib
 
-from agents import InputData, MessageData, ActorData
+from agents.datas import InputData, MessageData, ActorData
 from agents.actor import Actor
 from agents.observers.controller_observer import ControllerObserver
-from sources import InputType, ControllerInput
+from sources.controller_inputs import InputType, ControllerInput
 from sources.physical_controller_listener import PhysicalControllerListener
 
 

@@ -1,6 +1,15 @@
 import time
+from dataclasses import dataclass
 
-from sources import ControllerInputRecord, InputType, ControllerInput
+from sources.controller_inputs import InputType, ControllerInput
+
+@dataclass
+class ControllerInputRecord:
+    """ ControllerInputRecord stores the value of an input, the associated confidence level and the timestamp of acquisition """
+    val: float
+    confidence: float
+    timestamp: float
+
 
 
 class ControllerInputsMap:
@@ -20,7 +29,7 @@ class ControllerInputsMap:
         if timestamp is None:
             timestamp = time.time()
 
-        self.inputs_map[c_input.type] = ControllerInputRecord(val=c_input.val, level=level, timestamp=timestamp)
+        self.inputs_map[c_input.type] = ControllerInputRecord(val=c_input.val, confidence=level, timestamp=timestamp)
 
     def get(self, c_input: InputType) -> tuple[ControllerInput, ControllerInputRecord]:
         """ Returns the ControllerInput and the ControllerInputRecord associated with the input. """
