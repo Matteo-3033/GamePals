@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
 
+from ..sources.controller import ControllerInput
+from ..sources.game_state import GameState, GameStateListener, GameStateObserver
 from .actor import Actor
-from .observers.game_state_observer import GameStateObserver
-from ..sources.game_state import GameState
-from ..sources.controller_inputs import ControllerInput
-from ..sources.game_state_listener import GameStateListener
 
 
 class SWAgentActor(Actor, GameStateObserver, ABC):
@@ -21,17 +19,18 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
         self.game_state.subscribe(self)
 
     def start(self) -> None:
-        """ Starts listening to the Game State Listener."""
+        """Starts listening to the Game State Listener."""
         self.game_state.start_listening()
 
     def receive_game_state_update(self, game_state: GameState) -> None:
-        """ Receives Game State Updates and produces Inputs to notify to its subscribers."""
+        """Receives Game State Updates and produces Inputs to notify to its subscribers."""
         inputs = self.game_state_to_inputs(game_state)
-        for (c_input, confidence) in inputs:
+        for c_input, confidence in inputs:
             self.notify_input(c_input, confidence)
 
     @abstractmethod
-    def game_state_to_inputs(self, game_state: GameState) -> list[tuple[ControllerInput, float]]:
-        """ Produces inputs given a Game State """
+    def game_state_to_inputs(
+        self, game_state: GameState
+    ) -> list[tuple[ControllerInput, float]]:
+        """Produces inputs given a Game State"""
         pass
-

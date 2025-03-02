@@ -1,10 +1,12 @@
-import time
 import logging
+import time
+
 import vgamepad as vg
 
-from .controller_inputs import ControllerInput, InputType
+from .controller import ControllerInput, InputType
 
 logger = logging.getLogger(__name__)
+
 
 class VirtualControllerProvider:
     """
@@ -31,7 +33,9 @@ class VirtualControllerProvider:
 
         elif c_input.type in self.DPADS:  # Direction Pad (values are -1, 0 or 1)
             if c_input.val != 0:
-                self.gamepad.press_button(self.DPAD_TO_VGBUTTON[(c_input.type, c_input.val)])
+                self.gamepad.press_button(
+                    self.DPAD_TO_VGBUTTON[(c_input.type, c_input.val)]
+                )
             else:
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(c_input.type, 1)])
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(c_input.type, -1)])
@@ -44,7 +48,9 @@ class VirtualControllerProvider:
 
         self.gamepad.update()
 
-    def execute_stick(self, c_input_x: ControllerInput, c_input_y: ControllerInput) -> None:
+    def execute_stick(
+        self, c_input_x: ControllerInput, c_input_y: ControllerInput
+    ) -> None:
         """
         Receives Controller Inputs and produces them on a Virtual Controller.
 
@@ -57,25 +63,31 @@ class VirtualControllerProvider:
             raise ValueError("The inputs must be on the same stick")
 
         if c_input_x.type == InputType.STICK_LEFT_X:
-            self.gamepad.left_joystick_float(x_value_float=c_input_x.val, y_value_float=c_input_y.val)
+            self.gamepad.left_joystick_float(
+                x_value_float=c_input_x.val, y_value_float=c_input_y.val
+            )
         else:
-            self.gamepad.right_joystick_float(x_value_float=c_input_x.val, y_value_float=c_input_y.val)
+            self.gamepad.right_joystick_float(
+                x_value_float=c_input_x.val, y_value_float=c_input_y.val
+            )
 
         self.gamepad.update()
 
     def reset_controls(self):
-        """ Releases all buttons (except sticks) of the Virtual Controller """
-        time.sleep(0.5)  # This looks unnecessary, but it's needed for it to work even when the level is reset
+        """Releases all buttons (except sticks) of the Virtual Controller"""
+        time.sleep(
+            0.5
+        )  # This looks unnecessary, but it's needed for it to work even when the level is reset
         for btn in self.BTN_TO_VGBUTTON.values():
             self.gamepad.release_button(btn)
 
         for btn in self.DPAD_TO_VGBUTTON.values():
             self.gamepad.release_button(btn)
 
-        self.gamepad.left_trigger_float(0.)
-        self.gamepad.right_trigger_float(0.)
-        self.gamepad.left_joystick_float(0., 0.)
-        self.gamepad.right_joystick_float(0., 0.)
+        self.gamepad.left_trigger_float(0.0)
+        self.gamepad.right_trigger_float(0.0)
+        self.gamepad.left_joystick_float(0.0, 0.0)
+        self.gamepad.right_joystick_float(0.0, 0.0)
 
         self.gamepad.update()
         logger.info("Gamepad was reset")
@@ -92,7 +104,7 @@ class VirtualControllerProvider:
         InputType.THUMB_RIGHT: vg.XUSB_BUTTON.XUSB_GAMEPAD_RIGHT_THUMB,
         InputType.THUMB_LEFT: vg.XUSB_BUTTON.XUSB_GAMEPAD_LEFT_THUMB,
         InputType.BTN_BACK: vg.XUSB_BUTTON.XUSB_GAMEPAD_BACK,
-        InputType.BTN_START: vg.XUSB_BUTTON.XUSB_GAMEPAD_START
+        InputType.BTN_START: vg.XUSB_BUTTON.XUSB_GAMEPAD_START,
     }
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
@@ -106,4 +118,9 @@ class VirtualControllerProvider:
     # Arrays of InputTypes that can be used to check the category of the Input Type
     DPADS = [InputType.DIR_PAD_X, InputType.DIR_PAD_Y]
     TRIGGERS = [InputType.TRIGGER_LEFT, InputType.TRIGGER_RIGHT]
-    STICKS = [InputType.STICK_LEFT_X, InputType.STICK_LEFT_Y, InputType.STICK_RIGHT_X, InputType.STICK_RIGHT_Y]
+    STICKS = [
+        InputType.STICK_LEFT_X,
+        InputType.STICK_LEFT_Y,
+        InputType.STICK_RIGHT_X,
+        InputType.STICK_RIGHT_Y,
+    ]

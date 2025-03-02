@@ -1,7 +1,7 @@
 from typing import override
 
-from ..command_arbitrator import InputEntry
-from ..policies.policy import Policy
+from .input_entry import InputEntry
+from .policy import Policy
 
 
 class PolicyExclusivity(Policy):
@@ -12,14 +12,13 @@ class PolicyExclusivity(Policy):
     Thus, the resulting value from the merge is the value given by that actor.
     """
 
-
     def __init__(self):
         super().__init__()
 
     @staticmethod
     @override
     def get_max_actors() -> int:
-        """ Returns the maximum number of actors allowed in the policy. """
+        """Returns the maximum number of actors allowed in the policy."""
         return 1
 
     @staticmethod

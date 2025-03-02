@@ -1,5 +1,5 @@
-from ..command_arbitrator import InputEntry
-from ..policies.policy import ContinuousPolicy
+from .input_entry import InputEntry
+from .policy import ContinuousPolicy
 
 
 class PolicyContinuousOR(ContinuousPolicy):

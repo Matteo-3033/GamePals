@@ -1,5 +1,5 @@
-from ..command_arbitrator import InputEntry
-from ..policies.policy import BinaryPolicy
+from .input_entry import InputEntry
+from .policy import BinaryPolicy
 
 
 class PolicyBinaryAND(BinaryPolicy):

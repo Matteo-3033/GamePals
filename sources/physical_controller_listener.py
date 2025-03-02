@@ -1,12 +1,12 @@
-import threading
 import logging
+import threading
+
 from inputs import devices
 
-from ..agents.datas import InputData
-from ..agents.observers.controller_observer import ControllerObserver
-from .controller_inputs import ControllerInput, InputType
+from .controller import ControllerInput, ControllerObserver, InputData, InputType
 
 logger = logging.getLogger(__name__)
+
 
 class PhysicalControllerListener:
     """
@@ -25,32 +25,38 @@ class PhysicalControllerListener:
             self.gamepad = devices.gamepads[gamepad_number]
         except IndexError:
             logger.error("Gamepad %d not found", gamepad_number)
+            self.gamepad = None
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
-        """ Adds a subscriber to the list of subscribers """
+        """Adds a subscriber to the list of subscribers"""
         self.subscribers.append(subscriber)
 
     def notify_all(self, c_input: ControllerInput) -> None:
-        """ Notifies all subscribers of an input, wrapped in an InputData object """
+        """Notifies all subscribers of an input, wrapped in an InputData object"""
         data = InputData(c_input)
         for subscriber in self.subscribers:
             subscriber.receive_controller_input(data)
 
     def start_listening(self) -> None:
-        """  Starts listening to the physical controller inputs and notifying its subscribers """
+        """Starts listening to the physical controller inputs and notifying its subscribers"""
+        if self.gamepad is None:
+            return
+
         if self.listener_thread is None or not self.listener_thread.is_alive():
             self.running = True
-            self.listener_thread = threading.Thread(target=self._listen_loop, daemon=True)
+            self.listener_thread = threading.Thread(
+                target=self._listen_loop, daemon=True
+            )
             self.listener_thread.start()
 
     def stop_listening(self) -> None:
-        """ Stops listening for inputs """
+        """Stops listening for inputs"""
         self.running = False
         if self.listener_thread:
             self.listener_thread.join()
 
     def _listen_loop(self) -> None:
-        """ The loop that listens for controller inputs """
+        """The loop that listens for controller inputs"""
         while self.running:
             try:
                 events = self.gamepad.read()
@@ -67,7 +73,7 @@ class PhysicalControllerListener:
                     self.notify_all(observed)
 
     def event_to_input(self, event) -> ControllerInput | None:
-        """ Converts an event from the physical controller to a Controller Input """
+        """Converts an event from the physical controller to a Controller Input"""
         if event.code not in self.INPUT_TYPES_MAP:
             return None  # Ignore unmapped inputs
 
@@ -76,12 +82,17 @@ class PhysicalControllerListener:
         return ControllerInput(input_type, input_value)
 
     @staticmethod
-    def normalize(input_type : InputType, val : int) -> float:
-        """ Normalizes the value of the input into relative values between -1 and 1 (or 0 and 1) """
+    def normalize(input_type: InputType, val: int) -> float:
+        """Normalizes the value of the input into relative values between -1 and 1 (or 0 and 1)"""
         match input_type:
             case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
                 return val / 255
-            case InputType.STICK_RIGHT_X | InputType.STICK_RIGHT_Y | InputType.STICK_LEFT_X | InputType.STICK_LEFT_Y:
+            case (
+                InputType.STICK_RIGHT_X
+                | InputType.STICK_RIGHT_Y
+                | InputType.STICK_LEFT_X
+                | InputType.STICK_LEFT_Y
+            ):
                 return val / 32767
             case _:
                 return val

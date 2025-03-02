@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from ...sources.game_state import GameState
+from .game_state import GameState
+
 
 class GameStateObserver(ABC):
     """
@@ -8,7 +9,6 @@ class GameStateObserver(ABC):
     """
 
     @abstractmethod
-    def receive_game_state_update(self, game_state : GameState) -> None:
-        """ Receives Game State Updates """
+    def receive_game_state_update(self, game_state: GameState) -> None:
+        """Receives Game State Updates"""
         pass
-

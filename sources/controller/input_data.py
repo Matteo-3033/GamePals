@@ -1,6 +1,14 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
-from ..datas import InputData
+from .controller_inputs import ControllerInput
+
+
+@dataclass
+class InputData:
+    """The wrapper class of the Data sent to a Controller Observer"""
+
+    c_input: ControllerInput
 
 
 class ControllerObserver(ABC):
@@ -10,5 +18,5 @@ class ControllerObserver(ABC):
 
     @abstractmethod
     def receive_controller_input(self, data: InputData) -> None:
-        """ Receives Inputs from the Input Source """
+        """Receives Inputs from the Input Source"""
         pass
