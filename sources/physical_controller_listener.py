@@ -2,9 +2,9 @@ import threading
 import logging
 from inputs import devices
 
-from agents.datas import InputData
-from agents.observers.controller_observer import ControllerObserver
-from sources.controller_inputs import ControllerInput, InputType
+from ..agents.datas import InputData
+from ..agents.observers.controller_observer import ControllerObserver
+from .controller_inputs import ControllerInput, InputType
 
 logger = logging.getLogger(__name__)
 

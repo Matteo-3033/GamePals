@@ -1,7 +1,7 @@
 from typing import override
 
-from command_arbitrators.command_arbitrator import InputEntry
-from command_arbitrators.policies.policy import Policy
+from ..command_arbitrator import InputEntry
+from ..policies.policy import Policy
 
 
 class PolicyExclusivity(Policy):

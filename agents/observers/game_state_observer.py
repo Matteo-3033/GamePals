@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from sources.game_state import GameState
+from ...sources.game_state import GameState
 
 class GameStateObserver(ABC):
     """

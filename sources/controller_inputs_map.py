@@ -1,7 +1,7 @@
 import time
 from dataclasses import dataclass
 
-from sources.controller_inputs import InputType, ControllerInput
+from .controller_inputs import InputType, ControllerInput
 
 @dataclass
 class ControllerInputRecord:

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from agents.actor import Actor, ActorID
-from sources.controller_inputs import InputType
+from ..agents.actor import Actor, ActorID
+from ..sources.controller_inputs import InputType
 
 
 class PolicyRole(Enum):

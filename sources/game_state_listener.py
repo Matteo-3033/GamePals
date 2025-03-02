@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 
-from agents.observers.game_state_observer import GameStateObserver
-from sources.game_state import GameState
+from ..agents.observers.game_state_observer import GameStateObserver
+from .game_state import GameState
 
 
 class GameStateListener(ABC):

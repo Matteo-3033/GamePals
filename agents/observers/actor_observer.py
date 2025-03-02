@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from agents.datas import ActorData, MessageData
+from ..datas import ActorData, MessageData
 
 
 class ActorObserver(ABC):

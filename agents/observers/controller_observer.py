@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from agents.datas import InputData
+from ..datas import InputData
 
 
 class ControllerObserver(ABC):

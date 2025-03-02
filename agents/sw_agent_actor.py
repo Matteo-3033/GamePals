@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from agents.actor import Actor
-from agents.observers.game_state_observer import GameStateObserver
-from sources.game_state import GameState
-from sources.controller_inputs import ControllerInput
-from sources.game_state_listener import GameStateListener
+from .actor import Actor
+from .observers.game_state_observer import GameStateObserver
+from ..sources.game_state import GameState
+from ..sources.controller_inputs import ControllerInput
+from ..sources.game_state_listener import GameStateListener
 
 
 class SWAgentActor(Actor, GameStateObserver, ABC):

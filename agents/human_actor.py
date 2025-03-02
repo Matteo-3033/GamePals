@@ -1,10 +1,10 @@
 import tomllib
 
-from agents.datas import InputData, MessageData, ActorData
-from agents.actor import Actor
-from agents.observers.controller_observer import ControllerObserver
-from sources.controller_inputs import InputType, ControllerInput
-from sources.physical_controller_listener import PhysicalControllerListener
+from .datas import InputData
+from .actor import Actor
+from .observers.controller_observer import ControllerObserver
+from ..sources.controller_inputs import InputType, ControllerInput
+from ..sources.physical_controller_listener import PhysicalControllerListener
 
 
 class HumanActor(Actor, ControllerObserver):

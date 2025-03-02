@@ -2,14 +2,14 @@ import tomllib
 import logging
 from dataclasses import dataclass
 
-from agents.datas import MessageData, ActorData
-from agents.actor import Actor, ActorID
-from agents.observers.actor_observer import ActorObserver
-from command_arbitrators.policies.policy import Policy
-from command_arbitrators.policy_manager import PolicyManager, PolicyRole
-from sources.controller_inputs import ControllerInput, InputType
-from sources.controller_inputs_map import ControllerInputsMap, ControllerInputRecord
-from sources.virtual_controller_provider import VirtualControllerProvider
+from ..agents.datas import MessageData, ActorData
+from ..agents.actor import Actor, ActorID
+from ..agents.observers.actor_observer import ActorObserver
+from .policies.policy import Policy
+from .policy_manager import PolicyManager, PolicyRole
+from ..sources.controller_inputs import ControllerInput, InputType
+from ..sources.controller_inputs_map import ControllerInputsMap, ControllerInputRecord
+from ..sources.virtual_controller_provider import VirtualControllerProvider
 
 logger = logging.getLogger(__name__)
 

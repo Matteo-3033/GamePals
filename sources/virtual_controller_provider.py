@@ -2,7 +2,7 @@ import time
 import logging
 import vgamepad as vg
 
-from sources.controller_inputs import ControllerInput, InputType
+from .controller_inputs import ControllerInput, InputType
 
 logger = logging.getLogger(__name__)
 
