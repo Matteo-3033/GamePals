@@ -38,4 +38,4 @@ To run the architecture successfully, the following tools and packages are requi
 
 ## Arbitrator's Configuration
 
-TODO...
+TODO: Specify how do build a config.toml  
