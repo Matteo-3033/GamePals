@@ -32,7 +32,10 @@ To run the architecture successfully, the following tools and packages are requi
 - [**Python 3.13**](https://www.python.org/downloads/release/python-3130/) - The latest Python version as of February 2025.
 
 - ```requirements.txt``` - The required Python packages can be installed using:
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
+## Arbitrator's Configuration
+
+TODO...
