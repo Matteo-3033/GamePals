@@ -23,5 +23,4 @@ class PolicyExclusivity(Policy):
 
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
-        val = entries[0].input_details.val
-        return val
+        return (len(entries) > 0 and entries[0].input_details.val) or 0.0
