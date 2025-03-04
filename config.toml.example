@@ -1,9 +1,12 @@
-# This file is an example of the configuration file for Copilot
-# The configuration file is used to define how each input is mapped to the controller and how the inputs are merged
-# The file is divided into two sections: AssistanceLevels and PolicyTypes
-# - The AssistanceLevels section is used to define how much help the human player (using a physical controller) will receive. Set the value to 1.0 for full assistance and 0.0 for no assistance
-#   This section can be repeated to define the assistance levels for multiple human players
-# - The PolicyTypes section is used to define how the inputs are merged. Refer to command_arbitrator/policies for details on the available merging policies
+# This file is an example of the configuration file for Copilot.
+# The configuration file is used to define how each input is mapped to the controller and how the inputs are merged.
+#
+# The file is divided into two sections: AssistanceLevels and PolicyTypes:
+# - The AssistanceLevels section is used to define how much help the human player (using a physical controller) will receive.
+#   Set the value to 1.0 for full assistance and 0.0 for no assistance.
+#   This section can be repeated to define the assistance levels for multiple human players.
+# - The PolicyTypes section is used to define how the inputs are merged.
+#   Refer to command_arbitrator/policies for details on the available merging policies
 
 # Configuration for the first human player
 [[AssistanceLevels]]
