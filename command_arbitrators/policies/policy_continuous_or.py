@@ -12,6 +12,11 @@ class PolicyContinuousOR(ContinuousPolicy):
     def __init__(self):
         super().__init__()
 
+    @classmethod
+    def get_name(cls) -> str:
+        "Returns the name this class should be referred to in the configuration file."
+        return "POLICY_CONT_OR"
+
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
         latest_entry = sorted(entries, key=lambda x: x.input_details.timestamp, reverse=True)[0]

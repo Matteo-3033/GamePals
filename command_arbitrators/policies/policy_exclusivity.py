@@ -15,6 +15,11 @@ class PolicyExclusivity(Policy):
     def __init__(self):
         super().__init__()
 
+    @classmethod
+    def get_name(cls) -> str:
+        "Returns the name this class should be referred to in the configuration file."
+        return "POLICY_EXCLUSIVITY"
+
     @staticmethod
     @override
     def get_max_actors() -> int:

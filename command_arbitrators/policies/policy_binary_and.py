@@ -12,6 +12,11 @@ class PolicyBinaryAND(BinaryPolicy):
     def __init__(self):
         super().__init__()
 
+    @classmethod
+    def get_name(cls) -> str:
+        "Returns the name this class should be referred to in the configuration file."
+        return "POLICY_BIN_AND"
+
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
         val = True

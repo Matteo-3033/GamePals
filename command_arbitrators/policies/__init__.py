@@ -12,7 +12,7 @@ from .policy_exclusivity import PolicyExclusivity
 from .policy_manager import PolicyManager
 
 
-def get_all_subclasses(cls: Type) -> set:
+def get_all_subclasses(cls: Type) -> set[Type]:
     subclasses = set(cls.__subclasses__())  # Trova le sottoclassi dirette
     all_subclasses = set(subclasses)  # Copia iniziale delle sottoclassi dirette
 
@@ -32,7 +32,7 @@ def get_all_subclasses(cls: Type) -> set:
 
 
 policies = get_all_subclasses(Policy)
-PolicyName = Enum("PolicyName", {policy.__name__: policy for policy in policies})
+PolicyName = Enum("PolicyName", {policy.get_name(): policy for policy in policies})
 
 __all__ = [
     "Policy",
@@ -40,6 +40,7 @@ __all__ = [
     "PolicyBinaryOR",
     "PolicyContinuousOR",
     "PolicyExclusivity",
+    "PolicyContinuousSum",
     "PolicyManager",
     "InputEntry",
     "PolicyRole",

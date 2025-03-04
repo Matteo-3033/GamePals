@@ -9,6 +9,11 @@ class Policy(ABC):
     def __init__(self):
         pass
 
+    @classmethod
+    def get_name(cls) -> str:
+        "Returns the name this class should be referred to in the configuration file."
+        return cls.__name__
+
     @staticmethod
     def get_max_actors() -> int:
         """Returns the maximum number of actors allowed in the policy."""
