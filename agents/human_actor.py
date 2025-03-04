@@ -1,4 +1,5 @@
 import tomllib
+from typing import Final, Literal, TypedDict
 
 from ..sources import PhysicalControllerListener
 from ..sources.controller import (
@@ -9,6 +10,8 @@ from ..sources.controller import (
 )
 from .actor import Actor
 
+AssistanceLevels = dict[InputType, float]
+
 
 class HumanActor(Actor, ControllerObserver):
     """
@@ -18,7 +21,9 @@ class HumanActor(Actor, ControllerObserver):
     """
 
     def __init__(
-        self, physical_controller: PhysicalControllerListener, config_file_path: str
+        self,
+        physical_controller: PhysicalControllerListener,
+        assistance_levels: AssistanceLevels,
     ):
         super().__init__()
         self.controller = physical_controller
@@ -26,12 +31,8 @@ class HumanActor(Actor, ControllerObserver):
 
         self.controller.subscribe(self)
 
-        with open(config_file_path, "rb") as config_file:
-            config = tomllib.load(config_file)
-            # Confidence is the complement of Assistance
-            self.confidence_levels = {
-                t: 1 - v for t, v in config["AssistanceLevels"].items()
-            }
+        # Confidence is the complement of Assistance
+        self.confidence_levels = {t: 1 - v for t, v in assistance_levels.items()}
 
     def start(self) -> None:
         """

@@ -6,9 +6,11 @@ from ..agents import Actor, ActorID
 from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
 from ..sources.controller import ControllerInput, ControllerInputsMap, InputType
-from .policies import InputEntry, Policy, PolicyManager, PolicyRole
+from .policies import InputEntry, PolicyManager, PolicyName, PolicyRole
 
 logger = logging.getLogger(__name__)
+
+PolicyTypes = dict[InputType, PolicyName]
 
 
 class CommandArbitrator(ActorObserver):
@@ -20,18 +22,17 @@ class CommandArbitrator(ActorObserver):
     The Arbitrator can communicate to its Actors via their get_arbitrator_updates method.
     """
 
-    def __init__(self, config_file_path: str) -> None:
+    def __init__(self, policies: PolicyTypes) -> None:
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = {}
         self.input_maps: dict[ActorID, ControllerInputsMap] = {}
 
-        with open(config_file_path, "rb") as config_file:
-            config = tomllib.load(config_file)
-            policies_types = {
-                in_type: Policy.policy_name_to_policy(name)
-                for in_type, name in config["PolicyTypes"].items()
-            }
-            self.policy_manager = PolicyManager(policies_types)
+        policy_types = {
+            input_type: policy_name.value
+            for input_type, policy_name in policies.items()
+        }
+
+        self.policy_manager = PolicyManager(policy_types)
 
     def add_actor(self, actor: Actor, role: PolicyRole) -> None:
         """Adds an Actor to the Architecture"""

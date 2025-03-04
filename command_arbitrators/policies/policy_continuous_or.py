@@ -4,7 +4,7 @@ from .policy import ContinuousPolicy
 
 class PolicyContinuousOR(ContinuousPolicy):
     """
-    PolicyBinOR is a Continuous Policy that allows for all inputs to be executed (similarly to an OR logic).
+    PolicyContinuousOR is a Continuous Policy that allows for all inputs to be executed (similarly to an OR logic).
 
     Thus, it returns the most recent input of the given entries.
     """
