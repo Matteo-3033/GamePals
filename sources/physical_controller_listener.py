@@ -25,7 +25,7 @@ class PhysicalControllerListener:
             self.gamepad = devices.gamepads[gamepad_number]
         except IndexError:
             logger.error("Gamepad %d not found", gamepad_number)
-            self.gamepad = None
+            raise Exception("Gamepad %d not found", gamepad_number)
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
         """Adds a subscriber to the list of subscribers"""
@@ -39,9 +39,6 @@ class PhysicalControllerListener:
 
     def start_listening(self) -> None:
         """Starts listening to the physical controller inputs and notifying its subscribers"""
-        if self.gamepad is None:
-            return
-
         if self.listener_thread is None or not self.listener_thread.is_alive():
             self.running = True
             self.listener_thread = threading.Thread(

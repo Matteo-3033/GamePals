@@ -27,26 +27,3 @@ class Config(TypedDict, total=True):
             AssistanceLevels=assistance_levels,
             PolicyTypes=policy_types,
         )
-
-
-def get_config() -> Config:
-    import argparse
-    import tomllib
-
-    parser = argparse.ArgumentParser(
-        prog="Copilot",
-        description="Copilot is a tool for emulating a video game controller, allowing gameplay using inputs from either a physical controller or an AI agent.",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--config",
-        type=argparse.FileType("rb"),
-        help="Controller configuration file. An example configuration file can be found in the main repository of the project.",
-        required=True,
-    )
-
-    args = parser.parse_args()
-    config: dict[str, Any] = tomllib.load(args.config)
-
-    return Config.from_dict(config)
