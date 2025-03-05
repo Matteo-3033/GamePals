@@ -9,6 +9,7 @@ from .policy_continuous_or import PolicyContinuousOR
 from .policy_continuous_sum import PolicyContinuousSum
 from .policy_exclusivity import PolicyExclusivity
 from .policy_manager import PolicyManager
+from .policy_binary_democracy import PolicyBinaryDemocracy
 from .policy_binary_supv_by_pilot import PolicyBinarySupervisionByPilot
 
 

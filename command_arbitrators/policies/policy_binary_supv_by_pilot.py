@@ -10,7 +10,7 @@ class PolicyBinarySupervisionByPilot(BinaryPolicy):
     """
     PolicyBinarySupervisionByPilot is a Binary Policy that:
      * if a Pilot suggests value 1, produces 1
-     * otherwise, it decides democratically the result of the merge.
+     * otherwise, it decides democratically the result of the merge (equivalent to PolicyBinaryDemocracy.
 
     The democratic decision is based on the confidence level of the actors.
 
@@ -28,6 +28,7 @@ class PolicyBinarySupervisionByPilot(BinaryPolicy):
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
         from .. import PolicyRole
+        from .policy_binary_democracy import PolicyBinaryDemocracy
 
         if next((
                 entry
@@ -37,26 +38,4 @@ class PolicyBinarySupervisionByPilot(BinaryPolicy):
         ), None) is not None:
             return 1
 
-        one_voters: list[InputEntry] = [
-            entry
-            for entry in entries
-            if entry.input_details.val != 0
-        ]
-        if len(one_voters) == 0: return 0
-
-        zero_voters: list[InputEntry] = [
-            entry
-            for entry in entries
-            if entry.input_details.val == 0
-        ]
-        if len(zero_voters) == 0: return 1
-
-        one_score = sum(entry.input_details.confidence for entry in one_voters) / len(one_voters)
-        zero_score = sum(entry.input_details.confidence for entry in zero_voters) / len(zero_voters)
-
-        #logger.info("Scores are %.2f vs %.2f", one_score, zero_score)
-
-        if zero_score > one_score:
-            return 0
-        else:
-            return 1
+        return PolicyBinaryDemocracy.merge_input_entries(entries)
