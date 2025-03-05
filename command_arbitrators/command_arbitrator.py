@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 
 from ..agents import Actor, ActorID
 from ..agents.observer import ActorData, ActorObserver, MessageData

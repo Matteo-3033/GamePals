@@ -42,7 +42,7 @@ def get_config() -> Config:
         "-c",
         "--config",
         type=argparse.FileType("rb"),
-        help="Controller configuration file. An example configuration file can be found in the main reposity of the project.",
+        help="Controller configuration file. An example configuration file can be found in the main repository of the project.",
         required=True,
     )
 

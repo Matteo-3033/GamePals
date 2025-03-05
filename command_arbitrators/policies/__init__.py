@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Type
 
-from ...sources.controller import InputType
 from .input_entry import InputEntry, PolicyRole
 from .policy import Policy
 from .policy_binary_and import PolicyBinaryAND
@@ -12,20 +11,20 @@ from .policy_exclusivity import PolicyExclusivity
 from .policy_manager import PolicyManager
 
 
-def get_all_subclasses(cls: Type) -> set[Type]:
-    subclasses = set(cls.__subclasses__())  # Trova le sottoclassi dirette
-    all_subclasses = set(subclasses)  # Copia iniziale delle sottoclassi dirette
+def get_all_subclasses(cls: Type) -> set[Type[Policy]]:
+    """ Returns a set of all the Policy class concrete implementations. """
+    subclasses = set(cls.__subclasses__())  # Find direct subclasses
+    all_subclasses = set(subclasses)
 
-    for subclass in subclasses.copy():
-        # Ricorsione per sottoclassi indirette
+    for subclass in subclasses.copy(): # Find nested subclasses
         all_subclasses.update(get_all_subclasses(subclass))
 
-    # Rimuovi le classi astratte, controllando se hanno il set __abstractmethods__ (e se non è vuoto)
+    # Filter out abstract classes, checking the __abstractmethods__ attribute
     all_subclasses = {
         subclass
         for subclass in all_subclasses
-        if not hasattr(subclass, "__abstractmethods__")
-        or not subclass.__abstractmethods__
+        if not hasattr(subclass, "__abstractmethods__") # Doesn't have
+        or not subclass.__abstractmethods__ # Has but it's empty
     }
 
     return all_subclasses
@@ -36,11 +35,6 @@ PolicyName = Enum("PolicyName", {policy.get_name(): policy for policy in policie
 
 __all__ = [
     "Policy",
-    "PolicyBinaryAND",
-    "PolicyBinaryOR",
-    "PolicyContinuousOR",
-    "PolicyExclusivity",
-    "PolicyContinuousSum",
     "PolicyManager",
     "InputEntry",
     "PolicyRole",
