@@ -98,7 +98,7 @@ class CommandArbitrator(ActorObserver):
 
     def execute_single_value_command(self, c_input: ControllerInput) -> None:
         """Executes a single-value command on the Virtual Controller"""
-        logger.info("Executing %s", c_input)
+        logger.debug("Executing %s", c_input)
         self.virtual_controller.execute(c_input)
         self.notify_arbitrated_input(c_input)
 
@@ -106,7 +106,7 @@ class CommandArbitrator(ActorObserver):
         self, input_x: ControllerInput, input_y: ControllerInput
     ) -> None:
         """Executes a 2-axis command on the Virtual Controller"""
-        logger.info("Executing %s %s", input_x, input_y)
+        logger.debug("Executing %s %s", input_x, input_y)
         self.virtual_controller.execute_stick(input_x, input_y)
         self.notify_arbitrated_input(input_x)
         self.notify_arbitrated_input(input_y)
