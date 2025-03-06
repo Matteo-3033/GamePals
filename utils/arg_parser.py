@@ -1,10 +1,12 @@
 import argparse
 from typing import Any
 
+from .config import Config, config_from_dict
+
 
 class ArgParser:
 
-    def __init__(self):
+    def __init__(self) -> None:
         parser = argparse.ArgumentParser(
             prog="Copilot",
             description="Copilot is a tool for emulating a video game controller, allowing gameplay using inputs from either a physical controller or an AI agent.",
@@ -23,13 +25,12 @@ class ArgParser:
         self.args = parser.parse_args()
 
     def _add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        """ Adds Arguments to the parser """
+        """Adds Arguments to the parser"""
         pass
 
-    def get_config(self) -> 'Config':
-        from copilot.utils import Config
+    def get_config(self) -> Config:
         import tomllib
 
         config: dict[str, Any] = tomllib.load(self.args.config)
 
-        return Config.from_dict(config)
+        return config_from_dict(config)
