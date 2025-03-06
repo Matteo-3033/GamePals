@@ -22,6 +22,7 @@ class PolicyContinuousSlope(ContinuousPolicy):
     * The x-axis represents the Copilot Confidence.
     * The y-axis represents the alpha parameter, which is then used to weight the Linear Blending.
     * The corners of the function (theta_1 and theta_2) are determined by the Pilot Confidence.
+
     """
 
     def __init__(self):
