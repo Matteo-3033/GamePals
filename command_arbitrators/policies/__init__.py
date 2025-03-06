@@ -11,6 +11,7 @@ from .policy_exclusivity import PolicyExclusivity
 from .policy_manager import PolicyManager
 from .policy_binary_democracy import PolicyBinaryDemocracy
 from .policy_binary_supv_by_pilot import PolicyBinarySupervisionByPilot
+from .policy_continuous_slope import PolicyContinuousSlope
 
 
 def get_all_subclasses(cls: Type) -> set[Type[Policy]]:
