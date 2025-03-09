@@ -79,6 +79,9 @@ class PolicyContinuousSlope(ContinuousPolicy):
     def _calc_alpha(c : float, theta_1 : float, theta_2 : float) -> float:
         # c should be the Copilot Confidence
 
+        if c < theta_1: return 0
+        if c > theta_2: return 1
+
         if theta_1 == theta_2:
             return 1 if c > theta_1 else 0
 
