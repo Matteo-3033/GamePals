@@ -14,12 +14,10 @@ class SWAgentSequencedActor(SWAgentActor, GameStateObserver, ABC):
     """
 
     def __init__(self, game_state: GameStateListener):
-        super().__init__()
-        self.game_state = game_state
+        super().__init__(game_state)
         self.current_sequence : list[tuple[ControllerInput, float, float]] = []
         self.last_input_timestamp : float = 0
 
-        self.game_state.subscribe(self)
 
     @abstractmethod
     def game_state_to_input_sequence(
