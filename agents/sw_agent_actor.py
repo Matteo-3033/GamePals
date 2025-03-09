@@ -32,5 +32,5 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     def game_state_to_inputs(
         self, game_state: GameState
     ) -> list[tuple[ControllerInput, float]]:
-        """Produces inputs given a Game State"""
+        """Produces inputs given a Game State. Tuples are (input, confidence)"""
         pass
