@@ -1,3 +1,4 @@
+from importlib.metadata import entry_points
 from typing import override
 
 from .input_entry import InputEntry
@@ -42,6 +43,14 @@ class PolicyContinuousSlope(ContinuousPolicy):
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
         from .input_entry import PolicyRole
+
+        # Remove 0 values from Copilot
+        entries = [
+            entry
+            for entry in entries
+            if not (entry.actor_role == PolicyRole.COPILOT
+                    and entry.input_details.val == 0)
+        ]
 
         if len(entries) == 0: return 0.0
         if len(entries) == 1: return entries[0].input_details.val
