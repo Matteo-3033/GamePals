@@ -2,11 +2,11 @@ import time
 from abc import ABC, abstractmethod
 
 from ..sources.controller import ControllerInput
-from ..sources.game_state import GameState, GameStateListener, GameStateObserver
+from ..sources.game_state import GameState, GameStateListener
 from .sw_agent_actor import SWAgentActor
 
 
-class SWAgentSequencedActor(SWAgentActor, GameStateObserver, ABC):
+class SWAgentSequencedActor(SWAgentActor, ABC):
     """
     SWAgentSequencedActor is a particular type of SWAgentActor that calculates actions as sequences of inputs.
 
