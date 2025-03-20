@@ -25,7 +25,7 @@ class PhysicalControllerListener:
             self.gamepad = devices.gamepads[gamepad_number]
         except IndexError:
             logger.error("Gamepad %d not found", gamepad_number)
-            raise Exception("Gamepad %d not found", gamepad_number)
+            raise Exception(f"Gamepad {gamepad_number} not found")
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
         """Adds a subscriber to the list of subscribers"""
@@ -34,6 +34,7 @@ class PhysicalControllerListener:
     def notify_all(self, c_input: ControllerInput) -> None:
         """Notifies all subscribers of an input, wrapped in an InputData object"""
         data = InputData(c_input)
+        logger.info("Sending data %s", data)
         for subscriber in self.subscribers:
             subscriber.receive_controller_input(data)
 
