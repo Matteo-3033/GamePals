@@ -21,7 +21,13 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     ) -> None:
         super().__init__()
         self.game_state = game_state
-        self.action_to_game_input = action_to_game_input
+
+        #Filter for only actually used actions
+        self.action_to_game_input = {
+            action: game_input
+            for action, game_input in action_to_game_input
+            if action in self.get_controlled_actions()
+        }
 
         self.game_state.subscribe(self)
 
