@@ -1,7 +1,8 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput, InputType
+from ..sources.controller import ControllerInput
+from ..sources.game import GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
 
@@ -45,8 +46,8 @@ class Actor(ABC):
         pass
 
     @abstractmethod
-    def get_controlled_inputs(self) -> list[InputType]:
-        """Returns the list of Input Types that the Actor is controlling."""
+    def get_controlled_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is able to control"""
         pass
 
     @abstractmethod

@@ -1,10 +1,11 @@
 import time
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput
-from ..sources.game_state import GameState, GameStateListener
+from ..sources.controller import ControllerInput, InputType
+from ..sources.game import GameState, GameStateListener, GameAction
 from .sw_agent_actor import SWAgentActor
 
+ActionToInputMap = dict[GameAction, InputType]
 
 class SWAgentSequencedActor(SWAgentActor, ABC):
     """
@@ -13,8 +14,12 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
     The sequence inputs are sent to its subscribers based on the specified delays.
     """
 
-    def __init__(self, game_state: GameStateListener):
-        super().__init__(game_state)
+    def __init__(
+            self,
+            game_state: GameStateListener,
+            action_to_input: ActionToInputMap,
+    ) -> None:
+        super().__init__(game_state, action_to_input)
         self.current_sequence : list[tuple[ControllerInput, float, float]] = []
         self.last_input_timestamp : float = 0
 

@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput
-from ..sources.game_state import GameState, GameStateListener, GameStateObserver
+from ..sources.controller import ControllerInput, InputType
+from ..sources.game import GameState, GameStateListener, GameStateObserver, GameAction
 from .actor import Actor
+
+ActionToInputMap = dict[GameAction, InputType]
 
 
 class SWAgentActor(Actor, GameStateObserver, ABC):
@@ -12,9 +14,14 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     The inputs it produces are generated based on the current Game State, whose updates it receives.
     """
 
-    def __init__(self, game_state: GameStateListener):
+    def __init__(
+            self,
+            game_state: GameStateListener,
+            action_to_game_input: ActionToInputMap,
+    ) -> None:
         super().__init__()
         self.game_state = game_state
+        self.action_to_game_input = action_to_game_input
 
         self.game_state.subscribe(self)
 
@@ -28,9 +35,13 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
         for c_input, confidence in inputs:
             self.notify_input(c_input, confidence)
 
+    def action_to_controller_input(self, action: GameAction, value: float) -> ControllerInput:
+        """Converts (action, value) into (input_type, value)"""
+        return ControllerInput(self.action_to_game_input[action], value)
+
     @abstractmethod
     def game_state_to_inputs(
-        self, game_state: GameState
+            self, game_state: GameState
     ) -> list[tuple[ControllerInput, float]]:
         """Produces inputs given a Game State. Tuples are (input, confidence)"""
         pass
