@@ -1,7 +1,7 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput
+from ..sources.controller import ControllerInput, ControllerInputWithConfidence
 from ..sources.game import GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
@@ -30,7 +30,7 @@ class Actor(ABC):
 
     def notify_input(self, input_data: ControllerInput, confidence: float) -> None:
         """Notifies all the subscribers with an InputData object"""
-        data = ActorData(self.id, input_data, confidence)
+        data = ActorData(self.id, ControllerInputWithConfidence(input_data, confidence))
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 

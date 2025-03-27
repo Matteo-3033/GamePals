@@ -51,3 +51,9 @@ class ControllerInput:
 
     type: InputType
     val: float
+
+
+@dataclass
+class ControllerInputWithConfidence(ControllerInput):
+    """ControllerInputWithConfidence extends the ControllerInput with the related confidence"""
+    confidence: float

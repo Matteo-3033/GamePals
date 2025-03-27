@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput, InputType
+from . import ActionInputWithConfidence
+from ..sources.controller import ControllerInput, InputType, ControllerInputWithConfidence
 from ..sources.game import GameState, GameStateListener, GameStateObserver, GameAction
 from .actor import Actor
 
@@ -45,9 +46,24 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
         """Converts (action, value) into (input_type, value)"""
         return ControllerInput(self.action_to_game_input[action], value)
 
-    @abstractmethod
     def game_state_to_inputs(
             self, game_state: GameState
-    ) -> list[tuple[ControllerInput, float]]:
-        """Produces inputs given a Game State. Tuples are (input, confidence)"""
+    ) -> list[ControllerInputWithConfidence]:
+        """Produces inputs given a Game State. Inputs are specified by InputType"""
+        action_inputs = self.game_state_to_action_inputs(game_state)
+        return [
+            ControllerInputWithConfidence(
+                val=action_input.val,
+                type=self.action_to_game_input[action_input.action],
+                confidence=action_input.confidence
+            )
+            for action_input in action_inputs
+        ]
+
+    @abstractmethod
+    def game_state_to_action_inputs(
+            self, game_state: GameState
+    ) -> list[ActionInputWithConfidence]:
+        """Produces inputs given a Game State. Inputs are specified by GameAction"""
         pass
+

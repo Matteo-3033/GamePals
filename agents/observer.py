@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from ..sources.controller import ControllerInput
 from .actor_id import ActorID
+from ..sources.controller.controller_inputs import ControllerInputWithConfidence
 
 
 @dataclass
@@ -10,8 +10,7 @@ class ActorData:
     """The wrapper class of the Input Data sent to an Actor Observer"""
 
     actor_id: ActorID
-    c_input: ControllerInput
-    confidence: float
+    data : ControllerInputWithConfidence
 
 
 @dataclass
