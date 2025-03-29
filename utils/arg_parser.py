@@ -1,7 +1,6 @@
 import argparse
 from typing import Any
-
-from .config import Config, config_from_dict
+import tomllib
 
 
 class ArgParser:
@@ -13,10 +12,26 @@ class ArgParser:
         )
 
         parser.add_argument(
-            "-c",
-            "--config",
+            "-gc",
+            "--game_config",
             type=argparse.FileType("rb"),
-            help="Controller configuration file. An example configuration file can be found in the main repository of the project.",
+            help="Game Configuration, containing game information and available actions for the game",
+            required=True,
+        )
+
+        parser.add_argument(
+            "-agc",
+            "--agents_config",
+            type=argparse.FileType("rb"),
+            help="Agents Configuration for the Game, containing details on which agents are available",
+            required=True,
+        )
+
+        parser.add_argument(
+            "-asc",
+            "--assistance_config",
+            type=argparse.FileType("rb"),
+            help="Assistance Configuration, containing details for configuring the Shared Control Architecture settings",
             required=True,
         )
 
@@ -28,9 +43,14 @@ class ArgParser:
         """Adds Arguments to the parser"""
         pass
 
-    def get_config(self) -> Config:
-        import tomllib
+    def get_game_config_dict(self) -> dict[str, Any]:
+        config: dict[str, Any] = tomllib.load(self.args.game_config)
+        return config
 
-        config: dict[str, Any] = tomllib.load(self.args.config)
+    def get_agents_config_dict(self) -> dict[str, Any]:
+        config: dict[str, Any] = tomllib.load(self.args.agents_config)
+        return config
 
-        return config_from_dict(config)
+    def get_assistance_config_dict(self) -> dict[str, Any]:
+        config: dict[str, Any] = tomllib.load(self.args.assistance_config)
+        return config

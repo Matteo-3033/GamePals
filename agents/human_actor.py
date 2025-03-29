@@ -7,12 +7,9 @@ from ..sources.controller import (
 )
 from .actor import Actor
 from ..sources.game import GameAction
+from ..utils.configuration_handler import ConfigurationHandler
 
 ConfidenceLevels = dict[InputType, float]
-
-InputToActionMap = dict[InputType, GameAction]
-
-ActionToInputMap = dict[GameAction, InputType]
 
 
 class HumanActor(Actor, ControllerObserver):
@@ -24,16 +21,12 @@ class HumanActor(Actor, ControllerObserver):
 
     def __init__(
             self,
-            physical_controller: PhysicalControllerListener,
-            confidence_levels: ConfidenceLevels,
-            human_input_to_action: InputToActionMap, # Converts the User Input into the desired Game Action
-            action_to_game_input: ActionToInputMap, # Converts the Game Action into the corresponding expected Input
-    ):
+            physical_controller: PhysicalControllerListener
+    ) -> None:
         super().__init__()
         self.controller = physical_controller
-        self.confidence_levels = confidence_levels
-        self.input_to_action = human_input_to_action
-        self.action_to_game_input = action_to_game_input
+        self.config_handler = ConfigurationHandler()
+        self.confidence_levels = self.config_handler.get_confidence_levels()
 
         self.controller.subscribe(self)
 
