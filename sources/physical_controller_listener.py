@@ -56,8 +56,13 @@ class PhysicalControllerListener:
         self.devices = RefreshableDeviceManager()
 
         if not late_init:
-            self.__try_init_gamepad()
+            if not self.__try_init_gamepad():
+                raise RuntimeError(
+                    f"Gamepad {self.gamepad_number} not found. Please check if it is connected."
+                )
         else:
+            # If late_init is True, the virtual controller will be initialized first as gamepad 0, so we need to increment the gamepad_number
+            # to avoid conflicts with the virtual controller.
             self.gamepad_number += 1
 
     def __try_init_gamepad(self) -> bool:
