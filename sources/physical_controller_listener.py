@@ -1,11 +1,30 @@
 import logging
 import threading
+import time
 
-from inputs import devices
+from inputs import DeviceManager, GamePad, devices
 
 from .controller import ControllerInput, ControllerObserver, InputData, InputType
 
 logger = logging.getLogger(__name__)
+
+
+class RefreshableDeviceManager(DeviceManager):
+    """
+    This class is a DeviceManager that can be refreshed to detect new gamepads.
+    It is used to detect gamepads that are connected after the program has started.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        # Due to the way inputs works, codes are not properly initialized when the class is created.
+        # This is a workaround to initialize them properly.
+        self.codes = devices.codes
+
+    def update_gamepads(self) -> None:
+        self.gamepads: list[GamePad] = list()
+        self._detect_gamepads()
 
 
 class PhysicalControllerListener:
@@ -16,16 +35,41 @@ class PhysicalControllerListener:
     It runs in a separate thread.
     """
 
-    def __init__(self, gamepad_number: int):
+    def __init__(self, gamepad_number: int, late_init: bool = False) -> None:
+        """
+        Initializes the PhysicalControllerListener with the given gamepad number.
+
+        Args:
+            gamepad_number (int): The index of the gamepad in the list of gamepads.
+            0 is the first gamepad, 1 is the second, etc.
+            late_init (bool, optional): If True, the gamepad will not be immediately initialized. Instead, the thread will wait for the gamepad to be connected. Defaults to False.
+        """
+
         # gamepad_number is the index of the device in the inputs.devices.gamepads list
         self.subscribers: list[ControllerObserver] = []
         self.running: bool = False
         self.listener_thread: threading.Thread | None = None
-        try:
-            self.gamepad = devices.gamepads[gamepad_number]
-        except IndexError:
-            logger.error("Gamepad %d not found", gamepad_number)
-            raise Exception(f"Gamepad {gamepad_number} not found")
+
+        self.gamepad_number = gamepad_number
+        self.gamepad: GamePad | None = None
+
+        self.devices = RefreshableDeviceManager()
+
+        if not late_init:
+            self.__try_init_gamepad()
+        else:
+            self.gamepad_number += 1
+
+    def __try_init_gamepad(self) -> bool:
+        self.devices.update_gamepads()
+
+        if self.gamepad_number < len(self.devices.gamepads):
+            self.gamepad = self.devices.gamepads[self.gamepad_number]
+            logger.info("Gamepad %d initialized", self.gamepad_number)
+            return True
+
+        logger.error("Gamepad %d not found", self.gamepad_number)
+        return False
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
         """Adds a subscriber to the list of subscribers"""
@@ -55,12 +99,17 @@ class PhysicalControllerListener:
 
     def _listen_loop(self) -> None:
         """The loop that listens for controller inputs"""
-        while self.running:
+        while self.gamepad is None and self.running:
+            if not self.__try_init_gamepad():
+                time.sleep(5)
+
+        while self.running and self.gamepad is not None:
             try:
-                events = self.gamepad.read()
+                if self.gamepad is not None:
+                    events = self.gamepad.read()
             except Exception as e:
                 logger.error("Error while getting gamepad events: %s", e)
-                return
+                continue
 
             for event in events:
                 if event.ev_type == "Sync":
