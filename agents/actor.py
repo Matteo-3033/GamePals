@@ -5,6 +5,7 @@ from ..sources.controller import ControllerInput, ControllerInputWithConfidence
 from ..sources.game import GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
+from ..utils.configuration_handler import ConfigurationHandler
 
 
 class Actor(ABC):
@@ -19,6 +20,7 @@ class Actor(ABC):
     def __init__(self):
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
+        self.config_handler = ConfigurationHandler()
 
     def get_id(self) -> ActorID:
         """Returns the identifier for self"""
@@ -30,7 +32,7 @@ class Actor(ABC):
 
     def notify_input(self, input_data: ControllerInput, confidence: float) -> None:
         """Notifies all the subscribers with an InputData object"""
-        data = ActorData(self.id, ControllerInputWithConfidence(input_data, confidence))
+        data = ActorData(self.id, ControllerInputWithConfidence(input_data.type, input_data.val, confidence))
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 

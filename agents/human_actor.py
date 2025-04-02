@@ -7,7 +7,6 @@ from ..sources.controller import (
 )
 from .actor import Actor
 from ..sources.game import GameAction
-from ..utils.configuration_handler import ConfigurationHandler
 
 ConfidenceLevels = dict[InputType, float]
 
@@ -16,7 +15,7 @@ class HumanActor(Actor, ControllerObserver):
     """
     HumanActor is a particular type of Actor that represents a Human Player.
 
-    The inputs it produces are read from a Physical Controller.
+    The inputs it produces are read from a Physical Controller and mapped into Game Inputs for global understanding.
     """
 
     def __init__(
@@ -25,8 +24,7 @@ class HumanActor(Actor, ControllerObserver):
     ) -> None:
         super().__init__()
         self.controller = physical_controller
-        self.config_handler = ConfigurationHandler()
-        self.confidence_levels = self.config_handler.get_confidence_levels()
+        self.confidence_levels = self.config_handler.get_confidence_levels(self.controller.get_index())
 
         self.controller.subscribe(self)
 
@@ -46,20 +44,23 @@ class HumanActor(Actor, ControllerObserver):
 
     def get_controlled_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is controlling."""
-
-        # The Human controls all actions whose inputs have a specified confidence
-        return [self.input_to_action[inp] for inp in self.input_to_action.keys()]
-
-    def map_input(self, input_type: InputType) -> InputType:
-        """Maps the User Input Type into the Game Input Type"""
-
-        #TODO: check existence
-        return self.action_to_game_input[self.input_to_action[input_type]]
+        return self.config_handler.get_controlled_actions(self.controller.get_index())
 
     def receive_controller_input(self, data: InputData) -> None:
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
+
+        # Before sending, it converts the user input into the game input
+        game_input_data = ControllerInput(
+            self.map_input(data.c_input.type),
+            data.c_input.val,
+        )
+
         confidence = self.confidence_levels[data.c_input.type]
-        self.notify_input(data.c_input, confidence)
+        self.notify_input(game_input_data, confidence)
+
+    def map_input(self, input_type: InputType) -> InputType:
+        """Maps the User Input Type into the Game Input Type"""
+        return self.config_handler.user_input_to_game_input(self.controller.get_index(), input_type)
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment

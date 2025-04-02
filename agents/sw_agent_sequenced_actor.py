@@ -21,25 +21,26 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
     def __init__(
             self,
             game_state: GameStateListener,
-            action_to_input: ActionToInputMap,
     ) -> None:
-        super().__init__(game_state, action_to_input)
+        super().__init__(game_state)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
 
     @abstractmethod
-    def game_state_to_action_input_sequence(
-            self, game_state: GameState
+    def compute_actions_sequence(
+            self,
+            game_state: GameState
     ) -> list[ActionInputWithConfidenceAndDelay] | None:
-        """Produces input sequences given a Game State. Inputs are specified with a delay from the previous one in the order"""
+        """Produces action inputs sequences given a Game State. Inputs are specified with a delay from the previous one in the order"""
         pass
 
-    def game_state_to_action_inputs(
-            self, game_state: GameState
+    def compute_actions(
+            self,
+            game_state: GameState
     ) -> list[ActionInputWithConfidence]:
-        """Produces inputs given a Game State. Inputs are specified by GameAction"""
+        """Produces a list of action inputs given a Game State. Inputs are executed one after another, with no delay"""
 
-        new_sequence = self.game_state_to_action_input_sequence(game_state)
+        new_sequence = self.compute_actions_sequence(game_state)
 
         if new_sequence is not None:
             self.current_sequence = new_sequence  # Override last sequence if a better sequence is found
