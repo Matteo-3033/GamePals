@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from . import PolicyContinuousOR, PolicyExclusivity
 from ...agents import Actor, ActorID
 from ...sources.controller import InputType
 from .input_entry import PolicyRole
@@ -27,12 +28,8 @@ class PolicyManager:
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
 
         for input_type in InputType:
-            if input_type not in policies_types:
-                raise ValueError(
-                    f"Policy type is incomplete: it does not include {input_type}"
-                )
 
-            specified_policy = policies_types[input_type]
+            specified_policy = policies_types.get(input_type, PolicyExclusivity)
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
 
     def register_actor(self, actor: Actor, role: PolicyRole) -> None:

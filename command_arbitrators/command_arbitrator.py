@@ -50,7 +50,7 @@ class CommandArbitrator(ActorObserver):
         """Receives Input and Confidence Level from one of its Actors"""
 
         executed_action = self.config_handler.game_input_to_action(actor_data.data.type)
-        if executed_action not in self.actors[actor_data.actor_id].get_controlled_actions():
+        if executed_action is not None and executed_action not in self.actors[actor_data.actor_id].get_controlled_actions():
             logger.warning("Actor %s is not registered to execute action %s", actor_data.actor_id, executed_action)
             return
 

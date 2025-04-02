@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from .action_input import ActionInputWithConfidence
-from ..sources.controller import ControllerInputWithConfidence
+from ..sources.controller import ControllerInputWithConfidence, ControllerInput
 from ..sources.game import GameState, GameStateListener, GameStateObserver
 from .actor import Actor
 
@@ -35,8 +35,9 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     def receive_game_state_update(self, game_state: GameState) -> None:
         """Receives Game State Updates and produces Inputs to notify to its subscribers."""
         inputs = self.compute_inputs(game_state)
-        for c_input, confidence in inputs:
-            self.notify_input(c_input, confidence)
+        for inp in inputs:
+            c_input = ControllerInput(inp.type, inp.val)
+            self.notify_input(c_input, inp.confidence)
 
     def compute_inputs(
             self,

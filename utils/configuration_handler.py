@@ -1,12 +1,14 @@
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Type
 from collections import defaultdict
+import logging
 
 if TYPE_CHECKING:
-    from ..command_arbitrators.policies import PolicyName
+    from ..command_arbitrators.policies import PolicyName, Policy
     from ..sources.controller.controller_inputs import InputType
     from ..sources.game.game_action import GameAction
 
 
+logger = logging.getLogger(__name__)
 
 class ConfigurationHandler:
     """
@@ -44,15 +46,16 @@ class ConfigurationHandler:
             agents_config: dict[str, Any],
             assistance_config: dict[str, Any],
     ) -> None:
+        from ..command_arbitrators.policies import PolicyName
 
         #TODO: Configuration Validation should go here
 
-        self.confidence_levels: dict[int, dict['InputType', float]] = defaultdict()
-        self.user_actions: dict[int, list['GameAction']] = defaultdict()
-        self.policy_types: dict['InputType', 'PolicyName'] = defaultdict()
+        self.confidence_levels: dict[int, dict['InputType', float]] = defaultdict(lambda: defaultdict(lambda: 1.0))
+        self.user_actions: dict[int, list['GameAction']] = defaultdict(list)
+        self.policy_types: dict['InputType', Type['Policy']] = defaultdict()
 
-        self.user_input_to_action_map: dict[int, dict['InputType', 'GameAction']] = defaultdict()
-        self.action_to_user_input_map: dict[int, dict['GameAction', 'InputType']] = defaultdict()
+        self.user_input_to_action_map: dict[int, dict['InputType', 'GameAction']] = defaultdict(dict)
+        self.action_to_user_input_map: dict[int, dict['GameAction', 'InputType']] = defaultdict(dict)
         self.game_input_to_action_map: dict['InputType', 'GameAction'] = defaultdict()
         self.action_to_game_input_map: dict['GameAction', 'InputType'] = defaultdict()
 
@@ -73,7 +76,7 @@ class ConfigurationHandler:
 
             if action["name"] in game_config.get("actions", {}):
                 for game_input in game_config["actions"][action["name"]]:
-                    self.policy_types[game_input] = action["policy"]
+                    self.policy_types[game_input] = PolicyName[action.get("policy", "POLICY_EXCLUSIVITY")]
 
         for action, inputs in game_config.get("actions", {}).items():
 
@@ -82,9 +85,10 @@ class ConfigurationHandler:
             for game_input in inputs:
                 self.game_input_to_action_map[game_input] = action
 
+
     def get_policy_types(
             self
-    ) -> dict['InputType', 'PolicyName']:
+    ) -> dict['InputType', Type['Policy']]:
         return self.policy_types
 
     def get_confidence_levels(
@@ -130,14 +134,16 @@ class ConfigurationHandler:
             user_id: int,
             input_type: 'InputType',
     ) -> 'InputType':
-        return self.action_to_user_input(user_id, self.game_input_to_action(input_type))
+        found = self.action_to_user_input(user_id, self.game_input_to_action(input_type))
+        return found if found else input_type
 
     def user_input_to_game_input(
             self,
             user_id: int,
             input_type: 'InputType',
     ) -> 'InputType':
-        return self.action_to_game_input(self.user_input_to_action(user_id, input_type))
+        found = self.action_to_game_input(self.user_input_to_action(user_id, input_type))
+        return found if found else input_type
 
     def get_humans_count(self) -> int:
         return len(self.user_actions)
