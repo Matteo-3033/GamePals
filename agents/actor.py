@@ -5,7 +5,6 @@ from ..sources.controller import ControllerInput, ControllerInputWithConfidence
 from ..sources.game import GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
-from ..utils.configuration_handler import ConfigurationHandler
 
 
 class Actor(ABC):
@@ -18,6 +17,8 @@ class Actor(ABC):
     """
 
     def __init__(self):
+        from ..utils.configuration_handler import ConfigurationHandler
+
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
         self.config_handler = ConfigurationHandler()

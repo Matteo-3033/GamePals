@@ -4,6 +4,7 @@ from ...agents import Actor, ActorID
 from ...sources.controller import InputType
 from .input_entry import PolicyRole
 from .policy import Policy
+from ...utils.configuration_handler import ConfigurationHandler
 
 
 @dataclass
@@ -23,6 +24,7 @@ class PolicyManager:
 
     def __init__(self, policies_types: dict[InputType, type[Policy]]) -> None:
         self.policies_map: dict[InputType, PolicyMapEntry] = {}
+        self.config_handler: ConfigurationHandler = ConfigurationHandler()
 
         for input_type in InputType:
             if input_type not in policies_types:
@@ -40,7 +42,11 @@ class PolicyManager:
 
         TODO: future improvements could allow for specification of a certain PolicyRole for every InputType
         """
-        inputs = actor.get_controlled_inputs()
+        actions = actor.get_controlled_actions()
+        inputs = {
+            self.config_handler.action_to_game_input(action)
+            for action in actions
+        }
         for input_type in inputs:
             policy_entry = self.policies_map[input_type]
             actors_number = len(policy_entry.actors)

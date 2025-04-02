@@ -54,3 +54,11 @@ class ArgParser:
     def get_assistance_config_dict(self) -> dict[str, Any]:
         config: dict[str, Any] = tomllib.load(self.args.assistance_config)
         return config
+
+    def init_config_handler(self):
+        from ..utils.configuration_handler import ConfigurationHandler
+        return ConfigurationHandler(
+            game_config=self.get_game_config_dict(),
+            agents_config=self.get_agents_config_dict(),
+            assistance_config=self.get_assistance_config_dict(),
+        )

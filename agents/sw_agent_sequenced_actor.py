@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 
-from . import ActionInputWithConfidence
+from .action_input import ActionInputWithConfidence
 from ..sources.controller import ControllerInput, InputType, ControllerInputWithConfidence
 from ..sources.game import GameState, GameStateListener, GameAction
 from .sw_agent_actor import SWAgentActor

@@ -1,9 +1,11 @@
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from collections import defaultdict
 
-from ..command_arbitrators.policies import PolicyName
-from ..sources.controller import InputType
-from ..sources.game import GameAction
+if TYPE_CHECKING:
+    from ..command_arbitrators.policies import PolicyName
+    from ..sources.controller.controller_inputs import InputType
+    from ..sources.game.game_action import GameAction
+
 
 
 class ConfigurationHandler:
@@ -12,7 +14,7 @@ class ConfigurationHandler:
 
     TODO: implement default values for the config
     TODO: eventually split x and y axis into up and down
-    TODO: configuring metacommands
+    TODO: configuring meta-commands
     """
     _instance: 'ConfigurationHandler' = None
 
@@ -45,14 +47,14 @@ class ConfigurationHandler:
 
         #TODO: Configuration Validation should go here
 
-        self.confidence_levels: dict[int, dict[InputType, float]] = defaultdict()
-        self.user_actions: dict[int, list[GameAction]] = defaultdict()
-        self.policy_types: dict[InputType, PolicyName] = defaultdict()
+        self.confidence_levels: dict[int, dict['InputType', float]] = defaultdict()
+        self.user_actions: dict[int, list['GameAction']] = defaultdict()
+        self.policy_types: dict['InputType', 'PolicyName'] = defaultdict()
 
-        self.user_input_to_action_map: dict[int, dict[InputType, GameAction]] = defaultdict()
-        self.action_to_user_input_map: dict[int, dict[GameAction, InputType]] = defaultdict()
-        self.game_input_to_action_map: dict[InputType, GameAction] = defaultdict()
-        self.action_to_game_input_map: dict[GameAction, InputType] = defaultdict()
+        self.user_input_to_action_map: dict[int, dict['InputType', 'GameAction']] = defaultdict()
+        self.action_to_user_input_map: dict[int, dict['GameAction', 'InputType']] = defaultdict()
+        self.game_input_to_action_map: dict['InputType', 'GameAction'] = defaultdict()
+        self.action_to_game_input_map: dict['GameAction', 'InputType'] = defaultdict()
 
 
         for action in assistance_config.get("action", []):
@@ -82,57 +84,60 @@ class ConfigurationHandler:
 
     def get_policy_types(
             self
-    ) -> dict[InputType, PolicyName]:
+    ) -> dict['InputType', 'PolicyName']:
         return self.policy_types
 
     def get_confidence_levels(
             self,
             user_id: int
-    ) -> dict[InputType, float]:
+    ) -> dict['InputType', float]:
         return self.confidence_levels.get(user_id, {})
 
     def get_controlled_actions(
             self,
             user_id: int
-    ) -> list[GameAction]:
+    ) -> list['GameAction']:
         return self.user_actions.get(user_id, [])
 
     def user_input_to_action(
             self,
             user_id: int,
-            input_type: InputType,
-    ) -> GameAction:
+            input_type: 'InputType',
+    ) -> 'GameAction':
         return self.user_input_to_action_map.get(user_id, {}).get(input_type, None)
 
     def action_to_user_input(
             self,
             user_id: int,
-            action: GameAction,
-    ) -> InputType:
+            action: 'GameAction',
+    ) -> 'InputType':
         return self.action_to_user_input_map.get(user_id, {}).get(action, None)
 
     def game_input_to_action(
             self,
-            input_type: InputType
-    ) -> GameAction:
+            input_type: 'InputType'
+    ) -> 'GameAction':
         return self.game_input_to_action_map.get(input_type, None)
 
     def action_to_game_input(
             self,
-            action: GameAction,
-    ) -> InputType:
+            action: 'GameAction',
+    ) -> 'InputType':
         return self.action_to_game_input_map.get(action, None)
 
     def game_input_to_user_input(
             self,
             user_id: int,
-            input_type: InputType,
-    ) -> InputType:
+            input_type: 'InputType',
+    ) -> 'InputType':
         return self.action_to_user_input(user_id, self.game_input_to_action(input_type))
 
     def user_input_to_game_input(
             self,
             user_id: int,
-            input_type: InputType,
-    ) -> InputType:
+            input_type: 'InputType',
+    ) -> 'InputType':
         return self.action_to_game_input(self.user_input_to_action(user_id, input_type))
+
+    def get_humans_count(self) -> int:
+        return len(self.user_actions)

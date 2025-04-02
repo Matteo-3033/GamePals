@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from . import ActionInputWithConfidence
+from .action_input import ActionInputWithConfidence
 from ..sources.controller import ControllerInputWithConfidence
 from ..sources.game import GameState, GameStateListener, GameStateObserver
 from .actor import Actor
@@ -22,6 +22,11 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
         self.game_state = game_state
 
         self.game_state.subscribe(self)
+
+    @classmethod
+    def get_name(cls) -> str:
+        """Returns the name of the SW Agent, with which the Agent is identified in the config"""
+        return cls.__name__
 
     def start(self) -> None:
         """Starts listening to the Game State Listener."""
