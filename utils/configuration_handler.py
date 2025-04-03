@@ -54,8 +54,8 @@ class ConfigurationHandler:
         self.confidence_levels: dict[int, dict['InputType', float]] = defaultdict(lambda: defaultdict(lambda: 1.0))
         self.user_actions: dict[int, list['GameAction']] = defaultdict(list)
         self.policy_types: dict['InputType', Type['Policy']] = defaultdict()
-        self.registered_inputs: list['InputType'] = list()
-        self.required_agents: list[str] = list()
+        self.registered_inputs: set['InputType'] = set()
+        self.required_agents: set[str] = set()
         self.agents_params: dict[str, dict[str, Any]] = defaultdict(lambda: defaultdict())
 
         self.user_input_to_action_map: dict[int, dict['InputType', 'GameAction']] = defaultdict(dict)
@@ -78,7 +78,7 @@ class ConfigurationHandler:
                     self.action_to_user_input_map[human["id"]][action["name"]] = controls[0]
 
             for agent in action.get("agents", []):
-                self.required_agents.append(agent["name"])
+                self.required_agents.add(agent["name"])
 
             if action["name"] in game_config.get("actions", {}):
                 for game_input in game_config["actions"][action["name"]]:
@@ -90,11 +90,11 @@ class ConfigurationHandler:
 
             for game_input in inputs:
                 self.game_input_to_action_map[game_input] = action
-                self.registered_inputs.append(game_input)
+                self.registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", []):
             if agent["name"] not in self.required_agents and agent.get("active", False):
-                self.required_agents.append(agent["name"])
+                self.required_agents.add(agent["name"])
 
             self.agents_params[agent["name"]] = agent["params"]
 
@@ -117,7 +117,7 @@ class ConfigurationHandler:
 
     def get_registered_action_inputs(
             self
-    ) -> list['InputType']:
+    ) -> set['InputType']:
         return self.registered_inputs
 
     def user_input_to_action(

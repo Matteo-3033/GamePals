@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from . import PolicyExclusivity, PolicyContinuousOR
@@ -15,6 +16,7 @@ class PolicyMapEntry:
     policy_type: type[Policy]
     actors: dict[ActorID, PolicyRole]
 
+logger = logging.getLogger(__file__)
 
 class PolicyManager:
     """
@@ -50,7 +52,7 @@ class PolicyManager:
             self.config_handler.action_to_game_input(action)
             for action in actions
         }.union(
-            {t for t in InputType}.difference(set(self.config_handler.get_registered_action_inputs()))
+            {t for t in InputType}.difference(self.config_handler.get_registered_action_inputs())
         )
 
         for input_type in inputs:
