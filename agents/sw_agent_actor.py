@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 
 from .action_input import ActionInputWithConfidence
+from .observer import ActorObserver
 from ..sources.controller import ControllerInputWithConfidence, ControllerInput
 from ..sources.game import GameState, GameStateListener, GameStateObserver
 from .actor import Actor
 
 
-class SWAgentActor(Actor, GameStateObserver, ABC):
+class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     """
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
@@ -17,9 +18,11 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     def __init__(
             self,
             game_state: GameStateListener,
+            pilot: Actor
     ) -> None:
         super().__init__()
         self.game_state = game_state
+        pilot.subscribe(self)
 
         self.game_state.subscribe(self)
 

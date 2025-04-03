@@ -1,6 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 
+from . import Actor
 from .action_input import ActionInputWithConfidence
 from ..sources.controller import ControllerInput, InputType, ControllerInputWithConfidence
 from ..sources.game import GameState, GameStateListener, GameAction
@@ -21,8 +22,9 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
     def __init__(
             self,
             game_state: GameStateListener,
+            pilot: Actor,
     ) -> None:
-        super().__init__(game_state)
+        super().__init__(game_state, pilot)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
 

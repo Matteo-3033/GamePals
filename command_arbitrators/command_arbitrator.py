@@ -54,6 +54,9 @@ class CommandArbitrator(ActorObserver):
             logger.warning("Actor %s is not registered to execute action %s", actor_data.actor_id, executed_action)
             return
 
+        if executed_action is None:
+            logger.info("Arbitrator received untracked %s", actor_data)
+
         self.input_maps[actor_data.actor_id].set(actor_data.data)
 
         input_type = actor_data.data.type
@@ -92,12 +95,15 @@ class CommandArbitrator(ActorObserver):
         """
         policy_info = self.policy_manager.get_policy(input_type)
         policy = policy_info.policy_type
+
         input_entries = [
             InputEntry(
                 actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1]
             )
             for actor_id, actor_role in policy_info.actors.items()
         ]
+
+        logger.debug("Policy is %s and entries are %s", policy.__name__, input_entries)
 
         value = policy.merge_input_entries(input_entries)
         return ControllerInput(input_type, value)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from . import PolicyContinuousOR, PolicyExclusivity
+from . import PolicyExclusivity, PolicyContinuousOR
 from ...agents import Actor, ActorID
 from ...sources.controller import InputType
 from .input_entry import PolicyRole
@@ -23,13 +23,17 @@ class PolicyManager:
     A Policy is defined for every Input Type.
     """
 
-    def __init__(self, policies_types: dict[InputType, type[Policy]]) -> None:
+    def __init__(
+            self,
+            policies_types: dict[InputType, type[Policy]],
+            default_policy : type[Policy] = PolicyContinuousOR,
+    ) -> None:
         self.policies_map: dict[InputType, PolicyMapEntry] = {}
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
 
         for input_type in InputType:
 
-            specified_policy = policies_types.get(input_type, PolicyExclusivity)
+            specified_policy = policies_types.get(input_type, default_policy)
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
 
     def register_actor(self, actor: Actor, role: PolicyRole) -> None:
@@ -40,10 +44,15 @@ class PolicyManager:
         TODO: future improvements could allow for specification of a certain PolicyRole for every InputType
         """
         actions = actor.get_controlled_actions()
+
+        # This allows every actor to execute inputs not associated with any action
         inputs = {
             self.config_handler.action_to_game_input(action)
             for action in actions
-        }
+        }.union(
+            {t for t in InputType}.difference(set(self.config_handler.get_registered_action_inputs()))
+        )
+
         for input_type in inputs:
             policy_entry = self.policies_map[input_type]
             actors_number = len(policy_entry.actors)
