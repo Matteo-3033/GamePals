@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from . import PolicyExclusivity, PolicyContinuousOR
+from . import PolicyContinuousOR
 from ...agents import Actor, ActorID
 from ...sources.controller import InputType
 from .input_entry import PolicyRole
@@ -33,8 +33,8 @@ class PolicyManager:
         self.policies_map: dict[InputType, PolicyMapEntry] = {}
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
 
+        # Every Input is registered with the specified Policy (or the default one, if none is specified)
         for input_type in InputType:
-
             specified_policy = policies_types.get(input_type, default_policy)
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
 

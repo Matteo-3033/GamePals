@@ -169,8 +169,6 @@ class ConfigurationHandler:
         from ..agents.sw_agent_actor import SWAgentActor
 
         agent_classes = self.get_agent_classes(cls=SWAgentActor)
-        logger.info("Required agents are %s", self.required_agents)
-        logger.info("Found %d agent implementations: %s", len(agent_classes), agent_classes )
         required_agent_classes = {
             cls
             for cls in agent_classes
@@ -195,5 +193,5 @@ class ConfigurationHandler:
 
         return all_subclasses
 
-    def get_params_for_agent(self, agent_name : str) -> dict[str, Any]:
+    def get_params_for_agent(self, agent_name: str) -> dict[str, Any]:
         return self.agents_params[agent_name]
