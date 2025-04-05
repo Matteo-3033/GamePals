@@ -48,6 +48,8 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     ) -> list[ControllerInputWithConfidence]:
         """Produces a list of inputs given a Game State. Inputs are executed one after another, with no delay"""
         action_inputs = self.compute_actions(game_state)
+
+        # Before sending, it converts the actions into the game input
         return [
             ControllerInputWithConfidence(
                 val=action_input.val,
@@ -65,3 +67,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
         """Produces a list of action inputs given a Game State. Inputs are executed one after another, with no delay"""
         pass
 
+    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+        """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
+        # Ignore Arbitrated Inputs at the moment (can be overridden by implementations)
+        pass

@@ -3,11 +3,8 @@ from abc import ABC, abstractmethod
 
 from . import Actor
 from .action_input import ActionInputWithConfidence
-from ..sources.controller import ControllerInput, InputType, ControllerInputWithConfidence
-from ..sources.game import GameState, GameStateListener, GameAction
+from ..sources.game import GameState, GameStateListener
 from .sw_agent_actor import SWAgentActor
-
-ActionToInputMap = dict[GameAction, InputType]
 
 ActionInputWithConfidenceAndDelay = tuple[ActionInputWithConfidence, float]
 
@@ -27,14 +24,6 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
         super().__init__(game_state, pilot)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
-
-    @abstractmethod
-    def compute_actions_sequence(
-            self,
-            game_state: GameState
-    ) -> list[ActionInputWithConfidenceAndDelay] | None:
-        """Produces action inputs sequences given a Game State. Inputs are specified with a delay from the previous one in the order"""
-        pass
 
     def compute_actions(
             self,
@@ -59,3 +48,11 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
             return [next_input]
         else:
             return []
+
+    @abstractmethod
+    def compute_actions_sequence(
+            self,
+            game_state: GameState
+    ) -> list[ActionInputWithConfidenceAndDelay] | None:
+        """Produces action inputs sequences given a Game State. Inputs are specified with a delay from the previous one in the order"""
+        pass

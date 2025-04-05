@@ -35,7 +35,7 @@ class HumanActor(Actor, ControllerObserver):
         correct Arbitration from the start)
         """
 
-        # Notify all subscribers of the Confidence Levels (using zero-value inputs)
+        # Notify all subscribers of the Confidence Levels (using zero-value inputs) <-- Needed for correct arbitration
         for key, value in self.confidence_levels.items():
             zero_input = ControllerInput(type=key, val=0)
             self.notify_input(zero_input, value)
