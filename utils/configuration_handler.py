@@ -64,7 +64,7 @@ class ConfigurationHandler:
 
         # TODO: Configuration Validation should go here
 
-        self.confidence_levels: dict[int, dict['InputType', float]] = defaultdict(lambda: defaultdict(lambda: 1.0))
+        self.confidence_levels: dict[int, dict['GameAction', float]] = defaultdict(lambda: defaultdict(lambda: 1.0))
         self.user_actions: dict[int, list['GameAction']] = defaultdict(list)
         self.policy_types: dict['InputType', Type['Policy']] = defaultdict()
         self.registered_inputs: set['InputType'] = set()
@@ -87,8 +87,9 @@ class ConfigurationHandler:
                 self.user_policy_roles[(action["name"], human_idx)] = human_role
                 controls = human.get("controls", [])
 
+                self.confidence_levels[human_idx][action] = human["confidence"]
+
                 for control in controls:
-                    self.confidence_levels[human_idx][control] = human["confidence"]
                     self.user_input_to_action_map[human_idx][control] = action["name"]
 
                 if len(controls) > 0:
@@ -127,8 +128,8 @@ class ConfigurationHandler:
     def get_confidence_levels(
             self,
             user_idx: int
-    ) -> dict['InputType', float]:
-        """Returns the confidence level associated with every Input Type, for a specific HumanActor"""
+    ) -> dict['GameAction', float]:
+        """Returns the confidence level associated with every GameAction, for a specific HumanActor"""
         return self.confidence_levels.get(user_idx, {})
 
     def get_controlled_actions(

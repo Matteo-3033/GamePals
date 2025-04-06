@@ -1,7 +1,8 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput, ControllerInputWithConfidence
+from .action_input import ActionInput, ActionInputWithConfidence
+from ..sources.controller import ControllerInput
 from ..sources.game import GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
@@ -31,9 +32,9 @@ class Actor(ABC):
         """Adds a new subscriber to the list"""
         self.subscribers.append(subscriber)
 
-    def notify_input(self, input_data: ControllerInput, confidence: float) -> None:
-        """Notifies all the subscribers with an InputData object"""
-        data = ActorData(self.id, ControllerInputWithConfidence(input_data.type, input_data.val, confidence))
+    def notify_input(self, actor_data: ActionInput, confidence: float) -> None:
+        """Notifies all the subscribers with an ActionInputWithConfidence object"""
+        data = ActorData(self.id, ActionInputWithConfidence(actor_data.action, actor_data.val, confidence))
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 

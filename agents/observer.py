@@ -1,19 +1,19 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from .action_input import ActionInputWithConfidence
 from .actor_id import ActorID
-from ..sources.controller.controller_inputs import ControllerInputWithConfidence
 
 
 @dataclass
 class ActorData:
     """
     The wrapper class of the Input Data sent to an Actor Observer.
-    Note that the Actor always sends inputs in the globally-recognized format of the game inputs (not user inputs)
+    Note that the Actor always sends inputs in the globally-recognized format of the game actions (not actual input_types)
     """
 
     actor_id: ActorID
-    data : ControllerInputWithConfidence
+    data : ActionInputWithConfidence
 
 
 @dataclass
