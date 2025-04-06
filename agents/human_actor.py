@@ -28,6 +28,10 @@ class HumanActor(Actor, ControllerObserver):
 
         self.controller.subscribe(self)
 
+    def get_index(self) -> int:
+        """Returns the index with which the HumanActor is identified in the configuration"""
+        return self.controller.get_index()
+
     def start(self) -> None:
         """
         Starts listening to the Physical Controller.

@@ -7,7 +7,10 @@ from ..sources.controller.controller_inputs import ControllerInputWithConfidence
 
 @dataclass
 class ActorData:
-    """The wrapper class of the Input Data sent to an Actor Observer"""
+    """
+    The wrapper class of the Input Data sent to an Actor Observer.
+    Note that the Actor always sends inputs in the globally-recognized format of the game inputs (not user inputs)
+    """
 
     actor_id: ActorID
     data : ControllerInputWithConfidence
