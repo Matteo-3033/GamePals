@@ -38,5 +38,26 @@ To run the architecture successfully, the following tools and packages are requi
 
 ## Arbitrator's Configuration
 
-TODO: Specify how do build a config.toml
-Give a look at config.toml.example
+The infrastructure's configuration requires 3 different configuration files:
+1. ```game.toml```, which contains all the information about the game for which the infrastructure is being used.   
+In particular, in this file are stored the inputs that the game recognizes and to which actions they are mapped. What is written in this file should match what the game settings look like.
+2. ```agents.toml```, which contains all the information about the known software agents for the game. Each declared agents should explicitly report what game actions they are able to control and which parameters and commands they are able to understand.
+3. ```assist.toml```, which contains all the information about how the arbitration should actually happen. In particular, this file contains: 
+   * For every game action, which Human Actors and Software Agent Actors are allowed to execute it and to which extent.
+   * For every game action, which arbitration policy should be used to merge the actor inputs.
+   * Which inputs are associated with agent's meta-commands.
+   * Eventually, special copilots that don't handle any action.
+
+An example for each of these files can be found in the config folder.
+
+## Command Line Arguments
+
+The infrastructure requires, as command line arguments, the paths to the 3 configuration files specified in the section above.   
+When writing your own implementation of the infrastructure it's suggested to create an Argument Parser that extends the ```ArgParser``` class from the infrastructure itself.
+By overriding the method ```_add_arguments``` you can easily introduce new command line arguments for your specific use cases.
+
+Executing the program implementing the infrastructure will look something like this:
+
+```bash
+python main.py -gc ./config/game.toml -agc ./config/agents.toml -asc ./config/assistance.toml # your args here...
+```

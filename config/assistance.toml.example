@@ -1,0 +1,171 @@
+# This is an example for the assistance.toml configuration file.
+# The file is divided into two sections:
+# - The action sections contains a list of actions. There should be an [[action]] for every action specified in the game.toml configuration file.
+#   Each action indicates which policy to use and which actors should be involved:
+#       - For Human Actors, a confidence level and one or more control buttons should be specified.
+#         The idx value is used to refer to the same actor in different [[action]] sections. By default idx is 0.
+#         A role can also be specified. The default role for Human Actors is "Pilot"
+#       - For Agent Actors, the name and the role should be specified.
+#         The default role for Agent Actors is "Copilot"
+#
+# - The agent section contains extra information about the agents. In particular:
+#       - Params can be specified for every agent that has been named in the previous section.
+#       - Agents that don't control any specific action (for example, for logging purposes or to handle only meta-commands), should be specified here with value active=true
+
+
+[[action]]
+name = "fire"
+humans = []
+agents = [
+    #{ name = "ShooterCopilot", role = "Pilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[action]]
+name = "interact"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["A"] }
+]
+agents = [
+    { name = "InteractCopilot", role = "Copilot" }
+]
+policy = "POLICY_BIN_OR"
+
+
+[[action]]
+name = "movement_x"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["Stick_Left_X"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[action]]
+name = "movement_y"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["Stick_Left_Y"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[action]]
+name = "direction_x"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 0.5, controls = ["Stick_Right_X"] }
+]
+agents = [
+    { name = "AimerCopilot", role = "Copilot" }
+]
+policy = "POLICY_CONT_SLOPE"
+
+
+[[action]]
+name = "direction_y"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 0.5, controls = ["Stick_Right_Y"] }
+]
+agents = [
+    { name = "AimerCopilot", role = "Copilot" }
+]
+policy = "POLICY_CONT_SLOPE"
+
+
+[[action]]
+name = "jump"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["Y"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[action]]
+name = "run"
+humans = []
+agents = [
+    { name = "RunnerCopilot", role = "Pilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[action]]
+name = "next_weapon"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["Bumper_Right"] }
+]
+agents = [
+    { name = "WeaponPicker", role = "Copilot" }
+]
+policy = "POLICY_CONT_OR"
+
+
+[[action]]
+name = "prev_weapon"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["Bumper_Left"] }
+]
+agents = [
+    { name = "WeaponPicker", role = "Copilot" }
+]
+policy = "POLICY_CONT_OR"
+
+
+[[action]]
+name = "open_map"
+humans = [
+    { idx = 0, role = "Pilot", confidence = 1.0, controls = ["DirPad_Y"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+
+# Metacommands, per agent (the controls specified below should be interpreted by our script, not by the game)
+
+[[agent]]
+name = "AimerCopilot"
+active = true # The default value could be based on whether it appears above or not
+params = { full_auto=false }
+metacommands = [
+    { name = "toggle-activate", control = "Thumb_Right" },
+    { name = "change-target", control = "Thumb_Left" }
+]
+
+[[agent]]
+name = "InteractCopilot"
+active = true # The default value could be based on whether it appears above or not
+params = {}
+metacommands = []
+
+[[agent]]
+name = "ResetCopilot"
+active = true # This copilot has no actions, which is the reason why this param is needed
+params = {}
+metacommands = []
+
+[[agent]]
+name = "RunToggler"
+params = {}
+metacommands = []
+
+[[agent]]
+name = "RunnerCopilot"
+params = {}
+metacommands = []
+
+[[agent]]
+name = "ShooterCopilot"
+params = {}
+metacommands = []
+
+[[agent]]
+name = "WeaponPicker"
+params = {}
+metacommands = []
+
+[[agent]]
+name = "InteractCopilot"
+params = {}
+metacommands = []

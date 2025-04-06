@@ -1,0 +1,23 @@
+# This is an example for the game.toml configuration file.
+# The file is divided into two sections:
+# - The game section contains general information about the game.
+# - The actions section contains the input bindings from the game settings.
+#   When the arbitrator decides to execute an action, it's going to be using the inputs specified in this section.
+
+# Game Configuration for Ultimate Doom
+[game]
+name = "Ultimate Doom"
+
+# These are the commands that the game expects to receive, for the specified actions
+[actions]
+fire = ["Trigger_Right"]
+interact = ["A"]
+movement_x = ["Stick_Left_X"]
+movement_y = ["Stick_Left_Y"]
+direction_x = ["Stick_Right_X"]
+direction_y = ["Stick_Right_Y"]
+jump = ["Y"]
+run = ["X"]
+next_weapon = ["Bumper_Right"]
+prev_weapon = ["Bumper_Left"]
+open_map = ["DirPad_Y"]
