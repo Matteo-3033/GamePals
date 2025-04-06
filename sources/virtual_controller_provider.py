@@ -109,10 +109,10 @@ class VirtualControllerProvider:
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     DPAD_TO_VGBUTTON = {
-        (InputType.DIR_PAD_Y, -1): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP,
-        (InputType.DIR_PAD_Y, 1): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_DOWN,
-        (InputType.DIR_PAD_X, -1): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_LEFT,
-        (InputType.DIR_PAD_X, 1): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_RIGHT,
+        (InputType.DIR_PAD_Y, -1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP,
+        (InputType.DIR_PAD_Y, 1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_DOWN,
+        (InputType.DIR_PAD_X, -1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_LEFT,
+        (InputType.DIR_PAD_X, 1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_RIGHT,
     }
 
     # Arrays of InputTypes that can be used to check the category of the Input Type

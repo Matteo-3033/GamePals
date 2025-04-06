@@ -46,6 +46,7 @@ class PhysicalControllerListener:
         """
 
         # gamepad_number is the index of the device in the inputs.devices.gamepads list
+        self.gamepad_number = gamepad_number
         self.subscribers: list[ControllerObserver] = []
         self.running: bool = False
         self.listener_thread: threading.Thread | None = None
@@ -148,6 +149,9 @@ class PhysicalControllerListener:
                 return val / 32767
             case _:
                 return val
+
+    def get_index(self) -> int:
+        return self.gamepad_number
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
     INPUT_TYPES_MAP = {

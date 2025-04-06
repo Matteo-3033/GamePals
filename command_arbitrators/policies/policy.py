@@ -11,7 +11,7 @@ class Policy(ABC):
 
     @classmethod
     def get_name(cls) -> str:
-        "Returns the name this class should be referred to in the configuration file."
+        """Returns the name this class should be referred to in the configuration file."""
         return cls.__name__
 
     @staticmethod

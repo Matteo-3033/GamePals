@@ -1,9 +1,12 @@
+import logging
 from dataclasses import dataclass
 
+from . import PolicyContinuousOR
 from ...agents import Actor, ActorID
 from ...sources.controller import InputType
 from .input_entry import PolicyRole
 from .policy import Policy
+from ...utils.configuration_handler import ConfigurationHandler
 
 
 @dataclass
@@ -13,6 +16,7 @@ class PolicyMapEntry:
     policy_type: type[Policy]
     actors: dict[ActorID, PolicyRole]
 
+logger = logging.getLogger(__file__)
 
 class PolicyManager:
     """
@@ -21,32 +25,61 @@ class PolicyManager:
     A Policy is defined for every Input Type.
     """
 
-    def __init__(self, policies_types: dict[InputType, type[Policy]]) -> None:
+    def __init__(
+            self,
+            policies_types: dict[InputType, type[Policy]],
+            default_policy : type[Policy] = PolicyContinuousOR,
+    ) -> None:
         self.policies_map: dict[InputType, PolicyMapEntry] = {}
+        self.config_handler: ConfigurationHandler = ConfigurationHandler()
 
+        # Every Input is registered with the specified Policy (or the default one, if none is specified)
         for input_type in InputType:
-            if input_type not in policies_types:
-                raise ValueError(
-                    f"Policy type is incomplete: it does not include {input_type}"
-                )
-
-            specified_policy = policies_types[input_type]
+            specified_policy = policies_types.get(input_type, default_policy)
             self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
 
-    def register_actor(self, actor: Actor, role: PolicyRole) -> None:
+    def register_actor(self, actor: Actor) -> None:
         """
-        Registers the given Actor with the specified Role, for the Input Types specified by the
+        Registers the given Actor, for the Input Types specified by the
         get_controlled_inputs method of the Actor.
-
-        TODO: future improvements could allow for specification of a certain PolicyRole for every InputType
+        The Role of the Actor for each of its inputs is determined checking the configuration
         """
-        inputs = actor.get_controlled_inputs()
+        from ...agents.human_actor import HumanActor
+        from ...agents.sw_agent_actor import SWAgentActor
+
+        actions = actor.get_controlled_actions()
+
+        # This allows every actor to execute inputs not associated with any action
+        inputs = {
+            self.config_handler.action_to_game_input(action)
+            for action in actions
+        }.union(
+            {t for t in InputType}.difference(self.config_handler.get_registered_action_inputs())
+        )
+
         for input_type in inputs:
             policy_entry = self.policies_map[input_type]
             actors_number = len(policy_entry.actors)
+            action = self.config_handler.game_input_to_action(input_type)
+
+            if not action:
+                role = PolicyRole.PILOT
+            elif isinstance(actor, HumanActor):
+                role = self.config_handler.get_human_role(
+                    user_idx=actor.get_index(),
+                    action=action
+                )
+            elif isinstance(actor, SWAgentActor):
+                role = self.config_handler.get_agent_role(
+                    agent_name=actor.get_name(),
+                    action=action
+                )
+            else:
+                logger.warning("Couldn't find a role for %s for %s. Defaulted to Pilot", actor.get_name(), input_type)
+                role = PolicyRole.PILOT
 
             if policy_entry.policy_type.get_max_actors() > actors_number:
-                self.policies_map[input_type].actors[actor.get_id()] = role
+                self.policies_map[input_type].actors[actor.get_id()] = PolicyRole(role)
             else:
                 raise ValueError(
                     f"Only one Actor per Input Type {input_type} is allowed"

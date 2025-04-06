@@ -1,18 +1,18 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from ...agents import ActorID
 from ...sources.controller import ControllerInputRecord
 
 
-class PolicyRole(Enum):
+class PolicyRole(StrEnum):
     """
     Enumerator for the Policy Roles. An Actor can register for an input specifying its Role.
     The Role is supposed to be used to allow for more complex Policies to be produced.
     """
 
-    PILOT = 0
-    COPILOT = 1
+    PILOT = "Pilot"
+    COPILOT = "Copilot"
 
 
 @dataclass

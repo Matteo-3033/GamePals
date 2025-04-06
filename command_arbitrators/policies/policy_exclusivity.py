@@ -17,7 +17,7 @@ class PolicyExclusivity(Policy):
 
     @classmethod
     def get_name(cls) -> str:
-        "Returns the name this class should be referred to in the configuration file."
+        """Returns the name this class should be referred to in the configuration file."""
         return "POLICY_EXCLUSIVITY"
 
     @staticmethod

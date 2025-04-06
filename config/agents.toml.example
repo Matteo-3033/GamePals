@@ -1,0 +1,48 @@
+# This is an example for the agents.toml configuration file.
+# The file contains a list of all the available copilots for the game specified in the game.toml file.
+# Every Software Agent should declare which actions it's able to handle, which parameters it expects in its constructor
+# and which meta-commands it's able to understand
+
+[[agent]]
+name = "AimerCopilot"
+actions = ["direction_x", "direction_y"]
+params = ["full_auto"]
+metacommands = ["toggle-activate", "change-target"]
+
+[[agent]]
+name = "InteractCopilot"
+actions = ["interact"]
+params = []
+metacommands = ["toggle-activate"]
+
+[[agent]]
+name = "ResetCopilot"
+actions = []
+params = []
+metacommands = []
+
+[[agent]]
+name = "RunToggler"
+actions = ["run"]
+params = []
+metacommands = ["toggle-activate"]
+
+[[agent]]
+name = "RunnerCopilot"
+actions = ["run"]
+params = []
+metacommands = ["toggle-activate"]
+
+[[agent]]
+name = "ShooterCopilot"
+actions = ["fire"]
+params = []
+metacommands = ["toggle-activate"]
+
+[[agent]]
+name = "WeaponPicker"
+actions = ["next_weapon", "prev_weapon"]
+params = []
+metacommands = ["toggle-activate"]
+
+

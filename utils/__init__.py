@@ -1,4 +1,7 @@
 from .arg_parser import ArgParser
-from .config import Config
+from .configuration_handler import ConfigurationHandler
 
-__all__ = ["ArgParser", "Config"]
+__all__ = [
+    "ArgParser",
+    "ConfigurationHandler"
+]

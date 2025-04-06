@@ -1,6 +1,7 @@
 import time
 from dataclasses import dataclass
 
+from . import ControllerInputWithConfidence
 from .controller_inputs import ControllerInput, InputType
 
 
@@ -23,8 +24,7 @@ class ControllerInputsMap:
 
     def set(
         self,
-        c_input: ControllerInput,
-        level: float = 1.0,
+        c_input: ControllerInputWithConfidence,
         timestamp: float | None = None,
     ) -> None:
         """
@@ -36,7 +36,7 @@ class ControllerInputsMap:
             timestamp = time.time()
 
         self.inputs_map[c_input.type] = ControllerInputRecord(
-            val=c_input.val, confidence=level, timestamp=timestamp
+            val=c_input.val, confidence=c_input.confidence, timestamp=timestamp
         )
 
     def get(self, c_input: InputType) -> tuple[ControllerInput, ControllerInputRecord]:
