@@ -1,9 +1,10 @@
-from importlib.metadata import entry_points
+import logging
 from typing import override
 
 from .input_entry import InputEntry
 from .policy import ContinuousPolicy
 
+logger = logging.getLogger(__name__)
 
 class PolicyContinuousSlope(ContinuousPolicy):
     """
@@ -51,6 +52,8 @@ class PolicyContinuousSlope(ContinuousPolicy):
             if not (entry.actor_role == PolicyRole.COPILOT
                     and entry.input_details.val == 0)
         ]
+
+        logger.debug("entries: %s", entries)
 
         if len(entries) == 0: return 0.0
         if len(entries) == 1: return entries[0].input_details.val

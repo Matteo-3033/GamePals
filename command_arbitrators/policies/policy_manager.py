@@ -62,7 +62,9 @@ class PolicyManager:
             actors_number = len(policy_entry.actors)
             action = self.config_handler.game_input_to_action(input_type)
 
-            if isinstance(actor, HumanActor):
+            if not action:
+                role = PolicyRole.PILOT
+            elif isinstance(actor, HumanActor):
                 role = self.config_handler.get_human_role(
                     user_idx=actor.get_index(),
                     action=action
@@ -73,10 +75,11 @@ class PolicyManager:
                     action=action
                 )
             else:
+                logger.warning("Couldn't find a role for %s for %s. Defaulted to Pilot", actor.get_name(), input_type)
                 role = PolicyRole.PILOT
 
             if policy_entry.policy_type.get_max_actors() > actors_number:
-                self.policies_map[input_type].actors[actor.get_id()] = role
+                self.policies_map[input_type].actors[actor.get_id()] = PolicyRole(role)
             else:
                 raise ValueError(
                     f"Only one Actor per Input Type {input_type} is allowed"

@@ -103,7 +103,7 @@ class CommandArbitrator(ActorObserver):
             for actor_id, actor_role in policy_info.actors.items()
         ]
 
-        logger.debug("Policy is %s and entries are %s", policy.__name__, input_entries)
+        logger.debug("Input is %s, Policy is %s and Entries are %s", input_type, policy.__name__, input_entries)
 
         value = policy.merge_input_entries(input_entries)
         return ControllerInput(input_type, value)
