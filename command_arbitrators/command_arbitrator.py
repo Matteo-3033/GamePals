@@ -71,7 +71,6 @@ class CommandArbitrator(ActorObserver):
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
         """
-        input_type = self.config_handler.action_to_game_input(action)
         policy_info = self.policy_manager.get_policy(action)
         policy = policy_info.policy_type
 
@@ -82,10 +81,14 @@ class CommandArbitrator(ActorObserver):
             for actor_id, actor_role in policy_info.actors.items()
         ]
 
-        logger.debug("Input is %s, Policy is %s and Entries are %s", input_type, policy.__name__, input_entries)
 
         value = policy.merge_input_entries(input_entries)
-        return ControllerInput(input_type, value)
+        action_input = ActionInput(action=action, val=value)
+        c_input = self.action_to_input(action_input)
+
+        logger.debug("Policy is %s and Entries are %s", policy.__name__, input_entries)
+
+        return c_input
 
     def execute_command(self, c_input: ControllerInput) -> None:
         """Executes a command on the Virtual Controller"""
@@ -97,3 +100,13 @@ class CommandArbitrator(ActorObserver):
         """Notifies all Actors of the Arbitrated Input"""
         for actor in self.actors.values():
             actor.get_arbitrated_inputs(input_data)
+
+    def action_to_input(self, action_input: ActionInput) -> ControllerInput | None:
+        """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
+        input_type = self.config_handler.action_to_game_input(action_input.action)
+
+        if input_type is None:
+            logger.warning("The game action %s is not mapped to any input. Ignored", action_input.action)
+            return None
+
+        return ControllerInput(type=input_type, val=action_input.val)
