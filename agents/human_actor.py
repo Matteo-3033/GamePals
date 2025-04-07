@@ -58,23 +58,24 @@ class HumanActor(Actor, ControllerObserver):
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
 
         # Before sending, it converts the user input into the game input
-        action = self.input_to_action(data.c_input.type)
+        action_input = self.input_to_action(data.c_input)
 
-        if action is None:
-            logger.warning("The input %s is not recognized as a game action. Ignored", data.c_input.type)
+        if action_input is None:
             return
 
-        game_input_data = ActionInput(
-            action,
-            data.c_input.val,
-        )
+        confidence = self.confidence_levels[action_input.action]
+        self.notify_input(action_input, confidence)
 
-        confidence = self.confidence_levels[action]
-        self.notify_input(game_input_data, confidence)
+    def input_to_action(self, c_input: ControllerInput) -> ActionInput | None:
+        """Maps the User Input Type into the Game Action. Return None to ignore the input (i.e. unrecognized)"""
+        action_name = self.config_handler.user_input_to_action(self.get_index(), c_input.type)
 
-    def input_to_action(self, input_type: InputType) -> GameAction:
-        """Maps the User Input Type into the Game Action"""
-        return self.config_handler.user_input_to_action(self.get_index(), input_type)
+        if action_name is None:
+            logger.warning("The input %s is not recognized as a game action. Ignored", c_input.type)
+            return None
+
+        return ActionInput(action=action_name, val=c_input.val)
+
 
     def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment
