@@ -15,6 +15,8 @@ class VirtualControllerProvider:
 
     def __init__(self):
         self.gamepad: vg.VX360Gamepad = vg.VX360Gamepad()
+        self.left_stick_values : tuple[float, float] = (0, 0) # (X, Y)
+        self.right_stick_values : tuple[float, float] = (0, 0) # (X, Y)
 
     def execute(self, c_input: ControllerInput) -> None:
         """
@@ -23,7 +25,23 @@ class VirtualControllerProvider:
         Valid for any single-value Input Type.
         """
         if c_input.type in self.STICKS:
-            raise ValueError("Use execute_stick method to handle stick inputs")
+            if c_input.type in self.RIGHT_STICK: # Right Stick
+                if c_input.type == InputType.STICK_RIGHT_Y:
+                    self.right_stick_values = (self.right_stick_values[0], c_input.val)
+                else:
+                    self.right_stick_values = (c_input.val, self.right_stick_values[1])
+                self.gamepad.right_joystick_float(
+                    x_value_float=self.right_stick_values[0], y_value_float=self.right_stick_values[1]
+                )
+            elif c_input.type in self.LEFT_STICK: # Left Stick
+                if c_input.type == InputType.STICK_LEFT_Y:
+                    self.left_stick_values = (self.left_stick_values[0], c_input.val)
+                else:
+                    self.left_stick_values = (c_input.val, self.left_stick_values[1])
+                self.gamepad.left_joystick_float(
+                    x_value_float=self.left_stick_values[0], y_value_float=self.left_stick_values[1]
+                )
+
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
             if c_input.val == 1:
@@ -40,36 +58,11 @@ class VirtualControllerProvider:
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(c_input.type, 1)])
                 self.gamepad.release_button(self.DPAD_TO_VGBUTTON[(c_input.type, -1)])
 
-        elif c_input.type in self.TRIGGERS:  # Triggers (values are in [0, 255])
+        elif c_input.type in self.TRIGGERS:  # Triggers (values are in [0, 1])
             if c_input.type == InputType.TRIGGER_LEFT:
                 self.gamepad.left_trigger_float(c_input.val)
             else:
                 self.gamepad.right_trigger_float(c_input.val)
-
-        self.gamepad.update()
-
-    def execute_stick(
-        self, c_input_x: ControllerInput, c_input_y: ControllerInput
-    ) -> None:
-        """
-        Receives Controller Inputs and produces them on a Virtual Controller.
-
-        Valid for any 2-axis Input Type.
-        """
-        if c_input_x.type not in self.STICKS or c_input_y.type not in self.STICKS:
-            raise ValueError("Use execute method to handle non-stick inputs")
-
-        if c_input_x.type[:-1] != c_input_y.type[:-1]:
-            raise ValueError("The inputs must be on the same stick")
-
-        if c_input_x.type == InputType.STICK_LEFT_X:
-            self.gamepad.left_joystick_float(
-                x_value_float=c_input_x.val, y_value_float=c_input_y.val
-            )
-        else:
-            self.gamepad.right_joystick_float(
-                x_value_float=c_input_x.val, y_value_float=c_input_y.val
-            )
 
         self.gamepad.update()
 
@@ -118,9 +111,12 @@ class VirtualControllerProvider:
     # Arrays of InputTypes that can be used to check the category of the Input Type
     DPADS = [InputType.DIR_PAD_X, InputType.DIR_PAD_Y]
     TRIGGERS = [InputType.TRIGGER_LEFT, InputType.TRIGGER_RIGHT]
-    STICKS = [
+    LEFT_STICK = [
         InputType.STICK_LEFT_X,
         InputType.STICK_LEFT_Y,
+    ]
+    RIGHT_STICK = [
         InputType.STICK_RIGHT_X,
         InputType.STICK_RIGHT_Y,
     ]
+    STICKS = LEFT_STICK + RIGHT_STICK

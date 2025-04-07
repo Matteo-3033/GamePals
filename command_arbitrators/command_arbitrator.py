@@ -1,15 +1,17 @@
 import logging
 
-from ..agents import Actor, ActorID
+from ..agents import Actor, ActorID, ActionInput
 from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
 from ..sources.controller import ControllerInput, ControllerInputsMap, InputType
 from .policies import InputEntry, PolicyManager, PolicyName, PolicyRole
+from ..sources.game import GameAction
+from ..sources.game.game_actions_map import GameActionsMap
 from ..utils.configuration_handler import ConfigurationHandler
 
 logger = logging.getLogger(__name__)
 
-PolicyTypes = dict[InputType, PolicyName]
+PolicyTypes = dict[GameAction, PolicyName]
 
 
 class CommandArbitrator(ActorObserver):
@@ -25,7 +27,7 @@ class CommandArbitrator(ActorObserver):
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = {}
-        self.input_maps: dict[ActorID, ControllerInputsMap] = {}
+        self.action_maps: dict[ActorID, GameActionsMap] = {}
 
         policy_types = {
             input_type: policy_name.value
@@ -37,7 +39,7 @@ class CommandArbitrator(ActorObserver):
     def add_actor(self, actor: Actor) -> None:
         """Adds an Actor to the Architecture"""
         self.actors[actor.get_id()] = actor
-        self.input_maps[actor.get_id()] = ControllerInputsMap()
+        self.action_maps[actor.get_id()] = GameActionsMap()
         self.policy_manager.register_actor(actor)
         actor.subscribe(self)  # Subscribe the Arbitrator to all the Actors
 
@@ -48,39 +50,15 @@ class CommandArbitrator(ActorObserver):
 
     def receive_input_update(self, actor_data: ActorData) -> None:
         """Receives Input and Confidence Level from one of its Actors"""
+        executed_action = actor_data.data.action
 
-        executed_action = self.config_handler.game_input_to_action(actor_data.data.type)
-        if executed_action is not None and executed_action not in self.actors[actor_data.actor_id].get_controlled_actions():
+        if executed_action not in self.actors[actor_data.actor_id].get_controlled_actions():
             logger.warning("Actor %s is not registered to execute action %s", self.actors[actor_data.actor_id].__class__.__name__, executed_action)
             return
 
-        if executed_action is None:
-            logger.info("Arbitrator received untracked %s", actor_data)
-
-        self.input_maps[actor_data.actor_id].set(actor_data.data)
-
-        input_type = actor_data.data.type
-
-        if input_type in VirtualControllerProvider.STICKS:  # Input is a Stick (2-Axis required)
-            is_left_stick = (
-                    input_type == InputType.STICK_LEFT_X
-                    or input_type == InputType.STICK_LEFT_Y
-            )
-            input_type_x = (
-                InputType.STICK_LEFT_X if is_left_stick else InputType.STICK_RIGHT_X
-            )
-            input_type_y = (
-                InputType.STICK_LEFT_Y if is_left_stick else InputType.STICK_RIGHT_Y
-            )
-
-            merge_result_x = self._merge_by_input_type(input_type_x)
-            merge_result_y = self._merge_by_input_type(input_type_y)
-
-            self.execute_double_value_command(merge_result_x, merge_result_y)
-
-        else:  # Input is not a Stick (1 Axis/Value is enough)
-            merge_result = self._merge_by_input_type(input_type)
-            self.execute_single_value_command(merge_result)
+        self.action_maps[actor_data.actor_id].set(actor_data.data)
+        merge_result = self._merge_by_action(executed_action)
+        self.execute_command(merge_result)
 
     def receive_message_update(self, data: MessageData) -> None:
         """Receives a Message from one of its Actors"""
@@ -88,17 +66,18 @@ class CommandArbitrator(ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_by_input_type(self, input_type: InputType) -> ControllerInput:
+    def _merge_by_action(self, action : GameAction) -> ControllerInput:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
         """
-        policy_info = self.policy_manager.get_policy(input_type)
+        input_type = self.config_handler.action_to_game_input(action)
+        policy_info = self.policy_manager.get_policy(action)
         policy = policy_info.policy_type
 
         input_entries = [
             InputEntry(
-                actor_id, actor_role, self.input_maps[actor_id].get(input_type)[1]
+                actor_id, actor_role, self.action_maps[actor_id].get(action)[1]
             )
             for actor_id, actor_role in policy_info.actors.items()
         ]
@@ -108,20 +87,11 @@ class CommandArbitrator(ActorObserver):
         value = policy.merge_input_entries(input_entries)
         return ControllerInput(input_type, value)
 
-    def execute_single_value_command(self, c_input: ControllerInput) -> None:
-        """Executes a single-value command on the Virtual Controller"""
+    def execute_command(self, c_input: ControllerInput) -> None:
+        """Executes a command on the Virtual Controller"""
         logger.debug("Executing %s", c_input)
         self.virtual_controller.execute(c_input)
         self.notify_arbitrated_input(c_input)
-
-    def execute_double_value_command(
-            self, input_x: ControllerInput, input_y: ControllerInput
-    ) -> None:
-        """Executes a 2-axis command on the Virtual Controller"""
-        logger.debug("Executing %s %s", input_x, input_y)
-        self.virtual_controller.execute_stick(input_x, input_y)
-        self.notify_arbitrated_input(input_x)
-        self.notify_arbitrated_input(input_y)
 
     def notify_arbitrated_input(self, input_data: ControllerInput) -> None:
         """Notifies all Actors of the Arbitrated Input"""

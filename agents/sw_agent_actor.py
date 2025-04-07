@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from .action_input import ActionInputWithConfidence
+from .action_input import ActionInputWithConfidence, ActionInput
 from .observer import ActorObserver
 from ..sources.controller import ControllerInputWithConfidence, ControllerInput
 from ..sources.game import GameState, GameStateListener, GameStateObserver
@@ -12,7 +12,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
     The inputs it produces are generated based on the current Game State, whose updates it receives.
-    In particular, the Agent produces Actions, which are converted to Game Inputs before sending.
+    In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
     """
 
     def __init__(
@@ -37,27 +37,10 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
 
     def receive_game_state_update(self, game_state: GameState) -> None:
         """Receives Game State Updates and produces Inputs to notify to its subscribers."""
-        inputs = self.compute_inputs(game_state)
-        for inp in inputs:
-            c_input = ControllerInput(inp.type, inp.val)
-            self.notify_input(c_input, inp.confidence)
-
-    def compute_inputs(
-            self,
-            game_state: GameState
-    ) -> list[ControllerInputWithConfidence]:
-        """Produces a list of inputs given a Game State. Inputs are executed one after another, with no delay"""
-        action_inputs = self.compute_actions(game_state)
-
-        # Before sending, it converts the actions into the game input
-        return [
-            ControllerInputWithConfidence(
-                val=action_input.val,
-                type=self.config_handler.action_to_game_input(action_input.action),
-                confidence=action_input.confidence
-            )
-            for action_input in action_inputs
-        ]
+        actions = self.compute_actions(game_state)
+        for action in actions:
+            action_input = ActionInput(action.action, action.val)
+            self.notify_input(action_input, action.confidence)
 
     @abstractmethod
     def compute_actions(
