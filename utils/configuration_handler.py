@@ -66,7 +66,7 @@ class ConfigurationHandler:
 
         self.confidence_levels: dict[int, dict['GameAction', float]] = defaultdict(lambda: defaultdict(lambda: 1.0))
         self.user_actions: dict[int, list['GameAction']] = defaultdict(list)
-        self.policy_types: dict['InputType', Type['Policy']] = defaultdict()
+        self.policy_types: dict['GameAction', Type['Policy']] = defaultdict()
         self.registered_inputs: set['InputType'] = set()
         self.required_agents: set[str] = set()
         self.agents_params: dict[str, dict[str, Any]] = defaultdict(lambda: defaultdict())
@@ -87,7 +87,7 @@ class ConfigurationHandler:
                 self.user_policy_roles[(action["name"], human_idx)] = human_role
                 controls = human.get("controls", [])
 
-                self.confidence_levels[human_idx][action] = human["confidence"]
+                self.confidence_levels[human_idx][action["name"]] = human["confidence"]
 
                 for control in controls:
                     self.user_input_to_action_map[human_idx][control] = action["name"]
@@ -102,8 +102,7 @@ class ConfigurationHandler:
                 self.agent_policy_roles[(action["name"], agent["name"])] = agent_role
 
             if action["name"] in game_config.get("actions", {}):
-                for game_input in game_config["actions"][action["name"]]:
-                    self.policy_types[game_input] = PolicyName[action.get("policy", "POLICY_EXCLUSIVITY")]
+                self.policy_types[action["name"]] = PolicyName[action.get("policy", "POLICY_EXCLUSIVITY")]
 
         for action, inputs in game_config.get("actions", {}).items():
 
@@ -121,7 +120,7 @@ class ConfigurationHandler:
 
     def get_policy_types(
             self
-    ) -> dict['InputType', Type['Policy']]:
+    ) -> dict['GameAction', Type['Policy']]:
         """Returns the Policy associated with every Input Type"""
         return self.policy_types
 

@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 from . import PolicyContinuousOR
 from ...agents import Actor, ActorID
-from ...sources.controller import InputType
 from .input_entry import PolicyRole
 from .policy import Policy
+from ...sources.game import GameAction
 from ...utils.configuration_handler import ConfigurationHandler
 
 
@@ -27,16 +27,16 @@ class PolicyManager:
 
     def __init__(
             self,
-            policies_types: dict[InputType, type[Policy]],
+            policies_types: dict[GameAction, type[Policy]],
             default_policy : type[Policy] = PolicyContinuousOR,
     ) -> None:
-        self.policies_map: dict[InputType, PolicyMapEntry] = {}
+        self.policies_map: dict[GameAction, PolicyMapEntry] = {}
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
+        self.default_policy = default_policy
 
         # Every Input is registered with the specified Policy (or the default one, if none is specified)
-        for input_type in InputType:
-            specified_policy = policies_types.get(input_type, default_policy)
-            self.policies_map[input_type] = PolicyMapEntry(specified_policy, {})
+        for action, policy_type in policies_types.items():
+            self.policies_map[action] = PolicyMapEntry(policy_type, {})
 
     def register_actor(self, actor: Actor) -> None:
         """
@@ -49,22 +49,17 @@ class PolicyManager:
 
         actions = actor.get_controlled_actions()
 
-        # This allows every actor to execute inputs not associated with any action
-        inputs = {
-            self.config_handler.action_to_game_input(action)
-            for action in actions
-        }.union(
-            {t for t in InputType}.difference(self.config_handler.get_registered_action_inputs())
-        )
+        for action in actions:
+            policy_entry = self.policies_map.get(action)
+            if policy_entry is None:
+                self.policies_map[action] = PolicyMapEntry(self.default_policy, {})
+                policy_entry = self.policies_map.get(action)
 
-        for input_type in inputs:
-            policy_entry = self.policies_map[input_type]
             actors_number = len(policy_entry.actors)
-            action = self.config_handler.game_input_to_action(input_type)
 
-            if not action:
-                role = PolicyRole.PILOT
-            elif isinstance(actor, HumanActor):
+            # Finds the Role of the Actor in the Config, for that specific action. It's over-complicated because we
+            # currently don't have a unique way to identify actors in the config (for humans we use index, for agents we use name)
+            if isinstance(actor, HumanActor):
                 role = self.config_handler.get_human_role(
                     user_idx=actor.get_index(),
                     action=action
@@ -75,15 +70,19 @@ class PolicyManager:
                     action=action
                 )
             else:
-                logger.warning("Couldn't find a role for %s for %s. Defaulted to Pilot", actor.get_name(), input_type)
+                logger.warning("Couldn't find a role for %s for %s. Defaulted to Pilot", actor.get_name(), action)
                 role = PolicyRole.PILOT
 
             if policy_entry.policy_type.get_max_actors() > actors_number:
-                self.policies_map[input_type].actors[actor.get_id()] = PolicyRole(role)
+                self.policies_map[action].actors[actor.get_id()] = PolicyRole(role)
             else:
                 raise ValueError(
-                    f"Only one Actor per Input Type {input_type} is allowed"
+                    f"Only one Actor per Action {action} is allowed"
                 )
 
-    def get_policy(self, input_type: InputType) -> PolicyMapEntry:
-        return self.policies_map[input_type]
+    def get_policy(self, action: GameAction) -> PolicyMapEntry:
+        found = self.policies_map.get(action)
+        if found is None:
+            self.policies_map[action] = PolicyMapEntry(self.default_policy, {})
+            return self.policies_map.get(action)
+        return found

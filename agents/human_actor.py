@@ -1,3 +1,5 @@
+import logging
+
 from .action_input import ActionInput
 from ..sources import PhysicalControllerListener
 from ..sources.controller import (
@@ -11,6 +13,7 @@ from ..sources.game import GameAction
 
 ConfidenceLevels = dict[GameAction, float]
 
+logger = logging.getLogger(__file__)
 
 class HumanActor(Actor, ControllerObserver):
     """
@@ -56,7 +59,11 @@ class HumanActor(Actor, ControllerObserver):
 
         # Before sending, it converts the user input into the game input
         action = self.input_to_action(data.c_input.type)
-        # TODO: What to do if the input is not associated to any action?
+
+        if action is None:
+            logger.warning("The input %s is not recognized as a game action. Ignored", data.c_input.type)
+            return
+
         game_input_data = ActionInput(
             action,
             data.c_input.val,

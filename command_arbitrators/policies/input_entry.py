@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ...agents import ActorID
-from ...sources.controller import ControllerInputRecord
+from ...sources.game.game_actions_map import ActionInputRecord
 
 
 class PolicyRole(StrEnum):
@@ -25,4 +25,4 @@ class InputEntry:
 
     actor_id: ActorID
     actor_role: PolicyRole
-    input_details: ControllerInputRecord  # Contains Value, Confidence Level and a Timestamp of last acquisition
+    input_details: ActionInputRecord  # Contains Value, Confidence Level and a Timestamp of last acquisition
