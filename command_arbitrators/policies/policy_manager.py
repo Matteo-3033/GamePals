@@ -1,12 +1,12 @@
 import logging
 from dataclasses import dataclass
 
-from . import PolicyContinuousOR
 from ...agents import Actor, ActorID
-from .input_entry import PolicyRole
-from .policy import Policy
 from ...sources.game import GameAction
 from ...utils.configuration_handler import ConfigurationHandler
+from .input_entry import PolicyRole
+from .policy import Policy
+from .policy_continuous_or import PolicyContinuousOR
 
 
 @dataclass
@@ -16,7 +16,9 @@ class PolicyMapEntry:
     policy_type: type[Policy]
     actors: dict[ActorID, PolicyRole]
 
+
 logger = logging.getLogger(__file__)
+
 
 class PolicyManager:
     """
@@ -26,9 +28,9 @@ class PolicyManager:
     """
 
     def __init__(
-            self,
-            policies_types: dict[GameAction, type[Policy]],
-            default_policy : type[Policy] = PolicyContinuousOR,
+        self,
+        policies_types: dict[GameAction, type[Policy]],
+        default_policy: type[Policy] = PolicyContinuousOR,
     ) -> None:
         self.policies_map: dict[GameAction, PolicyMapEntry] = {}
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
@@ -61,24 +63,24 @@ class PolicyManager:
             # currently don't have a unique way to identify actors in the config (for humans we use index, for agents we use name)
             if isinstance(actor, HumanActor):
                 role = self.config_handler.get_human_role(
-                    user_idx=actor.get_index(),
-                    action=action
+                    user_idx=actor.get_index(), action=action
                 )
             elif isinstance(actor, SWAgentActor):
                 role = self.config_handler.get_agent_role(
-                    agent_name=actor.get_name(),
-                    action=action
+                    agent_name=actor.get_name(), action=action
                 )
             else:
-                logger.warning("Couldn't find a role for %s for %s. Defaulted to Pilot", actor.get_name(), action)
+                logger.warning(
+                    "Couldn't find a role for %s for %s. Defaulted to Pilot",
+                    actor.get_name(),
+                    action,
+                )
                 role = PolicyRole.PILOT
 
             if policy_entry.policy_type.get_max_actors() > actors_number:
                 self.policies_map[action].actors[actor.get_id()] = PolicyRole(role)
             else:
-                raise ValueError(
-                    f"Only one Actor per Action {action} is allowed"
-                )
+                raise ValueError(f"Only one Actor per Action {action} is allowed")
 
     def get_policy(self, action: GameAction) -> PolicyMapEntry:
         found = self.policies_map.get(action)

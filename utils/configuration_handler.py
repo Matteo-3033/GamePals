@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from .utils import get_all_concrete_subclasses
 
@@ -29,7 +29,7 @@ class ConfigurationHandler:
     TODO: configure meta-commands
     """
 
-    _instance: "ConfigurationHandler" | None = None
+    _instance: Optional["ConfigurationHandler"] = None
 
     def __new__(
         cls,
@@ -68,151 +68,129 @@ class ConfigurationHandler:
 
         # TODO: Configuration Validation should go here
 
-        self.confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
+        self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
             lambda: defaultdict(lambda: 1.0)
         )
-        self.user_actions: dict[int, list["GameAction"]] = defaultdict(list)
-        self.policy_types: dict["GameAction", Type["Policy"]] = defaultdict()
-        self.registered_inputs: set["InputType"] = set()
-        self.required_agents: set[str] = set()
-        self.agents_params: dict[str, dict[str, Any]] = defaultdict(
+        self._user_actions: dict[int, list["GameAction"]] = defaultdict(list)
+        self._policy_types: dict["GameAction", Type["Policy"]] = defaultdict()
+        self._registered_inputs: set["InputType"] = set()
+        self._required_agents: set[str] = set()
+        self._agents_params: dict[str, dict[str, Any]] = defaultdict(
             lambda: defaultdict()
         )
-        self.user_policy_roles: dict[tuple["GameAction", int], PolicyRole] = (
+        self._user_policy_roles: dict[tuple["GameAction", int], PolicyRole] = (
             defaultdict()
         )
-        self.agent_policy_roles: dict[tuple["GameAction", str], PolicyRole] = (
+        self._agent_policy_roles: dict[tuple["GameAction", str], PolicyRole] = (
             defaultdict()
         )
 
-        self.user_input_to_action_map: dict[int, dict["InputType", "GameAction"]] = (
+        self._user_input_to_action_map: dict[int, dict["InputType", "GameAction"]] = (
             defaultdict(dict)
         )
-        self.action_to_user_input_map: dict[int, dict["GameAction", "InputType"]] = (
+        self._action_to_user_input_map: dict[int, dict["GameAction", "InputType"]] = (
             defaultdict(dict)
         )
-        self.game_input_to_action_map: dict["InputType", "GameAction"] = defaultdict()
-        self.action_to_game_input_map: dict["GameAction", "InputType"] = defaultdict()
+        self._game_input_to_action_map: dict["InputType", "GameAction"] = defaultdict()
+        self._action_to_game_input_map: dict["GameAction", list["InputType"]] = (
+            defaultdict(list)
+        )
 
         for action in assistance_config.get("action", []):
             for human in action.get("humans", []):
                 human_idx = human.get("idx", self.DEFAULTS["HUMAN_IDX"])
                 human_role = human.get("role", self.DEFAULTS["HUMAN_ROLE"])
 
-                self.user_actions[human_idx].append(action["name"])
-                self.user_policy_roles[(action["name"], human_idx)] = human_role
+                self._user_actions[human_idx].append(action["name"])
+                self._user_policy_roles[(action["name"], human_idx)] = human_role
                 controls = human.get("controls", [])
 
-                self.confidence_levels[human_idx][action["name"]] = human["confidence"]
+                self._confidence_levels[human_idx][action["name"]] = human["confidence"]
 
                 for control in controls:
-                    self.user_input_to_action_map[human_idx][control] = action["name"]
+                    self._user_input_to_action_map[human_idx][control] = action["name"]
 
                 if len(controls) > 0:
                     # Knowing one input for each action is enough
-                    self.action_to_user_input_map[human_idx][action["name"]] = controls[
-                        0
-                    ]
+                    self._action_to_user_input_map[human_idx][action["name"]] = (
+                        controls[0]
+                    )
 
             for agent in action.get("agents", []):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
-                self.required_agents.add(agent["name"])
-                self.agent_policy_roles[(action["name"], agent["name"])] = agent_role
+                self._required_agents.add(agent["name"])
+                self._agent_policy_roles[(action["name"], agent["name"])] = agent_role
 
             if action["name"] in game_config.get("actions", {}):
-                self.policy_types[action["name"]] = PolicyName[
+                self._policy_types[action["name"]] = PolicyName[
                     action.get("policy", self.DEFAULTS["POLICY"])
                 ].value
 
         for action, inputs in game_config.get("actions", {}).items():
 
-            self.action_to_game_input_map[action] = inputs[
-                0
-            ]  # Knowing one input for each action is enough
+            self._action_to_game_input_map[action] = inputs
 
             for game_input in inputs:
-                self.game_input_to_action_map[game_input] = action
-                self.registered_inputs.add(game_input)
+                self._game_input_to_action_map[game_input] = action
+                self._registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", []):
-            if agent["name"] not in self.required_agents and agent.get("active", False):
-                self.required_agents.add(agent["name"])
+            if agent["name"] not in self._required_agents and agent.get(
+                "active", False
+            ):
+                self._required_agents.add(agent["name"])
 
-            self.agents_params[agent["name"]] = agent["params"]
+            self._agents_params[agent["name"]] = agent["params"]
 
     def get_policy_types(self) -> dict["GameAction", Type["Policy"]]:
         """Returns the Policy associated with every Input Type"""
-        return self.policy_types
+        return self._policy_types
 
     def get_confidence_levels(self, user_idx: int) -> dict["GameAction", float]:
         """Returns the confidence level associated with every GameAction, for a specific HumanActor"""
-        return self.confidence_levels.get(user_idx, dict())
+        return self._confidence_levels.get(user_idx, dict())
 
     def get_controlled_actions(self, user_idx: int) -> list["GameAction"]:
         """Returns the list of game actions that a certain HumanActor is responsible for"""
-        return self.user_actions.get(user_idx, list())
+        return self._user_actions.get(user_idx, list())
 
     def get_registered_action_inputs(self) -> set["InputType"]:
         """
         Returns all the action inputs for which there is a designated actor.
         This allows to know which inputs are not part of the config (i.e., a button that is only used in the menu)
         """
-        return self.registered_inputs
+        return self._registered_inputs
 
     def user_input_to_action(
         self,
         user_idx: int,
         input_type: "InputType",
-    ) -> "GameAction" | None:
+    ) -> Optional["GameAction"]:
         """Returns the GameAction that the user user_idx intends to do when pressing the given input_type"""
-        return self.user_input_to_action_map.get(user_idx, {}).get(input_type, None)
+        return self._user_input_to_action_map.get(user_idx, {}).get(input_type, None)
 
     def action_to_user_input(
         self,
         user_idx: int,
         action: "GameAction",
-    ) -> "InputType" | None:
+    ) -> Optional["InputType"]:
         """Returns the InputType that the user user_idx needs to press to perform the given action"""
-        return self.action_to_user_input_map.get(user_idx, {}).get(action, None)
+        return self._action_to_user_input_map.get(user_idx, {}).get(action, None)
 
-    def game_input_to_action(self, input_type: "InputType") -> "GameAction" | None:
+    def game_input_to_action(self, input_type: "InputType") -> Optional["GameAction"]:
         """Returns the GameAction that the game associates with the given input_type"""
-        return self.game_input_to_action_map.get(input_type, None)
+        return self._game_input_to_action_map.get(input_type, None)
 
     def action_to_game_input(
         self,
         action: "GameAction",
-    ) -> "InputType" | None:
+    ) -> list["InputType"] | None:
         """Returns the InputType that the game associates with the given action"""
-        return self.action_to_game_input_map.get(action, None)
-
-    def game_input_to_user_input(
-        self,
-        user_idx: int,
-        input_type: "InputType",
-    ) -> "InputType":
-        """Returns the game InputType corresponding to the user InputType (matches the inputs based on the action)"""
-        action = self.game_input_to_action(input_type)
-        if action is None:
-            return input_type
-
-        found = self.action_to_user_input(user_idx, action)
-        return found if found else input_type
-
-    def user_input_to_game_input(
-        self,
-        user_idx: int,
-        input_type: "InputType",
-    ) -> "InputType":
-        """Returns the user InputType corresponding to the game InputType (matches the inputs based on the action)"""
-        found = self.action_to_game_input(
-            self.user_input_to_action(user_idx, input_type)
-        )
-        return found if found else input_type
+        return self._action_to_game_input_map.get(action, None)
 
     def get_humans_count(self) -> int:
         """Returns the number of Human Actors specified in the config"""
-        return len(self.user_actions)
+        return len(self._user_actions)
 
     def get_necessary_agents(self) -> set[Type["SWAgentActor"]]:
         """Returns the list of SWAgentActors that are required by the config"""
@@ -220,22 +198,22 @@ class ConfigurationHandler:
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
         required_agent_classes = {
-            cls for cls in agent_classes if cls.get_name() in self.required_agents
+            cls for cls in agent_classes if cls.get_name() in self._required_agents
         }
         return required_agent_classes
 
     def get_params_for_agent(self, agent_name: str) -> dict[str, Any]:
         """Returns the map of constructor parameters associated to the specified agent"""
-        return self.agents_params.get(agent_name, dict())
+        return self._agents_params.get(agent_name, dict())
 
     def get_agent_role(self, agent_name: str, action: "GameAction") -> "PolicyRole":
         """Returns the Role that agent_name covers for the specified action"""
-        found = self.agent_policy_roles[(action, agent_name)]
+        found = self._agent_policy_roles[(action, agent_name)]
         return found if found else self.DEFAULTS["AGENT_ROLE"]
 
     def get_human_role(self, user_idx: int, action: "GameAction") -> "PolicyRole":
         """Returns the Role that user_idx covers for the specified action"""
-        found = self.user_policy_roles[(action, user_idx)]
+        found = self._user_policy_roles[(action, user_idx)]
         return found if found else self.DEFAULTS["HUMAN_ROLE"]
 
     DEFAULTS: dict[str, Any] = {
