@@ -1,9 +1,9 @@
-from typing import TypeVar, Type
+from typing import TypeVar
 
-T = TypeVar("T")
+T = TypeVar("T", bound=type)
 
 
-def get_all_concrete_subclasses(cls: Type[T]) -> set[Type[T]]:
+def get_all_concrete_subclasses(cls: T) -> set[T]:
     """Returns a set of all the Type class concrete implementations"""
     subclasses = set(cls.__subclasses__())  # Find direct subclasses
     all_subclasses = set(subclasses)
@@ -16,7 +16,7 @@ def get_all_concrete_subclasses(cls: Type[T]) -> set[Type[T]]:
         subclass
         for subclass in all_subclasses
         if not hasattr(subclass, "__abstractmethods__")  # Doesn't have
-           or not subclass.__abstractmethods__  # Has but it's empty
+        or not subclass.__abstractmethods__  # Has but it's empty
     }
 
     return all_subclasses

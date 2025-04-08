@@ -1,6 +1,5 @@
 import logging
 
-from .action_input import ActionInput
 from ..sources import PhysicalControllerListener
 from ..sources.controller import (
     ControllerInput,
@@ -8,12 +7,14 @@ from ..sources.controller import (
     InputData,
     InputType,
 )
-from .actor import Actor
 from ..sources.game import GameAction
+from .action_input import ActionInput
+from .actor import Actor
 
 ConfidenceLevels = dict[GameAction, float]
 
 logger = logging.getLogger(__file__)
+
 
 class HumanActor(Actor, ControllerObserver):
     """
@@ -22,13 +23,12 @@ class HumanActor(Actor, ControllerObserver):
     The inputs it produces are read from a Physical Controller and mapped into Game Actions for global understanding.
     """
 
-    def __init__(
-            self,
-            physical_controller: PhysicalControllerListener
-    ) -> None:
+    def __init__(self, physical_controller: PhysicalControllerListener) -> None:
         super().__init__()
         self.controller = physical_controller
-        self.confidence_levels : ConfidenceLevels = self.config_handler.get_confidence_levels(self.controller.get_index())
+        self.confidence_levels: ConfidenceLevels = (
+            self.config_handler.get_confidence_levels(self.controller.get_index())
+        )
 
         self.controller.subscribe(self)
 
@@ -68,15 +68,18 @@ class HumanActor(Actor, ControllerObserver):
 
     def input_to_action(self, c_input: ControllerInput) -> ActionInput | None:
         """Maps the User Input Type into the Game Action. Return None to ignore the input (i.e. unrecognized)"""
-        action_name = self.config_handler.user_input_to_action(self.get_index(), c_input.type)
+        action_name = self.config_handler.user_input_to_action(
+            self.get_index(), c_input.type
+        )
 
         if action_name is None:
-            logger.warning("The input %s is not recognized as a game action. Ignored", c_input.type)
+            logger.warning(
+                "The input %s is not recognized as a game action. Ignored", c_input.type
+            )
             return None
 
         return ActionInput(action=action_name, val=c_input.val)
 
-
-    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+    def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment
         pass
