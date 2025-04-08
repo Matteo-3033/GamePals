@@ -1,14 +1,9 @@
 import logging
 
 from ..sources import PhysicalControllerListener
-from ..sources.controller import (
-    ControllerInput,
-    ControllerObserver,
-    InputData,
-    InputType,
-)
+from ..sources.controller import ControllerInput, ControllerObserver, InputData
 from ..sources.game import GameAction
-from .action_input import ActionInput
+from .action_input import ActionConversionDelegate, ActionInput
 from .actor import Actor
 
 ConfidenceLevels = dict[GameAction, float]
@@ -23,12 +18,23 @@ class HumanActor(Actor, ControllerObserver):
     The inputs it produces are read from a Physical Controller and mapped into Game Actions for global understanding.
     """
 
-    def __init__(self, physical_controller: PhysicalControllerListener) -> None:
+    def __init__(
+        self,
+        physical_controller: PhysicalControllerListener,
+        conversion_delegates: list[ActionConversionDelegate] | None = None,
+    ) -> None:
         super().__init__()
+        if conversion_delegates is None:
+            conversion_delegates = list()
+
         self.controller = physical_controller
         self.confidence_levels: ConfidenceLevels = (
             self.config_handler.get_confidence_levels(self.controller.get_index())
         )
+
+        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
+            delegate.get_action(): delegate for delegate in conversion_delegates
+        }
 
         self.controller.subscribe(self)
 
@@ -68,17 +74,22 @@ class HumanActor(Actor, ControllerObserver):
 
     def input_to_action(self, c_input: ControllerInput) -> ActionInput | None:
         """Maps the User Input Type into the Game Action. Return None to ignore the input (i.e. unrecognized)"""
-        action_name = self.config_handler.user_input_to_action(
+        action = self.config_handler.user_input_to_action(
             self.get_index(), c_input.type
         )
 
-        if action_name is None:
+        if action is None:
             logger.warning(
                 "The input %s is not recognized as a game action. Ignored", c_input.type
             )
             return None
 
-        return ActionInput(action=action_name, val=c_input.val)
+        if action in self.conversion_delegates:
+            # Check if the Action is handled by a Delegate
+            # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
+            return self.conversion_delegates[action].convert_from_input(c_input)
+
+        return ActionInput(action=action, val=c_input.val)
 
     def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment

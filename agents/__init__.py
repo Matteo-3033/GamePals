@@ -1,5 +1,9 @@
 from . import actor_observer as observer
-from .action_input import ActionInput, ActionInputWithConfidence
+from .action_input import (
+    ActionConversionDelegate,
+    ActionInput,
+    ActionInputWithConfidence,
+)
 from .actor import Actor
 from .actor_id import ActorID
 from .human_actor import ConfidenceLevels, HumanActor
@@ -18,6 +22,7 @@ __all__ = [
     "SWAgentSequencedActor",
     "ActionInput",
     "ActionInputWithConfidence",
+    "ActionConversionDelegate",
     "ActionInputWithConfidenceAndDelay",
     "observer",
 ]

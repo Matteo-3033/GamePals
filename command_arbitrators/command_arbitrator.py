@@ -1,6 +1,7 @@
 import logging
+from typing import Type
 
-from ..agents import ActionInput, Actor, ActorID
+from ..agents import ActionConversionDelegate, ActionInput, Actor, ActorID
 from ..agents.actor_observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
 from ..sources.controller import ControllerInput
@@ -21,11 +22,21 @@ class CommandArbitrator(ActorObserver):
     The Arbitrator can communicate to its Actors the computed inputs via their get_arbitrator_updates method.
     """
 
-    def __init__(self, policies: dict[GameAction, Policy]) -> None:
+    def __init__(
+        self,
+        policies: dict[GameAction, Type[Policy]],
+        conversion_delegates: list[ActionConversionDelegate] | None = None,
+    ) -> None:
+        if conversion_delegates is None:
+            conversion_delegates = list()
+
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = {}
         self.action_maps: dict[ActorID, GameActionsMap] = {}
+        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
+            delegate.get_action(): delegate for delegate in conversion_delegates
+        }
 
         policy_types = policies.copy()
 
@@ -104,13 +115,29 @@ class CommandArbitrator(ActorObserver):
 
     def action_to_input(self, action_input: ActionInput) -> ControllerInput | None:
         """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
-        input_type = self.config_handler.action_to_game_input(action_input.action)
 
-        if input_type is None:
+        inputs = self.config_handler.action_to_game_input(action_input.action)
+
+        if not inputs:
             logger.warning(
                 "The game action %s is not mapped to any input. Ignored",
                 action_input.action,
             )
             return None
 
-        return ControllerInput(type=input_type, val=action_input.val)
+        if len(inputs) > 1:
+            if action_input.action not in self.conversion_delegates:
+                logger.warning(
+                    "Game actions mapped to multiple inputs must be handled by a Delegate. Ignored",
+                    action_input.action,
+                )
+                return None
+
+        if action_input.action in self.conversion_delegates:
+            # Check if the Action is handled by a Delegate
+            # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
+            return self.conversion_delegates[action_input.action].convert_to_input(
+                action_input
+            )
+
+        return ControllerInput(type=inputs[0], val=action_input.val)
