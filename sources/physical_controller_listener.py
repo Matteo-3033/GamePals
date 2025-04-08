@@ -48,12 +48,16 @@ class PhysicalControllerListener:
         """
 
         # gamepad_number is the index of the device in the inputs.devices.gamepads list
-        self.gamepad_number = gamepad_number
+        # while gamepad_id is the id assigned to the gamepad
+        # These two may differ if late_init is True
+        self._inputs_index = gamepad_number
+        self.gamepad_id = gamepad_number
+
         self.subscribers: list[ControllerObserver] = []
         self.running: bool = False
         self.listener_thread: threading.Thread | None = None
 
-        self.gamepad_number = gamepad_number
+        self._inputs_index = gamepad_number
         self.gamepad: GamePad | None = None
 
         self.devices = RefreshableDeviceManager()
@@ -61,22 +65,22 @@ class PhysicalControllerListener:
         if not late_init:
             if not self.__try_init_gamepad():
                 raise RuntimeError(
-                    f"Gamepad {self.gamepad_number} not found. Please check if it is connected."
+                    f"Gamepad {self._inputs_index} not found. Please check if it is connected."
                 )
         else:
-            # If late_init is True, the virtual controller will be initialized first as gamepad 0, so we need to increment the gamepad_number
+            # If late_init is True, the virtual controller will be initialized first as gamepad 0, so we need to increment the inputs_index
             # to avoid conflicts with the virtual controller.
-            self.gamepad_number += 1
+            self._inputs_index += 1
 
     def __try_init_gamepad(self) -> bool:
         self.devices.update_gamepads()
 
-        if self.gamepad_number < len(self.devices.gamepads):
-            self.gamepad = self.devices.gamepads[self.gamepad_number]
-            logger.info("Gamepad %d initialized", self.gamepad_number)
+        if self._inputs_index < len(self.devices.gamepads):
+            self.gamepad = self.devices.gamepads[self._inputs_index]
+            logger.info("Gamepad %d initialized", self._inputs_index)
             return True
 
-        logger.error("Gamepad %d not found", self.gamepad_number)
+        logger.error("Gamepad %d not found", self._inputs_index)
         return False
 
     def subscribe(self, subscriber: ControllerObserver) -> None:
@@ -86,9 +90,9 @@ class PhysicalControllerListener:
     def notify_all(self, c_input: ControllerInput) -> None:
         """Notifies all subscribers of an input, wrapped in an InputData object"""
         data = InputData(c_input)
-        logger.info("Sending data %s", data)
+        # logger.info("Sending data %s", data)
         for subscriber in self.subscribers:
-            subscriber.receive_controller_input(data)
+            subscriber.on_controller_input(data)
 
     def start_listening(self) -> None:
         """Starts listening to the physical controller inputs and notifying its subscribers"""
@@ -153,7 +157,11 @@ class PhysicalControllerListener:
                 return val
 
     def get_index(self) -> int:
-        return self.gamepad_number
+        """
+        Returns the index of the gamepad.
+        This value is equal to the gamepad_number passed to the constructor.
+        """
+        return self.gamepad_id
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
     INPUT_TYPES_MAP = {

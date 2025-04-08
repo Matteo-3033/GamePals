@@ -57,7 +57,7 @@ class HumanActor(Actor, ControllerObserver):
         """Returns the list of Game Actions that the Actor is controlling."""
         return self.config_handler.get_controlled_actions(self.controller.get_index())
 
-    def receive_controller_input(self, data: InputData) -> None:
+    def on_controller_input(self, data: InputData) -> None:
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
 
         # Before sending, it converts the user input into the game input

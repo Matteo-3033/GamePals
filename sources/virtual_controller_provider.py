@@ -14,9 +14,12 @@ class VirtualControllerProvider:
     """
 
     def __init__(self):
-        self.gamepad: vg.VX360Gamepad = vg.VX360Gamepad()
-        self.left_stick_values : tuple[float, float] = (0, 0) # (X, Y)
-        self.right_stick_values : tuple[float, float] = (0, 0) # (X, Y)
+        self.gamepad: vg.VX360Gamepad | None = None
+        self.left_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
+        self.right_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
+
+    def start(self) -> None:
+        self.gamepad = vg.VX360Gamepad()
 
     def execute(self, c_input: ControllerInput) -> None:
         """
@@ -24,24 +27,28 @@ class VirtualControllerProvider:
 
         Valid for any single-value Input Type.
         """
+
+        assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
+
         if c_input.type in self.STICKS:
-            if c_input.type in self.RIGHT_STICK: # Right Stick
+            if c_input.type in self.RIGHT_STICK:  # Right Stick
                 if c_input.type == InputType.STICK_RIGHT_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
                 else:
                     self.right_stick_values = (c_input.val, self.right_stick_values[1])
                 self.gamepad.right_joystick_float(
-                    x_value_float=self.right_stick_values[0], y_value_float=self.right_stick_values[1]
+                    x_value_float=self.right_stick_values[0],
+                    y_value_float=self.right_stick_values[1],
                 )
-            elif c_input.type in self.LEFT_STICK: # Left Stick
+            elif c_input.type in self.LEFT_STICK:  # Left Stick
                 if c_input.type == InputType.STICK_LEFT_Y:
                     self.left_stick_values = (self.left_stick_values[0], c_input.val)
                 else:
                     self.left_stick_values = (c_input.val, self.left_stick_values[1])
                 self.gamepad.left_joystick_float(
-                    x_value_float=self.left_stick_values[0], y_value_float=self.left_stick_values[1]
+                    x_value_float=self.left_stick_values[0],
+                    y_value_float=self.left_stick_values[1],
                 )
-
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
             if c_input.val == 1:
@@ -102,10 +109,10 @@ class VirtualControllerProvider:
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     DPAD_TO_VGBUTTON = {
-        (InputType.DIR_PAD_Y, -1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP,
-        (InputType.DIR_PAD_Y, 1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_DOWN,
-        (InputType.DIR_PAD_X, -1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_LEFT,
-        (InputType.DIR_PAD_X, 1.): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_RIGHT,
+        (InputType.DIR_PAD_Y, -1.0): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_UP,
+        (InputType.DIR_PAD_Y, 1.0): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_DOWN,
+        (InputType.DIR_PAD_X, -1.0): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_LEFT,
+        (InputType.DIR_PAD_X, 1.0): vg.XUSB_BUTTON.XUSB_GAMEPAD_DPAD_RIGHT,
     }
 
     # Arrays of InputTypes that can be used to check the category of the Input Type

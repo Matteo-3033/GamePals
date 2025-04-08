@@ -63,6 +63,9 @@ class CommandArbitrator(ActorObserver):
 
     def start(self) -> None:
         """Starts the Actors and the Arbitration Process"""
+
+        self.virtual_controller.start()
+
         for _, actor in self.actors.items():
             actor.start()
 
