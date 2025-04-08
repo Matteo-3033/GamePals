@@ -1,6 +1,6 @@
 import logging
 
-from ...sources.controller import ControllerInput
+from ...sources.controller import ControllerInput, InputType
 from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput
 from .game_action import GameAction
@@ -39,13 +39,13 @@ class BinaryConversionDelegate(ActionConversionDelegate):
 
         if action_input.val >= 0:
             return [
-                ControllerInput(positive, action_input.val),
-                ControllerInput(negative, 0),
+                ControllerInput(InputType(positive), action_input.val),
+                ControllerInput(InputType(negative), 0),
             ]
 
         return [
-            ControllerInput(negative, -action_input.val),
-            ControllerInput(positive, 0),
+            ControllerInput(InputType(negative), -action_input.val),
+            ControllerInput(InputType(positive), 0),
         ]
 
     def convert_from_input(
