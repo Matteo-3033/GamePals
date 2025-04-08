@@ -1,6 +1,6 @@
 from enum import Enum
 
-from ...utils.utils import get_all_concrete_subclasses
+from ...utils import get_all_concrete_subclasses
 from .input_entry import InputEntry, PolicyRole
 from .policy import Policy
 from .policy_binary_and import PolicyBinaryAND
