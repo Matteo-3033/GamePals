@@ -4,7 +4,7 @@ from typing import Generic
 
 from ...agents import Actor, ActorID, HumanActor, SWAgentActor
 from ...sources.game import TGameAction
-from ...sources.configuration_handler import ConfigurationHandler
+from ...utils.configuration_handler import ConfigurationHandler
 from .input_entry import PolicyRole
 from .policy import Policy
 from .policy_continuous_or import PolicyContinuousOR
@@ -34,14 +34,14 @@ class PolicyManager(Generic[TGameAction]):
         default_policy: type[Policy] = PolicyContinuousOR,
     ) -> None:
         self.policies_map: dict[TGameAction, PolicyMapEntry] = dict()
-        self.config_handler: ConfigurationHandler = ConfigurationHandler()
+        self.config_handler: ConfigurationHandler[TGameAction] = ConfigurationHandler()
         self.default_policy = default_policy
 
         # Every Input is registered with the specified Policy (or the default one, if none is specified)
         for action, policy_type in policies_types.items():
-            self.policies_map[action] = PolicyMapEntry(policy_type, {})
+            self.policies_map[action] = PolicyMapEntry(policy_type, dict())
 
-    def register_actor(self, actor: Actor) -> None:
+    def register_actor(self, actor: Actor[TGameAction]) -> None:
         """
         Registers the given Actor, for the Input Types specified by the
         get_controlled_inputs method of the Actor.

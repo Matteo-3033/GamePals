@@ -19,11 +19,11 @@ class Actor(Generic[TGameAction], ABC):
     """
 
     def __init__(self):
-        from ..sources.configuration_handler import ConfigurationHandler
+        from ..utils.configuration_handler import ConfigurationHandler
 
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
-        self.config_handler = ConfigurationHandler()
+        self.config_handler: ConfigurationHandler[TGameAction] = ConfigurationHandler()
 
     def get_id(self) -> ActorID:
         """Returns the identifier for self"""

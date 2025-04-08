@@ -4,9 +4,9 @@ from typing import Generic, Type, TypeVar
 from ..agents import ActionConversionDelegate, ActionInput, Actor, ActorID
 from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
-from ..sources.configuration_handler import ConfigurationHandler
 from ..sources.controller import ControllerInput
 from ..sources.game import TGameAction
+from ..utils.configuration_handler import ConfigurationHandler
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
 
@@ -31,7 +31,7 @@ class CommandArbitrator(Generic[TGameAction], ActorObserver):
         if conversion_delegates is None:
             conversion_delegates = list()
 
-        self.config_handler = ConfigurationHandler()
+        self.config_handler: ConfigurationHandler[TGameAction] = ConfigurationHandler()
         self.virtual_controller = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = dict()
         self.action_maps: dict[ActorID, GameActionsMap[TGameAction]] = dict()
