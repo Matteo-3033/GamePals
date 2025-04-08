@@ -81,7 +81,9 @@ class HumanActor(Actor, ControllerObserver):
         if action in self.conversion_delegates:
             # Check if the Action is handled by a Delegate
             # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
-            return self.conversion_delegates[action].convert_from_input(c_input)
+            return self.conversion_delegates[action].convert_from_input(
+                self.get_index(), c_input
+            )
 
         return ActionInput(action=action, val=c_input.val)
 

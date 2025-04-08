@@ -88,9 +88,9 @@ class ConfigurationHandler:
         self._user_input_to_action_map: dict[int, dict["InputType", "GameAction"]] = (
             defaultdict(dict)
         )
-        self._action_to_user_input_map: dict[int, dict["GameAction", "InputType"]] = (
-            defaultdict(dict)
-        )
+        self._action_to_user_input_map: dict[
+            int, dict["GameAction", list["InputType"]]
+        ] = defaultdict(dict)
         self._game_input_to_action_map: dict["InputType", "GameAction"] = defaultdict()
         self._action_to_game_input_map: dict["GameAction", list["InputType"]] = (
             defaultdict(list)
@@ -111,10 +111,7 @@ class ConfigurationHandler:
                     self._user_input_to_action_map[human_idx][control] = action["name"]
 
                 if len(controls) > 0:
-                    # Knowing one input for each action is enough
-                    self._action_to_user_input_map[human_idx][action["name"]] = (
-                        controls[0]
-                    )
+                    self._action_to_user_input_map[human_idx][action["name"]] = controls
 
             for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
@@ -167,15 +164,17 @@ class ConfigurationHandler:
         input_type: "InputType",
     ) -> Optional["GameAction"]:
         """Returns the GameAction that the user user_idx intends to do when pressing the given input_type"""
-        return self._user_input_to_action_map.get(user_idx, {}).get(input_type, None)
+        return self._user_input_to_action_map.get(user_idx, dict()).get(
+            input_type, None
+        )
 
     def action_to_user_input(
         self,
         user_idx: int,
         action: "GameAction",
-    ) -> Optional["InputType"]:
+    ) -> list["InputType"] | None:
         """Returns the InputType that the user user_idx needs to press to perform the given action"""
-        return self._action_to_user_input_map.get(user_idx, {}).get(action, None)
+        return self._action_to_user_input_map.get(user_idx, dict()).get(action, None)
 
     def game_input_to_action(self, input_type: "InputType") -> Optional["GameAction"]:
         """Returns the GameAction that the game associates with the given input_type"""
