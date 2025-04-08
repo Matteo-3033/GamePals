@@ -35,6 +35,8 @@ class PhysicalControllerListener:
     It runs in a separate thread.
     """
 
+    CHECK_GAMEPAD_INTERVAL = 5  # seconds
+
     def __init__(self, gamepad_number: int, late_init: bool = False) -> None:
         """
         Initializes the PhysicalControllerListener with the given gamepad number.
@@ -107,7 +109,7 @@ class PhysicalControllerListener:
         """The loop that listens for controller inputs"""
         while self.gamepad is None and self.running:
             if not self.__try_init_gamepad():
-                time.sleep(5)
+                time.sleep(self.CHECK_GAMEPAD_INTERVAL)
 
         while self.running and self.gamepad is not None:
             try:
