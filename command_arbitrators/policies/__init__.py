@@ -10,6 +10,7 @@ from .policy_binary_supv_by_pilot import PolicyBinarySupervisionByPilot
 from .policy_continuous_or import PolicyContinuousOR
 from .policy_continuous_slope import PolicyContinuousSlope
 from .policy_continuous_sum import PolicyContinuousSum
+from .policy_continuous_supv_by_pilot import PolicyContinuousSupervisionByPilot
 from .policy_exclusivity import PolicyExclusivity
 from .policy_manager import PolicyManager
 

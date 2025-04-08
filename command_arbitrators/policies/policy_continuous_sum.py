@@ -1,3 +1,5 @@
+import math
+
 from .input_entry import InputEntry
 from .policy import ContinuousPolicy
 
@@ -26,7 +28,7 @@ class PolicyContinuousSum(ContinuousPolicy):
             value = entry.input_details.val
             weight = entry.input_details.confidence
 
-            if value != 0:
+            if not math.isclose(value, 0.0, abs_tol=1e-3):
                 values_sum += value * weight
                 weights_sum += weight
 
