@@ -22,7 +22,7 @@ class GameStateListener(ABC):
     def notify_all(self, state: GameState) -> None:
         """Notifies all subscribers of an input"""
         for subscriber in self.subscribers:
-            subscriber.receive_game_state_update(state)
+            subscriber.on_game_state_update(state)
 
     @abstractmethod
     def start_listening(self):

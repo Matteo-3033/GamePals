@@ -1,11 +1,11 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from .action_input import ActionInput, ActionInputWithConfidence
 from ..sources.controller import ControllerInput
 from ..sources.game import GameAction
+from .action_input import ActionInput, ActionInputWithConfidence
 from .actor_id import ActorID
-from .observer import ActorData, ActorObserver, MessageData
+from .actor_observer import ActorData, ActorObserver, MessageData
 
 
 class Actor(ABC):
@@ -34,7 +34,10 @@ class Actor(ABC):
 
     def notify_input(self, actor_data: ActionInput, confidence: float) -> None:
         """Notifies all the subscribers with an ActionInputWithConfidence object"""
-        data = ActorData(self.id, ActionInputWithConfidence(actor_data.action, actor_data.val, confidence))
+        data = ActorData(
+            self.id,
+            ActionInputWithConfidence(actor_data.action, actor_data.val, confidence),
+        )
         for subscriber in self.subscribers:
             subscriber.receive_input_update(data)
 
@@ -55,6 +58,6 @@ class Actor(ABC):
         pass
 
     @abstractmethod
-    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+    def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
         pass

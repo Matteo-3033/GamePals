@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from .action_input import ActionInputWithConfidence, ActionInput
-from .observer import ActorObserver
-from ..sources.controller import ControllerInputWithConfidence, ControllerInput
+from ..sources.controller import ControllerInput
 from ..sources.game import GameState, GameStateListener, GameStateObserver
+from .action_input import ActionInput, ActionInputWithConfidence
 from .actor import Actor
+from .actor_observer import ActorObserver
 
 
 class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
@@ -15,11 +15,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
     """
 
-    def __init__(
-            self,
-            game_state: GameStateListener,
-            pilot: Actor
-    ) -> None:
+    def __init__(self, game_state: GameStateListener, pilot: Actor) -> None:
         super().__init__()
         self.game_state = game_state
         pilot.subscribe(self)
@@ -35,7 +31,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
         """Starts listening to the Game State Listener."""
         self.game_state.start_listening()
 
-    def receive_game_state_update(self, game_state: GameState) -> None:
+    def on_game_state_update(self, game_state: GameState) -> None:
         """Receives Game State Updates and produces Inputs to notify to its subscribers."""
         actions = self.compute_actions(game_state)
         for action in actions:
@@ -43,14 +39,11 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
             self.notify_input(action_input, action.confidence)
 
     @abstractmethod
-    def compute_actions(
-            self,
-            game_state: GameState
-    ) -> list[ActionInputWithConfidence]:
+    def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
         """Produces a list of action inputs given a Game State. Inputs are executed one after another, with no delay"""
         pass
 
-    def get_arbitrated_inputs(self, input_data: ControllerInput) -> None:
+    def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
         # Ignore Arbitrated Inputs at the moment (can be overridden by implementations)
         pass

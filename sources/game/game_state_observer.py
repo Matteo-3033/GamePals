@@ -9,6 +9,6 @@ class GameStateObserver(ABC):
     """
 
     @abstractmethod
-    def receive_game_state_update(self, game_state: GameState) -> None:
+    def on_game_state_update(self, game_state: GameState) -> None:
         """Receives Game State Updates"""
         pass

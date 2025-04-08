@@ -1,17 +1,15 @@
 import logging
 
-from ..agents import Actor, ActorID, ActionInput
-from ..agents.observer import ActorData, ActorObserver, MessageData
+from ..agents import ActionInput, Actor, ActorID
+from ..agents.actor_observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
-from ..sources.controller import ControllerInput, ControllerInputsMap, InputType
-from .policies import InputEntry, PolicyManager, PolicyName, PolicyRole
+from ..sources.controller import ControllerInput
 from ..sources.game import GameAction
 from ..sources.game.game_actions_map import GameActionsMap
 from ..utils.configuration_handler import ConfigurationHandler
+from .policies import InputEntry, Policy, PolicyManager
 
 logger = logging.getLogger(__name__)
-
-PolicyTypes = dict[GameAction, PolicyName]
 
 
 class CommandArbitrator(ActorObserver):
@@ -23,16 +21,13 @@ class CommandArbitrator(ActorObserver):
     The Arbitrator can communicate to its Actors the computed inputs via their get_arbitrator_updates method.
     """
 
-    def __init__(self, policies: PolicyTypes) -> None:
+    def __init__(self, policies: dict[GameAction, Policy]) -> None:
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
         self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = {}
         self.action_maps: dict[ActorID, GameActionsMap] = {}
 
-        policy_types = {
-            input_type: policy_name.value
-            for input_type, policy_name in policies.items()
-        }
+        policy_types = policies.copy()
 
         self.policy_manager = PolicyManager(policy_types)
 
@@ -52,13 +47,22 @@ class CommandArbitrator(ActorObserver):
         """Receives Input and Confidence Level from one of its Actors"""
         executed_action = actor_data.data.action
 
-        if executed_action not in self.actors[actor_data.actor_id].get_controlled_actions():
-            logger.warning("Actor %s is not registered to execute action %s", self.actors[actor_data.actor_id].__class__.__name__, executed_action)
+        if (
+            executed_action
+            not in self.actors[actor_data.actor_id].get_controlled_actions()
+        ):
+            logger.warning(
+                "Actor %s is not registered to execute action %s",
+                self.actors[actor_data.actor_id].__class__.__name__,
+                executed_action,
+            )
             return
 
         self.action_maps[actor_data.actor_id].set(actor_data.data)
         merge_result = self._merge_by_action(executed_action)
-        self.execute_command(merge_result)
+
+        if merge_result is not None:
+            self.execute_command(merge_result)
 
     def receive_message_update(self, data: MessageData) -> None:
         """Receives a Message from one of its Actors"""
@@ -66,7 +70,7 @@ class CommandArbitrator(ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_by_action(self, action : GameAction) -> ControllerInput:
+    def _merge_by_action(self, action: GameAction) -> ControllerInput | None:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
@@ -75,12 +79,9 @@ class CommandArbitrator(ActorObserver):
         policy = policy_info.policy_type
 
         input_entries = [
-            InputEntry(
-                actor_id, actor_role, self.action_maps[actor_id].get(action)[1]
-            )
+            InputEntry(actor_id, actor_role, self.action_maps[actor_id].get(action)[1])
             for actor_id, actor_role in policy_info.actors.items()
         ]
-
 
         value = policy.merge_input_entries(input_entries)
         action_input = ActionInput(action=action, val=value)
@@ -99,14 +100,17 @@ class CommandArbitrator(ActorObserver):
     def notify_arbitrated_input(self, input_data: ControllerInput) -> None:
         """Notifies all Actors of the Arbitrated Input"""
         for actor in self.actors.values():
-            actor.get_arbitrated_inputs(input_data)
+            actor.on_arbitrated_inputs(input_data)
 
     def action_to_input(self, action_input: ActionInput) -> ControllerInput | None:
         """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
         input_type = self.config_handler.action_to_game_input(action_input.action)
 
         if input_type is None:
-            logger.warning("The game action %s is not mapped to any input. Ignored", action_input.action)
+            logger.warning(
+                "The game action %s is not mapped to any input. Ignored",
+                action_input.action,
+            )
             return None
 
         return ControllerInput(type=input_type, val=action_input.val)
