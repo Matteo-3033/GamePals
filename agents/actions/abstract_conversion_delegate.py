@@ -21,7 +21,7 @@ class ActionConversionDelegate(ABC):
         pass
 
     @abstractmethod
-    def convert_to_input(self, action_input: ActionInput) -> ControllerInput | None:
+    def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
         pass
 

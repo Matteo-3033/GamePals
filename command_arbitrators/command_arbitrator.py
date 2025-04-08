@@ -87,8 +87,8 @@ class CommandArbitrator(ActorObserver):
         self.action_maps[actor_data.actor_id].set(actor_data.data)
         merge_result = self._merge_by_action(executed_action)
 
-        if merge_result is not None:
-            self.execute_command(merge_result)
+        for merged_input in merge_result:
+            self.execute_command(merged_input)
 
     def on_message_update(self, data: MessageData) -> None:
         """Receives a Message from one of its Actors"""
@@ -96,7 +96,7 @@ class CommandArbitrator(ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_by_action(self, action: GameAction) -> ControllerInput | None:
+    def _merge_by_action(self, action: GameAction) -> list[ControllerInput]:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
@@ -111,11 +111,9 @@ class CommandArbitrator(ActorObserver):
 
         value = policy.merge_input_entries(input_entries)
         action_input = ActionInput(action=action, val=value)
-        c_input = self.action_to_input(action_input)
+        c_inputs = self.action_to_inputs(action_input)
 
-        logger.debug("Policy is %s and Entries are %s", policy.__name__, input_entries)
-
-        return c_input
+        return c_inputs
 
     def execute_command(self, c_input: ControllerInput) -> None:
         """Executes a command on the Virtual Controller"""
@@ -128,18 +126,18 @@ class CommandArbitrator(ActorObserver):
         for actor in self.actors.values():
             actor.on_arbitrated_inputs(input_data)
 
-    def action_to_input(self, action_input: ActionInput) -> ControllerInput | None:
+    def action_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
 
         inputs = self.config_handler.action_to_game_input(action_input.action)
         if not inputs:
-            return None
+            return list()
 
         if action_input.action in self.conversion_delegates:
             # Check if the Action is handled by a Delegate
             # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
-            return self.conversion_delegates[action_input.action].convert_to_input(
+            return self.conversion_delegates[action_input.action].convert_to_inputs(
                 action_input
             )
 
-        return ControllerInput(type=inputs[0], val=action_input.val)
+        return [ControllerInput(type=inputs[0], val=action_input.val)]
