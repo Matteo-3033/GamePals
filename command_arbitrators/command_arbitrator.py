@@ -1,11 +1,11 @@
 import logging
-from typing import Generic, Type, TypeVar
+from typing import Type
 
 from ..agents import ActionConversionDelegate, ActionInput, Actor, ActorID
 from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
 from ..sources.controller import ControllerInput
-from ..sources.game import TGameAction
+from ..sources.game import GameAction
 from ..utils.configuration_handler import ConfigurationHandler
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
@@ -13,7 +13,7 @@ from .policies import InputEntry, Policy, PolicyManager
 logger = logging.getLogger(__name__)
 
 
-class CommandArbitrator(Generic[TGameAction], ActorObserver):
+class CommandArbitrator(ActorObserver):
     """
     The CommandArbitrator class is an abstract Arbitrator.
 
@@ -24,18 +24,18 @@ class CommandArbitrator(Generic[TGameAction], ActorObserver):
 
     def __init__(
         self,
-        game_action: Type[TGameAction],
-        policies: dict[TGameAction, Type[Policy]],
+        game_action: Type[GameAction],
+        policies: dict[GameAction, Type[Policy]],
         conversion_delegates: list[ActionConversionDelegate] | None = None,
     ) -> None:
         if conversion_delegates is None:
             conversion_delegates = list()
 
-        self.config_handler: ConfigurationHandler[TGameAction] = ConfigurationHandler()
+        self.config_handler = ConfigurationHandler()
         self.virtual_controller = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = dict()
-        self.action_maps: dict[ActorID, GameActionsMap[TGameAction]] = dict()
-        self.conversion_delegates: dict[TGameAction, ActionConversionDelegate] = {
+        self.action_maps: dict[ActorID, GameActionsMap] = dict()
+        self.conversion_delegates = {
             delegate.get_action(): delegate for delegate in conversion_delegates
         }
 
@@ -93,7 +93,7 @@ class CommandArbitrator(Generic[TGameAction], ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_by_action(self, action: TGameAction) -> ControllerInput | None:
+    def _merge_by_action(self, action: GameAction) -> ControllerInput | None:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput

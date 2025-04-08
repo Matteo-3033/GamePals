@@ -1,5 +1,4 @@
 from enum import StrEnum
-from typing import TypeVar
 
 
 class GameAction(StrEnum):
@@ -10,6 +9,3 @@ class GameAction(StrEnum):
     """
 
     pass
-
-
-TGameAction = TypeVar("TGameAction", bound=GameAction)

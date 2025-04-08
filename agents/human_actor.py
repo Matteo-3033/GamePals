@@ -2,14 +2,14 @@ import logging
 
 from ..sources import PhysicalControllerListener
 from ..sources.controller import ControllerInput, ControllerObserver, InputData
-from ..sources.game import TGameAction
+from ..sources.game import GameAction
 from .action_input import ActionConversionDelegate, ActionInput
 from .actor import Actor
 
 logger = logging.getLogger(__file__)
 
 
-class HumanActor(Actor[TGameAction], ControllerObserver):
+class HumanActor(Actor, ControllerObserver):
     """
     HumanActor is a particular type of Actor that represents a Human Player.
 
@@ -26,11 +26,11 @@ class HumanActor(Actor[TGameAction], ControllerObserver):
             conversion_delegates = list()
 
         self.controller = physical_controller
-        self.confidence_levels: dict[TGameAction, float] = (
+        self.confidence_levels: dict[GameAction, float] = (
             self.config_handler.get_confidence_levels(self.controller.get_index())
         )
 
-        self.conversion_delegates: dict[TGameAction, ActionConversionDelegate] = {
+        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
             delegate.get_action(): delegate for delegate in conversion_delegates
         }
 
@@ -54,7 +54,7 @@ class HumanActor(Actor[TGameAction], ControllerObserver):
 
         self.controller.start_listening()
 
-    def get_controlled_actions(self) -> list[TGameAction]:
+    def get_controlled_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is controlling."""
         return self.config_handler.get_controlled_actions(self.controller.get_index())
 

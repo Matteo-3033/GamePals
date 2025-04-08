@@ -1,9 +1,8 @@
 import logging
 from dataclasses import dataclass
-from typing import Generic
 
 from ...agents import Actor, ActorID, HumanActor, SWAgentActor
-from ...sources.game import TGameAction
+from ...sources.game import GameAction
 from ...utils.configuration_handler import ConfigurationHandler
 from .input_entry import PolicyRole
 from .policy import Policy
@@ -21,7 +20,7 @@ class PolicyMapEntry:
 logger = logging.getLogger(__file__)
 
 
-class PolicyManager(Generic[TGameAction]):
+class PolicyManager:
     """
     PolicyManager manages the Arbitration Policies for a Command Arbitrator.
 
@@ -30,18 +29,18 @@ class PolicyManager(Generic[TGameAction]):
 
     def __init__(
         self,
-        policies_types: dict[TGameAction, type[Policy]],
+        policies_types: dict[GameAction, type[Policy]],
         default_policy: type[Policy] = PolicyContinuousOR,
     ) -> None:
-        self.policies_map: dict[TGameAction, PolicyMapEntry] = dict()
-        self.config_handler: ConfigurationHandler[TGameAction] = ConfigurationHandler()
+        self.policies_map: dict[GameAction, PolicyMapEntry] = dict()
+        self.config_handler = ConfigurationHandler()
         self.default_policy = default_policy
 
         # Every Input is registered with the specified Policy (or the default one, if none is specified)
         for action, policy_type in policies_types.items():
             self.policies_map[action] = PolicyMapEntry(policy_type, dict())
 
-    def register_actor(self, actor: Actor[TGameAction]) -> None:
+    def register_actor(self, actor: Actor) -> None:
         """
         Registers the given Actor, for the Input Types specified by the
         get_controlled_inputs method of the Actor.
@@ -75,7 +74,7 @@ class PolicyManager(Generic[TGameAction]):
             else:
                 raise ValueError(f"Action {action} allows maximum {max_actors} actors")
 
-    def get_policy(self, action: TGameAction) -> PolicyMapEntry:
+    def get_policy(self, action: GameAction) -> PolicyMapEntry:
         found = self.policies_map.get(action)
         if found is None:
             self.policies_map[action] = PolicyMapEntry(self.default_policy, {})

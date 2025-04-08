@@ -1,9 +1,9 @@
 import time
 from abc import ABC, abstractmethod
 
+from ..sources.game import GameState, GameStateListener
 from . import Actor
 from .action_input import ActionInputWithConfidence
-from ..sources.game import GameState, GameStateListener
 from .sw_agent_actor import SWAgentActor
 
 ActionInputWithConfidenceAndDelay = tuple[ActionInputWithConfidence, float]
@@ -17,24 +17,23 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
     """
 
     def __init__(
-            self,
-            game_state: GameStateListener,
-            pilot: Actor,
+        self,
+        game_state: GameStateListener,
+        pilot: Actor,
     ) -> None:
         super().__init__(game_state, pilot)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
 
-    def compute_actions(
-            self,
-            game_state: GameState
-    ) -> list[ActionInputWithConfidence]:
+    def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
         """Produces a list of action inputs given a Game State. Inputs are executed one after another, with no delay"""
 
         new_sequence = self.compute_actions_sequence(game_state)
 
         if new_sequence is not None:
-            self.current_sequence = new_sequence  # Override last sequence if a better sequence is found
+            self.current_sequence = (
+                new_sequence  # Override last sequence if a better sequence is found
+            )
 
         if len(self.current_sequence) == 0:
             return []
@@ -51,8 +50,7 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
 
     @abstractmethod
     def compute_actions_sequence(
-            self,
-            game_state: GameState
+        self, game_state: GameState
     ) -> list[ActionInputWithConfidenceAndDelay] | None:
         """Produces action inputs sequences given a Game State. Inputs are specified with a delay from the previous one in the order"""
         pass

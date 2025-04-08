@@ -13,7 +13,7 @@ class ActorData:
     """
 
     actor_id: ActorID
-    data : ActionInputWithConfidence
+    data: ActionInputWithConfidence
 
 
 @dataclass

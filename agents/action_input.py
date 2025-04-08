@@ -1,15 +1,15 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic
 
 from ..sources.controller import ControllerInput
-from ..sources.game import TGameAction
+from ..sources.game import GameAction
 
 
 @dataclass
-class ActionInput(Generic[TGameAction]):
+class ActionInput:
     """ActionInput is an input yet to be bound to a specific InputType."""
 
-    action: TGameAction
+    action: GameAction
     val: float
 
 
@@ -20,13 +20,10 @@ class ActionInputWithConfidence(ActionInput):
     confidence: float
 
 
-from abc import ABC, abstractmethod
-
-
-class ActionConversionDelegate(Generic[TGameAction], ABC):
+class ActionConversionDelegate(ABC):
 
     @abstractmethod
-    def get_action(self) -> TGameAction:
+    def get_action(self) -> GameAction:
         """Returns the Game Action this Delegate is responsible for"""
         pass
 

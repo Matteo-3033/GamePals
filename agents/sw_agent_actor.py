@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
 from ..sources.controller import ControllerInput
-from ..sources.game import GameState, GameStateListener, GameStateObserver, TGameAction
+from ..sources.game import GameAction, GameState, GameStateListener, GameStateObserver
 from .action_input import ActionInput, ActionInputWithConfidence
 from .actor import Actor
 from .observer import ActorObserver
 
 
-class SWAgentActor(Actor[TGameAction], GameStateObserver, ActorObserver, ABC):
+class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     """
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
