@@ -116,17 +116,17 @@ class ConfigurationHandler:
                         controls[0]
                     )
 
-            for agent in action.get("agents", []):
+            for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
                 self._required_agents.add(agent["name"])
                 self._agent_policy_roles[(action["name"], agent["name"])] = agent_role
 
-            if action["name"] in game_config.get("actions", {}):
+            if action["name"] in game_config.get("actions", dict()):
                 self._policy_types[action["name"]] = PolicyName[
                     action.get("policy", self.DEFAULTS["POLICY"])
                 ].value
 
-        for action, inputs in game_config.get("actions", {}).items():
+        for action, inputs in game_config.get("actions", dict()).items():
 
             self._action_to_game_input_map[action] = inputs
 
@@ -134,7 +134,7 @@ class ConfigurationHandler:
                 self._game_input_to_action_map[game_input] = action
                 self._registered_inputs.add(game_input)
 
-        for agent in assistance_config.get("agent", []):
+        for agent in assistance_config.get("agent", list()):
             if agent["name"] not in self._required_agents and agent.get(
                 "active", False
             ):
