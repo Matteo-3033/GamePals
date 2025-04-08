@@ -35,7 +35,7 @@ class PhysicalControllerListener:
     It runs in a separate thread.
     """
 
-    CHECK_GAMEPAD_INTERVAL = 5  # seconds
+    CHECK_GAMEPAD_INTERVAL = 2.5  # seconds
 
     def __init__(self, gamepad_number: int, late_init: bool = False) -> None:
         """
