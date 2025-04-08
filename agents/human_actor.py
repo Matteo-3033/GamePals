@@ -2,16 +2,14 @@ import logging
 
 from ..sources import PhysicalControllerListener
 from ..sources.controller import ControllerInput, ControllerObserver, InputData
-from ..sources.game import GameAction
+from ..sources.game import TGameAction
 from .action_input import ActionConversionDelegate, ActionInput
 from .actor import Actor
-
-ConfidenceLevels = dict[GameAction, float]
 
 logger = logging.getLogger(__file__)
 
 
-class HumanActor(Actor, ControllerObserver):
+class HumanActor(Actor[TGameAction], ControllerObserver):
     """
     HumanActor is a particular type of Actor that represents a Human Player.
 
@@ -28,11 +26,11 @@ class HumanActor(Actor, ControllerObserver):
             conversion_delegates = list()
 
         self.controller = physical_controller
-        self.confidence_levels: ConfidenceLevels = (
+        self.confidence_levels: dict[TGameAction, float] = (
             self.config_handler.get_confidence_levels(self.controller.get_index())
         )
 
-        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
+        self.conversion_delegates: dict[TGameAction, ActionConversionDelegate] = {
             delegate.get_action(): delegate for delegate in conversion_delegates
         }
 
@@ -56,7 +54,7 @@ class HumanActor(Actor, ControllerObserver):
 
         self.controller.start_listening()
 
-    def get_controlled_actions(self) -> list[GameAction]:
+    def get_controlled_actions(self) -> list[TGameAction]:
         """Returns the list of Game Actions that the Actor is controlling."""
         return self.config_handler.get_controlled_actions(self.controller.get_index())
 
@@ -79,9 +77,6 @@ class HumanActor(Actor, ControllerObserver):
         )
 
         if action is None:
-            logger.warning(
-                "The input %s is not recognized as a game action. Ignored", c_input.type
-            )
             return None
 
         if action in self.conversion_delegates:

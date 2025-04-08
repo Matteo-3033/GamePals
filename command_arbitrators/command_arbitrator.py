@@ -1,19 +1,19 @@
 import logging
-from typing import Type
+from typing import Generic, Type, TypeVar
 
 from ..agents import ActionConversionDelegate, ActionInput, Actor, ActorID
-from ..agents.actor_observer import ActorData, ActorObserver, MessageData
+from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
+from ..sources.configuration_handler import ConfigurationHandler
 from ..sources.controller import ControllerInput
-from ..sources.game import GameAction
-from ..sources.game.game_actions_map import GameActionsMap
-from ..utils.configuration_handler import ConfigurationHandler
+from ..sources.game import TGameAction
+from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
 
 logger = logging.getLogger(__name__)
 
 
-class CommandArbitrator(ActorObserver):
+class CommandArbitrator(Generic[TGameAction], ActorObserver):
     """
     The CommandArbitrator class is an abstract Arbitrator.
 
@@ -24,23 +24,35 @@ class CommandArbitrator(ActorObserver):
 
     def __init__(
         self,
-        policies: dict[GameAction, Type[Policy]],
+        game_action: Type[TGameAction],
+        policies: dict[TGameAction, Type[Policy]],
         conversion_delegates: list[ActionConversionDelegate] | None = None,
     ) -> None:
         if conversion_delegates is None:
             conversion_delegates = list()
 
-        self.config_handler: ConfigurationHandler = ConfigurationHandler()
-        self.virtual_controller: VirtualControllerProvider = VirtualControllerProvider()
-        self.actors: dict[ActorID, Actor] = {}
-        self.action_maps: dict[ActorID, GameActionsMap] = {}
-        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
+        self.config_handler = ConfigurationHandler()
+        self.virtual_controller = VirtualControllerProvider()
+        self.actors: dict[ActorID, Actor] = dict()
+        self.action_maps: dict[ActorID, GameActionsMap[TGameAction]] = dict()
+        self.conversion_delegates: dict[TGameAction, ActionConversionDelegate] = {
             delegate.get_action(): delegate for delegate in conversion_delegates
         }
 
         policy_types = policies.copy()
-
         self.policy_manager = PolicyManager(policy_types)
+
+        for action in game_action:
+            inputs = self.config_handler.action_to_game_input(action)
+
+            if not inputs:
+                logger.warning(
+                    f"{action} action: No input found for action {action}. It will be ignored."
+                )
+            elif len(inputs) > 1 and action not in self.conversion_delegates:
+                logger.warning(
+                    f"{action} action: Game actions mapped to multiple inputs should be handled by a Delegate; otherwise, only the first input will be used."
+                )
 
     def add_actor(self, actor: Actor) -> None:
         """Adds an Actor to the Architecture"""
@@ -81,7 +93,7 @@ class CommandArbitrator(ActorObserver):
         if "RESET" in data.message:
             self.virtual_controller.reset_controls()
 
-    def _merge_by_action(self, action: GameAction) -> ControllerInput | None:
+    def _merge_by_action(self, action: TGameAction) -> ControllerInput | None:
         """
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
@@ -117,21 +129,8 @@ class CommandArbitrator(ActorObserver):
         """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
 
         inputs = self.config_handler.action_to_game_input(action_input.action)
-
         if not inputs:
-            logger.warning(
-                "The game action %s is not mapped to any input. Ignored",
-                action_input.action,
-            )
             return None
-
-        if len(inputs) > 1:
-            if action_input.action not in self.conversion_delegates:
-                logger.warning(
-                    "Game actions mapped to multiple inputs must be handled by a Delegate. Ignored",
-                    action_input.action,
-                )
-                return None
 
         if action_input.action in self.conversion_delegates:
             # Check if the Action is handled by a Delegate

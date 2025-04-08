@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import TypeVar
 
 
 class GameAction(StrEnum):
@@ -7,4 +8,8 @@ class GameAction(StrEnum):
 
     Implementing the architecture for a specific game requires all Game Actions to be specified in a subclass of this class.
     """
+
     pass
+
+
+TGameAction = TypeVar("TGameAction", bound=GameAction)

@@ -1,8 +1,9 @@
 import argparse
 import tomllib
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from .configuration_handler import ConfigurationHandler
+if TYPE_CHECKING:
+    from ..sources.configuration_handler import ConfigurationHandler
 
 
 class ArgParser:
@@ -57,7 +58,9 @@ class ArgParser:
         config: dict[str, Any] = tomllib.load(self.args.assistance_config)
         return config
 
-    def init_config_handler(self) -> ConfigurationHandler:
+    def init_config_handler(self) -> "ConfigurationHandler":
+        from ..sources.configuration_handler import ConfigurationHandler
+
         return ConfigurationHandler(
             game_config=self.get_game_config_dict(),
             agents_config=self.get_agents_config_dict(),

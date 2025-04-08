@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ...agents import ActorID
-from ...sources.game.game_actions_map import ActionInputRecord
+from ..game_actions_map import ActionInputRecord
 
 
 class PolicyRole(StrEnum):

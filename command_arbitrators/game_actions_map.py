@@ -1,8 +1,9 @@
 import time
 from dataclasses import dataclass
+from typing import Generic
 
-from ...agents import ActionInput, ActionInputWithConfidence
-from . import GameAction
+from ..agents import ActionInput, ActionInputWithConfidence
+from ..sources.game import TGameAction
 
 
 @dataclass
@@ -14,13 +15,13 @@ class ActionInputRecord:
     timestamp: float
 
 
-class GameActionsMap:
+class GameActionsMap(Generic[TGameAction]):
     """
     GameActionsMap is a class that stores for each Game Action a corresponding ActionInputRecord
     """
 
     def __init__(self):
-        self.actions_map: dict[GameAction, ActionInputRecord] = {}
+        self.actions_map: dict[TGameAction, ActionInputRecord] = {}
 
     def set(
         self,
@@ -39,7 +40,7 @@ class GameActionsMap:
             val=action.val, confidence=action.confidence, timestamp=timestamp
         )
 
-    def get(self, action: GameAction) -> tuple[ActionInput, ActionInputRecord]:
+    def get(self, action: TGameAction) -> tuple[ActionInput, ActionInputRecord]:
         """Returns the ControllerInput and the ActionInputRecord associated with the input."""
         record = self.actions_map.get(action)
 

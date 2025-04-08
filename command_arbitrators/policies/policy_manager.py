@@ -1,9 +1,10 @@
 import logging
 from dataclasses import dataclass
+from typing import Generic
 
-from ...agents import Actor, ActorID
-from ...sources.game import GameAction
-from ...utils.configuration_handler import ConfigurationHandler
+from ...agents import Actor, ActorID, HumanActor, SWAgentActor
+from ...sources.game import TGameAction
+from ...sources.configuration_handler import ConfigurationHandler
 from .input_entry import PolicyRole
 from .policy import Policy
 from .policy_continuous_or import PolicyContinuousOR
@@ -20,7 +21,7 @@ class PolicyMapEntry:
 logger = logging.getLogger(__file__)
 
 
-class PolicyManager:
+class PolicyManager(Generic[TGameAction]):
     """
     PolicyManager manages the Arbitration Policies for a Command Arbitrator.
 
@@ -29,10 +30,10 @@ class PolicyManager:
 
     def __init__(
         self,
-        policies_types: dict[GameAction, type[Policy]],
+        policies_types: dict[TGameAction, type[Policy]],
         default_policy: type[Policy] = PolicyContinuousOR,
     ) -> None:
-        self.policies_map: dict[GameAction, PolicyMapEntry] = {}
+        self.policies_map: dict[TGameAction, PolicyMapEntry] = dict()
         self.config_handler: ConfigurationHandler = ConfigurationHandler()
         self.default_policy = default_policy
 
@@ -46,8 +47,6 @@ class PolicyManager:
         get_controlled_inputs method of the Actor.
         The Role of the Actor for each of its inputs is determined checking the configuration
         """
-        from ...agents.human_actor import HumanActor
-        from ...agents.sw_agent_actor import SWAgentActor
 
         actions = actor.get_controlled_actions()
 
@@ -55,7 +54,7 @@ class PolicyManager:
             policy_entry = self.policies_map.get(action)
             if policy_entry is None:
                 self.policies_map[action] = PolicyMapEntry(self.default_policy, {})
-                policy_entry = self.policies_map.get(action)
+                policy_entry = self.policies_map[action]
 
             actors_number = len(policy_entry.actors)
 
@@ -69,22 +68,16 @@ class PolicyManager:
                 role = self.config_handler.get_agent_role(
                     agent_name=actor.get_name(), action=action
                 )
-            else:
-                logger.warning(
-                    "Couldn't find a role for %s for %s. Defaulted to Pilot",
-                    actor.get_name(),
-                    action,
-                )
-                role = PolicyRole.PILOT
 
-            if policy_entry.policy_type.get_max_actors() > actors_number:
+            max_actors = policy_entry.policy_type.get_max_actors()
+            if max_actors > actors_number:
                 self.policies_map[action].actors[actor.get_id()] = PolicyRole(role)
             else:
-                raise ValueError(f"Only one Actor per Action {action} is allowed")
+                raise ValueError(f"Action {action} allows maximum {max_actors} actors")
 
-    def get_policy(self, action: GameAction) -> PolicyMapEntry:
+    def get_policy(self, action: TGameAction) -> PolicyMapEntry:
         found = self.policies_map.get(action)
         if found is None:
             self.policies_map[action] = PolicyMapEntry(self.default_policy, {})
-            return self.policies_map.get(action)
+            return self.policies_map[action]
         return found

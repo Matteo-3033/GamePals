@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
 from ..sources.controller import ControllerInput
-from ..sources.game import GameState, GameStateListener, GameStateObserver
+from ..sources.game import GameState, GameStateListener, GameStateObserver, TGameAction
 from .action_input import ActionInput, ActionInputWithConfidence
 from .actor import Actor
-from .actor_observer import ActorObserver
+from .observer import ActorObserver
 
 
-class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
+class SWAgentActor(Actor[TGameAction], GameStateObserver, ActorObserver, ABC):
     """
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
@@ -15,10 +15,14 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
     """
 
-    def __init__(self, game_state: GameStateListener, pilot: Actor) -> None:
+    def __init__(
+        self, game_state: GameStateListener, pilot: Actor | None = None
+    ) -> None:
         super().__init__()
         self.game_state = game_state
-        pilot.subscribe(self)
+
+        if pilot is not None:
+            pilot.subscribe(self)
 
         self.game_state.subscribe(self)
 

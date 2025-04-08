@@ -1,19 +1,20 @@
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Generic, Optional, Type
 
-from .utils import get_all_concrete_subclasses
+from ..utils.utils import get_all_concrete_subclasses
+from .controller import InputType
+from .game import TGameAction
 
 if TYPE_CHECKING:
     from ..agents.sw_agent_actor import SWAgentActor
     from ..command_arbitrators.policies import Policy, PolicyRole
-    from ..sources.controller.controller_inputs import InputType
-    from ..sources.game.game_action import GameAction
+
 
 logger = logging.getLogger(__name__)
 
 
-class ConfigurationHandler:
+class ConfigurationHandler(Generic[TGameAction]):
     """
     ConfigurationHandler class handles the configuration files for the architecture.
 
@@ -68,31 +69,31 @@ class ConfigurationHandler:
 
         # TODO: Configuration Validation should go here
 
-        self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
+        self._confidence_levels: dict[int, dict[TGameAction, float]] = defaultdict(
             lambda: defaultdict(lambda: 1.0)
         )
-        self._user_actions: dict[int, list["GameAction"]] = defaultdict(list)
-        self._policy_types: dict["GameAction", Type["Policy"]] = defaultdict()
+        self._user_actions: dict[int, list[TGameAction]] = defaultdict(list)
+        self._policy_types: dict[TGameAction, Type["Policy"]] = defaultdict()
         self._registered_inputs: set["InputType"] = set()
         self._required_agents: set[str] = set()
         self._agents_params: dict[str, dict[str, Any]] = defaultdict(
             lambda: defaultdict()
         )
-        self._user_policy_roles: dict[tuple["GameAction", int], PolicyRole] = (
+        self._user_policy_roles: dict[tuple[TGameAction, int], PolicyRole] = (
             defaultdict()
         )
-        self._agent_policy_roles: dict[tuple["GameAction", str], PolicyRole] = (
+        self._agent_policy_roles: dict[tuple[TGameAction, str], PolicyRole] = (
             defaultdict()
         )
 
-        self._user_input_to_action_map: dict[int, dict["InputType", "GameAction"]] = (
+        self._user_input_to_action_map: dict[int, dict["InputType", TGameAction]] = (
             defaultdict(dict)
         )
-        self._action_to_user_input_map: dict[int, dict["GameAction", "InputType"]] = (
+        self._action_to_user_input_map: dict[int, dict[TGameAction, "InputType"]] = (
             defaultdict(dict)
         )
-        self._game_input_to_action_map: dict["InputType", "GameAction"] = defaultdict()
-        self._action_to_game_input_map: dict["GameAction", list["InputType"]] = (
+        self._game_input_to_action_map: dict["InputType", TGameAction] = defaultdict()
+        self._action_to_game_input_map: dict[TGameAction, list["InputType"]] = (
             defaultdict(list)
         )
 
@@ -142,15 +143,15 @@ class ConfigurationHandler:
 
             self._agents_params[agent["name"]] = agent["params"]
 
-    def get_policy_types(self) -> dict["GameAction", Type["Policy"]]:
+    def get_policy_types(self) -> dict[TGameAction, Type["Policy"]]:
         """Returns the Policy associated with every Input Type"""
         return self._policy_types
 
-    def get_confidence_levels(self, user_idx: int) -> dict["GameAction", float]:
+    def get_confidence_levels(self, user_idx: int) -> dict[TGameAction, float]:
         """Returns the confidence level associated with every GameAction, for a specific HumanActor"""
         return self._confidence_levels.get(user_idx, dict())
 
-    def get_controlled_actions(self, user_idx: int) -> list["GameAction"]:
+    def get_controlled_actions(self, user_idx: int) -> list[TGameAction]:
         """Returns the list of game actions that a certain HumanActor is responsible for"""
         return self._user_actions.get(user_idx, list())
 
@@ -165,25 +166,25 @@ class ConfigurationHandler:
         self,
         user_idx: int,
         input_type: "InputType",
-    ) -> Optional["GameAction"]:
+    ) -> Optional[TGameAction]:
         """Returns the GameAction that the user user_idx intends to do when pressing the given input_type"""
         return self._user_input_to_action_map.get(user_idx, {}).get(input_type, None)
 
     def action_to_user_input(
         self,
         user_idx: int,
-        action: "GameAction",
+        action: TGameAction,
     ) -> Optional["InputType"]:
         """Returns the InputType that the user user_idx needs to press to perform the given action"""
         return self._action_to_user_input_map.get(user_idx, {}).get(action, None)
 
-    def game_input_to_action(self, input_type: "InputType") -> Optional["GameAction"]:
+    def game_input_to_action(self, input_type: "InputType") -> Optional[TGameAction]:
         """Returns the GameAction that the game associates with the given input_type"""
         return self._game_input_to_action_map.get(input_type, None)
 
     def action_to_game_input(
         self,
-        action: "GameAction",
+        action: TGameAction,
     ) -> list["InputType"] | None:
         """Returns the InputType that the game associates with the given action"""
         return self._action_to_game_input_map.get(action, None)
@@ -206,12 +207,12 @@ class ConfigurationHandler:
         """Returns the map of constructor parameters associated to the specified agent"""
         return self._agents_params.get(agent_name, dict())
 
-    def get_agent_role(self, agent_name: str, action: "GameAction") -> "PolicyRole":
+    def get_agent_role(self, agent_name: str, action: TGameAction) -> "PolicyRole":
         """Returns the Role that agent_name covers for the specified action"""
         found = self._agent_policy_roles[(action, agent_name)]
         return found if found else self.DEFAULTS["AGENT_ROLE"]
 
-    def get_human_role(self, user_idx: int, action: "GameAction") -> "PolicyRole":
+    def get_human_role(self, user_idx: int, action: TGameAction) -> "PolicyRole":
         """Returns the Role that user_idx covers for the specified action"""
         found = self._user_policy_roles[(action, user_idx)]
         return found if found else self.DEFAULTS["HUMAN_ROLE"]

@@ -1,14 +1,15 @@
 import uuid
 from abc import ABC, abstractmethod
+from typing import Generic
 
 from ..sources.controller import ControllerInput
-from ..sources.game import GameAction
+from ..sources.game import TGameAction
 from .action_input import ActionInput, ActionInputWithConfidence
 from .actor_id import ActorID
-from .actor_observer import ActorData, ActorObserver, MessageData
+from .observer import ActorData, ActorObserver, MessageData
 
 
-class Actor(ABC):
+class Actor(Generic[TGameAction], ABC):
     """
     Actor represents a generic subject of the Architecture.
 
@@ -18,7 +19,7 @@ class Actor(ABC):
     """
 
     def __init__(self):
-        from ..utils.configuration_handler import ConfigurationHandler
+        from ..sources.configuration_handler import ConfigurationHandler
 
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
@@ -53,7 +54,7 @@ class Actor(ABC):
         pass
 
     @abstractmethod
-    def get_controlled_actions(self) -> list[GameAction]:
+    def get_controlled_actions(self) -> list[TGameAction]:
         """Returns the list of Game Actions that the Actor is able to control"""
         pass
 

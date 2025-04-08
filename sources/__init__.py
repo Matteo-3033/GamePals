@@ -5,6 +5,6 @@ from .virtual_controller_provider import VirtualControllerProvider
 __all__ = [
     "PhysicalControllerListener",
     "VirtualControllerProvider",
-    "game_state",
+    "game",
     "controller",
 ]
