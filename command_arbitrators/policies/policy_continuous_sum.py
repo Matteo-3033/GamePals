@@ -19,8 +19,8 @@ class PolicyContinuousSum(ContinuousPolicy):
 
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
-        values_sum = 0
-        weights_sum = 0
+        values_sum = 0.0
+        weights_sum = 0.0
 
         for entry in entries:
             value = entry.input_details.val
