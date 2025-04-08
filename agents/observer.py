@@ -30,11 +30,11 @@ class ActorObserver(ABC):
     """
 
     @abstractmethod
-    def receive_input_update(self, actor_data: ActorData) -> None:
+    def on_input_update(self, actor_data: ActorData) -> None:
         """Receives Controller Inputs and the Confidence Level sent by an Actor"""
         pass
 
     @abstractmethod
-    def receive_message_update(self, message_data: MessageData) -> None:
+    def on_message_update(self, message_data: MessageData) -> None:
         """Receives a message from the Copilot. Messages are usually Metacommands"""
         pass

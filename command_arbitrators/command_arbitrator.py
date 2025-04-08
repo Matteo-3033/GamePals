@@ -69,7 +69,7 @@ class CommandArbitrator(ActorObserver):
         for _, actor in self.actors.items():
             actor.start()
 
-    def receive_input_update(self, actor_data: ActorData) -> None:
+    def on_input_update(self, actor_data: ActorData) -> None:
         """Receives Input and Confidence Level from one of its Actors"""
         executed_action = actor_data.data.action
 
@@ -90,7 +90,7 @@ class CommandArbitrator(ActorObserver):
         if merge_result is not None:
             self.execute_command(merge_result)
 
-    def receive_message_update(self, data: MessageData) -> None:
+    def on_message_update(self, data: MessageData) -> None:
         """Receives a Message from one of its Actors"""
         logger.info("Received Message: %s", data)
         if "RESET" in data.message:

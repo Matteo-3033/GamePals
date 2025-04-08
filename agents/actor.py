@@ -38,13 +38,13 @@ class Actor(ABC):
             ActionInputWithConfidence(actor_data.action, actor_data.val, confidence),
         )
         for subscriber in self.subscribers:
-            subscriber.receive_input_update(data)
+            subscriber.on_input_update(data)
 
     def notify_message(self, message: str) -> None:
         """Notifies all subscribers with a MessageData object"""
         data = MessageData(self.id, message)
         for subscriber in self.subscribers:
-            subscriber.receive_message_update(data)
+            subscriber.on_message_update(data)
 
     @abstractmethod
     def start(self) -> None:
