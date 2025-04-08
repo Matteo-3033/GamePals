@@ -40,7 +40,7 @@ class BinaryConversionDelegate(ActionConversionDelegate):
         if action_input.val >= 0:
             return ControllerInput(positive, action_input.val)
 
-        return ControllerInput(negative, action_input.val)
+        return ControllerInput(negative, -action_input.val)
 
     def convert_from_input(
         self, user_idx: int, c_input: ControllerInput
@@ -56,9 +56,9 @@ class BinaryConversionDelegate(ActionConversionDelegate):
         negative, positive = inputs
 
         if c_input.type == negative:
-            return ActionInput(self.action, c_input.val)
+            return ActionInput(self.action, -c_input.val)
 
         if c_input.type == positive:
-            return ActionInput(self.action, -c_input.val)
+            return ActionInput(self.action, c_input.val)
 
         return None
