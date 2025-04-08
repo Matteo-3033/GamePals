@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from ...agents import Actor, ActorID, HumanActor, SWAgentActor
-from ...sources.game import GameAction
+from ...agents.actions import GameAction
 from ...utils.configuration_handler import ConfigurationHandler
 from .input_entry import PolicyRole
 from .policy import Policy

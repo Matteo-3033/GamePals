@@ -1,14 +1,14 @@
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Generic, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from .utils import get_all_concrete_subclasses
 
 if TYPE_CHECKING:
+    from ..agents.actions import GameAction
     from ..agents.sw_agent_actor import SWAgentActor
     from ..command_arbitrators.policies import Policy, PolicyRole
     from ..sources.controller import InputType
-    from ..sources.game import GameAction
 
 logger = logging.getLogger(__name__)
 

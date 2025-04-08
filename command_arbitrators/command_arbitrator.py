@@ -1,11 +1,11 @@
 import logging
 from typing import Type
 
-from ..agents import ActionConversionDelegate, ActionInput, Actor, ActorID
+from ..agents import Actor, ActorID
+from ..agents.actions import ActionConversionDelegate, ActionInput, GameAction
 from ..agents.observer import ActorData, ActorObserver, MessageData
 from ..sources import VirtualControllerProvider
 from ..sources.controller import ControllerInput
-from ..sources.game import GameAction
 from ..utils.configuration_handler import ConfigurationHandler
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager

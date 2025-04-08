@@ -2,8 +2,7 @@ import uuid
 from abc import ABC, abstractmethod
 
 from ..sources.controller import ControllerInput
-from ..sources.game import GameAction
-from .action_input import ActionInput, ActionInputWithConfidence
+from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
 

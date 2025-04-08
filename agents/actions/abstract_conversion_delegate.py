@@ -1,26 +1,19 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
-from ..sources.controller import ControllerInput
-from ..sources.game import GameAction
-
-
-@dataclass
-class ActionInput:
-    """ActionInput is an input yet to be bound to a specific InputType."""
-
-    action: GameAction
-    val: float
-
-
-@dataclass
-class ActionInputWithConfidence(ActionInput):
-    """ActionInputWithConfidence extends the ActionInput with the related confidence"""
-
-    confidence: float
+from ...sources.controller import ControllerInput
+from ...utils import ConfigurationHandler
+from .action_input import ActionInput
+from .game_action import GameAction
 
 
 class ActionConversionDelegate(ABC):
+    """
+    Class used to convert Action Inputs to Controller Inputs and vice versa.
+    It is useful for actions that manage multiple inputs, such as the throttle a car.
+    """
+
+    def __init__(self) -> None:
+        self.config_handler = ConfigurationHandler()
 
     @abstractmethod
     def get_action(self) -> GameAction:

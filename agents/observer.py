@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from .action_input import ActionInputWithConfidence
+from .actions import ActionInputWithConfidence
 from .actor_id import ActorID
 
 

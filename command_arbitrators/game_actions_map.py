@@ -1,8 +1,7 @@
 import time
 from dataclasses import dataclass
 
-from ..agents import ActionInput, ActionInputWithConfidence
-from ..sources.game import GameAction
+from ..agents.actions import ActionInput, ActionInputWithConfidence, GameAction
 
 
 @dataclass

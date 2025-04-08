@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from ..sources.game import GameState, GameStateListener
 from . import Actor
-from .action_input import ActionInputWithConfidence
+from .actions import ActionInputWithConfidence
 from .sw_agent_actor import SWAgentActor
 
 ActionInputWithConfidenceAndDelay = tuple[ActionInputWithConfidence, float]

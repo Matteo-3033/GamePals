@@ -2,8 +2,7 @@ import logging
 
 from ..sources import PhysicalControllerListener
 from ..sources.controller import ControllerInput, ControllerObserver, InputData
-from ..sources.game import GameAction
-from .action_input import ActionConversionDelegate, ActionInput
+from .actions import ActionConversionDelegate, ActionInput, GameAction
 from .actor import Actor
 
 logger = logging.getLogger(__file__)
