@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Optional, Type, TypeVar
 
 from .utils import get_all_concrete_subclasses
 
@@ -55,20 +55,8 @@ class ConfigurationHandler:
             )
         return cls._instance
 
-    def _load_config_from_dicts(
-        self,
-        game_config: dict[str, Any],
-        agents_config: dict[str, Any],
-        assistance_config: dict[str, Any],
-    ) -> None:
-        """
-        Loads the configuration from config into more specific dictionaries.
-        """
-        from ..command_arbitrators.policies import PolicyName
-        from ..agents.actions import GameAction
-
-        # TODO: Configuration Validation should go here
-
+    def _initialize_config(self):
+        """Initializes configuration dictionaries"""
         self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
             lambda: defaultdict(lambda: 1.0)
         )
@@ -85,7 +73,6 @@ class ConfigurationHandler:
         self._agent_policy_roles: dict[tuple["GameAction", str], PolicyRole] = (
             defaultdict()
         )
-
         self._user_input_to_action_map: dict[int, dict["InputType", "GameAction"]] = (
             defaultdict(dict)
         )
@@ -97,16 +84,47 @@ class ConfigurationHandler:
             defaultdict(list)
         )
 
-        game_action_name = game_config.get("game", {}).get("action_name", "")
-        game_action_subclasses = get_all_concrete_subclasses(GameAction)
+    TGameClass = TypeVar("TGameClass", bound=Any)
 
-        self._game_action_type: Type[GameAction] = next(
-            (cl for cl in game_action_subclasses if cl.__name__ == game_action_name),
-            GameAction,
+    @staticmethod
+    def _get_game_specific_class(
+        class_name: str, super_class: Type[TGameClass]
+    ) -> Optional[Type[TGameClass]]:
+        """Loads a game specific class, given the class name and the superclass"""
+        subclasses = get_all_concrete_subclasses(super_class)
+        class_type: Optional[Type] = next(
+            (cl for cl in subclasses if cl.__name__ == class_name),
+            None,
         )
 
-        logger.info("Game Action Type: %s", self._game_action_type)
-        # TODO: What happens if no match?
+        return class_type
+
+    def _load_config_from_dicts(
+        self,
+        game_config: dict[str, Any],
+        agents_config: dict[str, Any],
+        assistance_config: dict[str, Any],
+    ) -> None:
+        """
+        Loads the configuration from config into more specific dictionaries.
+        """
+        from ..command_arbitrators.policies import PolicyName
+        from ..agents.actions import GameAction
+
+        # TODO: Configuration Validation should go here
+
+        self._initialize_config()
+
+        game_action_name = game_config.get("game", {}).get("action_name", "")
+        game_action_type: Optional[Type[GameAction]] = self._get_game_specific_class(
+            game_action_name, GameAction
+        )
+
+        if not game_action_type:
+            logger.error("Couldn't find the specified Game Action name")
+            return
+
+        self._game_action_type = game_action_type
 
         for action in assistance_config.get("action", []):
             action_enum = self._game_action_type(action["name"])
