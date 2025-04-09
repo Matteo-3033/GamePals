@@ -65,10 +65,9 @@ class ConfigurationHandler:
         Loads the configuration from config into more specific dictionaries.
         """
         from ..command_arbitrators.policies import PolicyName
+        from ..agents.actions import GameAction
 
         # TODO: Configuration Validation should go here
-
-        # TODO: fix gameactions to be enum values and not strings
 
         self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
             lambda: defaultdict(lambda: 1.0)
@@ -98,22 +97,34 @@ class ConfigurationHandler:
             defaultdict(list)
         )
 
+        game_action_name = game_config.get("game", {}).get("action_name", "")
+        game_action_subclasses = get_all_concrete_subclasses(GameAction)
+
+        self._game_action_type: Type[GameAction] = next(
+            (cl for cl in game_action_subclasses if cl.__name__ == game_action_name),
+            GameAction,
+        )
+
+        logger.info("Game Action Type: %s", self._game_action_type)
+        # TODO: What happens if no match?
+
         for action in assistance_config.get("action", []):
+            action_enum = self._game_action_type(action["name"])
             for human in action.get("humans", list()):
                 human_idx = human.get("idx", self.DEFAULTS["HUMAN_IDX"])
                 human_role = human.get("role", self.DEFAULTS["HUMAN_ROLE"])
 
-                self._user_actions[human_idx].append(action["name"])
-                self._user_policy_roles[(action["name"], human_idx)] = human_role
+                self._user_actions[human_idx].append(action_enum)
+                self._user_policy_roles[(action_enum, human_idx)] = human_role
                 controls = human.get("controls", [])
 
-                self._confidence_levels[human_idx][action["name"]] = human["confidence"]
+                self._confidence_levels[human_idx][action_enum] = human["confidence"]
 
                 for control in controls:
-                    self._user_input_to_action_map[human_idx][control] = action["name"]
+                    self._user_input_to_action_map[human_idx][control] = action_enum
 
                 if len(controls) > 0:
-                    self._action_to_user_input_map[human_idx][action["name"]] = controls
+                    self._action_to_user_input_map[human_idx][action_enum] = controls
 
             for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
@@ -121,7 +132,7 @@ class ConfigurationHandler:
                 self._agent_policy_roles[(action["name"], agent["name"])] = agent_role
 
             if action["name"] in game_config.get("actions", dict()):
-                self._policy_types[action["name"]] = PolicyName[
+                self._policy_types[action_enum] = PolicyName[
                     action.get("policy", self.DEFAULTS["POLICY"])
                 ].value
 
@@ -216,6 +227,10 @@ class ConfigurationHandler:
         """Returns the Role that user_idx covers for the specified action"""
         found = self._user_policy_roles[(action, user_idx)]
         return found if found else self.DEFAULTS["HUMAN_ROLE"]
+
+    def get_game_action_type(self) -> Type["GameAction"]:
+        """Returns the GameAction implementation class for the current game"""
+        return self._game_action_type
 
     DEFAULTS: dict[str, Any] = {
         "HUMAN_IDX": 0,

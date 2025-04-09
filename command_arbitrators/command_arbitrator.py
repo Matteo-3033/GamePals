@@ -24,7 +24,6 @@ class CommandArbitrator(ActorObserver):
 
     def __init__(
         self,
-        game_action: Type[GameAction],
         policies: dict[GameAction, Type[Policy]],
         conversion_delegates: list[ActionConversionDelegate] | None = None,
     ) -> None:
@@ -42,6 +41,7 @@ class CommandArbitrator(ActorObserver):
         policy_types = policies.copy()
         self.policy_manager = PolicyManager(policy_types)
 
+        game_action = self.config_handler.get_game_action_type()
         for action in game_action:
             inputs = self.config_handler.action_to_game_input(action)
 
