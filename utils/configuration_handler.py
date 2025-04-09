@@ -68,6 +68,8 @@ class ConfigurationHandler:
 
         # TODO: Configuration Validation should go here
 
+        # TODO: fix gameactions to be enum values and not strings
+
         self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
             lambda: defaultdict(lambda: 1.0)
         )
