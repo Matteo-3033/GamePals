@@ -16,14 +16,10 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     """
 
     def __init__(
-        self, game_state: GameStateListener, pilot: Actor | None = None
+        self, game_state: GameStateListener
     ) -> None:
         super().__init__()
         self.game_state = game_state
-
-        if pilot is not None:
-            pilot.subscribe(self)
-
         self.game_state.subscribe(self)
 
     @classmethod
