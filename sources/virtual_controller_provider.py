@@ -26,7 +26,7 @@ class VirtualControllerProvider:
             raise ValueError("Use execute_stick method to handle stick inputs")
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
-            if c_input.val == 1:
+            if c_input.val == 1: # Probably need to change it to > 0.5
                 self.gamepad.press_button(self.BTN_TO_VGBUTTON[c_input.type])
             else:
                 self.gamepad.release_button(self.BTN_TO_VGBUTTON[c_input.type])
