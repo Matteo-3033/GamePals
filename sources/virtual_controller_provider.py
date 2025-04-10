@@ -59,10 +59,10 @@ class VirtualControllerProvider:
         if c_input_x.type not in self.STICKS or c_input_y.type not in self.STICKS:
             raise ValueError("Use execute method to handle non-stick inputs")
 
-        if c_input_x.type[:-1] != c_input_y.type[:-1]:
+        if c_input_x.type[:9] != c_input_y.type[:9]: # Extracts "STICK_LEFT" or "STICK_RIGH"
             raise ValueError("The inputs must be on the same stick")
 
-        if c_input_x.type == InputType.STICK_LEFT_X:
+        if c_input_x.type in [InputType.STICK_LEFT_X_POS, InputType.STICK_LEFT_X_NEG]:
             self.gamepad.left_joystick_float(
                 x_value_float=c_input_x.val, y_value_float=c_input_y.val
             )
@@ -119,8 +119,12 @@ class VirtualControllerProvider:
     DPADS = [InputType.DIR_PAD_X, InputType.DIR_PAD_Y]
     TRIGGERS = [InputType.TRIGGER_LEFT, InputType.TRIGGER_RIGHT]
     STICKS = [
-        InputType.STICK_LEFT_X,
-        InputType.STICK_LEFT_Y,
-        InputType.STICK_RIGHT_X,
-        InputType.STICK_RIGHT_Y,
+        InputType.STICK_LEFT_X_POS,
+        InputType.STICK_LEFT_X_NEG,
+        InputType.STICK_LEFT_Y_POS,
+        InputType.STICK_LEFT_Y_NEG,
+        InputType.STICK_RIGHT_X_POS,
+        InputType.STICK_RIGHT_X_NEG,
+        InputType.STICK_RIGHT_Y_POS,
+        InputType.STICK_RIGHT_Y_NEG,
     ]

@@ -76,9 +76,15 @@ class PhysicalControllerListener:
         if event.code not in self.INPUT_TYPES_MAP:
             return None  # Ignore unmapped inputs
 
-        input_type = self.INPUT_TYPES_MAP[event.code]
-        input_value = self.normalize(input_type, event.state)
-        return ControllerInput(input_type, input_value)
+        input_types = self.INPUT_TYPES_MAP[event.code]
+
+        if len(input_types) == 1:
+            idx = 1
+        else: # It's a stick, with split axis
+            idx = 0 if event.state >= 0 else 1
+
+        input_value = self.normalize(input_types[idx], event.state)
+        return ControllerInput(input_types[idx], input_value)
 
     @staticmethod
     def normalize(input_type: InputType, val: int) -> float:
@@ -87,10 +93,14 @@ class PhysicalControllerListener:
             case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
                 return val / 255
             case (
-                InputType.STICK_RIGHT_X
-                | InputType.STICK_RIGHT_Y
-                | InputType.STICK_LEFT_X
-                | InputType.STICK_LEFT_Y
+                InputType.STICK_LEFT_X_POS
+                | InputType.STICK_LEFT_X_NEG
+                | InputType.STICK_LEFT_Y_POS
+                | InputType.STICK_LEFT_Y_NEG
+                | InputType.STICK_RIGHT_X_POS
+                | InputType.STICK_RIGHT_X_NEG
+                | InputType.STICK_RIGHT_Y_POS
+                | InputType.STICK_RIGHT_Y_NEG
             ):
                 return val / 32767
             case _:
@@ -101,22 +111,22 @@ class PhysicalControllerListener:
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
     INPUT_TYPES_MAP = {
-        "BTN_SOUTH": InputType.BTN_A,
-        "BTN_EAST": InputType.BTN_B,
-        "BTN_NORTH": InputType.BTN_Y,
-        "BTN_WEST": InputType.BTN_X,
-        "BTN_TR": InputType.BUMPER_RIGHT,
-        "BTN_TL": InputType.BUMPER_LEFT,
-        "BTN_THUMBR": InputType.THUMB_RIGHT,
-        "BTN_THUMBL": InputType.THUMB_LEFT,
-        "ABS_HAT0X": InputType.DIR_PAD_X,
-        "ABS_HAT0Y": InputType.DIR_PAD_Y,
-        "ABS_RZ": InputType.TRIGGER_RIGHT,
-        "ABS_Z": InputType.TRIGGER_LEFT,
-        "ABS_RX": InputType.STICK_RIGHT_X,
-        "ABS_RY": InputType.STICK_RIGHT_Y,
-        "ABS_X": InputType.STICK_LEFT_X,
-        "ABS_Y": InputType.STICK_LEFT_Y,
-        "BTN_START": InputType.BTN_BACK,
-        "BTN_SELECT": InputType.BTN_START,
+        "BTN_SOUTH": [InputType.BTN_A],
+        "BTN_EAST": [InputType.BTN_B],
+        "BTN_NORTH": [InputType.BTN_Y],
+        "BTN_WEST": [InputType.BTN_X],
+        "BTN_TR": [InputType.BUMPER_RIGHT],
+        "BTN_TL": [InputType.BUMPER_LEFT],
+        "BTN_THUMBR": [InputType.THUMB_RIGHT],
+        "BTN_THUMBL": [InputType.THUMB_LEFT],
+        "ABS_HAT0X": [InputType.DIR_PAD_X],
+        "ABS_HAT0Y": [InputType.DIR_PAD_Y],
+        "ABS_RZ": [InputType.TRIGGER_RIGHT],
+        "ABS_Z": [InputType.TRIGGER_LEFT],
+        "ABS_RX": [InputType.STICK_RIGHT_X_POS, InputType.STICK_RIGHT_X_NEG],
+        "ABS_RY": [InputType.STICK_RIGHT_Y_POS, InputType.STICK_RIGHT_Y_NEG],
+        "ABS_X": [InputType.STICK_LEFT_X_POS, InputType.STICK_LEFT_X_NEG],
+        "ABS_Y": [InputType.STICK_LEFT_Y_POS, InputType.STICK_LEFT_Y_NEG],
+        "BTN_START": [InputType.BTN_BACK],
+        "BTN_SELECT": [InputType.BTN_START],
     }
