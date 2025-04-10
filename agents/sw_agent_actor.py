@@ -16,7 +16,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     """
 
     def __init__(
-        self, game_state: GameStateListener
+        self, game_state: GameStateListener, **kwargs
     ) -> None:
         super().__init__()
         self.game_state = game_state
