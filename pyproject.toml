@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "copilot"
 version = "0.9"
-description = "Descrizione della libreria"
+description = "Framework to enables shared control over video game instances"
 authors = [
-  { name="Filippo Corti", email="filippo.corti1@studenti.unimi.it" },
-  { name="Matteo Manzoni", email="matteo.manzoni2@studenti.unimi.it" }
+  { name="Matteo Manzoni", email="matteo.manzoni2@studenti.unimi.it" },
+  { name="Filippo Corti", email="filippo.corti1@studenti.unimi.it" }
 ]
 readme = "README.md"
 license = { text = "MIT" }
