@@ -98,13 +98,13 @@ class ConfigurationHandler:
         )
 
         for action in assistance_config.get("action", []):
-            for human in action.get("humans", list()):
-                human_idx = human.get("idx", self.DEFAULTS["HUMAN_IDX"])
+            for i, human in enumerate(action.get("humans", list())):
+                human_idx = human.get("idx", i)
                 human_role = human.get("role", self.DEFAULTS["HUMAN_ROLE"])
 
                 self._user_actions[human_idx].append(action["name"])
                 self._user_policy_roles[(action["name"], human_idx)] = human_role
-                controls = human.get("controls", [])
+                controls = human.get("controls", list())
 
                 self._confidence_levels[human_idx][action["name"]] = human["confidence"]
 
@@ -217,7 +217,6 @@ class ConfigurationHandler:
         return found if found else self.DEFAULTS["HUMAN_ROLE"]
 
     DEFAULTS: dict[str, Any] = {
-        "HUMAN_IDX": 0,
         "HUMAN_ROLE": "Pilot",
         "AGENT_ROLE": "Copilot",
         "POLICY": "POLICY_EXCLUSIVITY",
