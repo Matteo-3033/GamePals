@@ -28,7 +28,7 @@ class PolicyContinuousSum(ContinuousPolicy):
             value = entry.input_details.val
             weight = entry.input_details.confidence
 
-            if not math.isclose(value, 0.0, abs_tol=1e-3):
+            if not math.isclose(value, 0.0, abs_tol=1e-1):
                 values_sum += value * weight
                 weights_sum += weight
 
