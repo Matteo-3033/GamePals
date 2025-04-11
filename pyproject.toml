@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "copilot"
-version = "0.5"
+version = "0.9"
 description = "Descrizione della libreria"
 authors = [
   { name="Filippo Corti", email="filippo.corti1@studenti.unimi.it" },
