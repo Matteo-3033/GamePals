@@ -1,7 +1,8 @@
 import logging
 
-from ..sources import PhysicalControllerListener
-from ..sources.controller import ControllerInput, ControllerObserver, InputData
+from copilot.sources import PhysicalControllerListener
+from copilot.sources.controller import ControllerInput, ControllerObserver, InputData
+
 from .actions import ActionConversionDelegate, ActionInput, GameAction
 from .actor import Actor
 

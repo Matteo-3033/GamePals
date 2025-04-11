@@ -1,12 +1,13 @@
 import logging
 from typing import Type
 
-from ..agents import Actor, ActorID
-from ..agents.actions import ActionConversionDelegate, ActionInput, GameAction
-from ..agents.observer import ActorData, ActorObserver, MessageData
-from ..sources import VirtualControllerProvider
-from ..sources.controller import ControllerInput
-from ..utils.configuration_handler import ConfigurationHandler
+from copilot.agents import Actor, ActorID
+from copilot.agents.actions import ActionConversionDelegate, ActionInput, GameAction
+from copilot.agents.observer import ActorData, ActorObserver, MessageData
+from copilot.sources import VirtualControllerProvider
+from copilot.sources.controller import ControllerInput
+from copilot.utils.configuration_handler import ConfigurationHandler
+
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
 

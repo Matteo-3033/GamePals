@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput
-from ..sources.game import GameState, GameStateListener, GameStateObserver
+from copilot.sources.controller import ControllerInput
+from copilot.sources.game import GameState, GameStateListener, GameStateObserver
+
 from .actions import ActionInput, ActionInputWithConfidence
 from .actor import Actor
 from .observer import ActorObserver

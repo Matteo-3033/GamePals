@@ -1,16 +1,8 @@
 import time
-from dataclasses import dataclass
 
-from ..agents.actions import ActionInput, ActionInputWithConfidence, GameAction
+from copilot.agents.actions import ActionInput, ActionInputWithConfidence, GameAction
 
-
-@dataclass
-class ActionInputRecord:
-    """ActionInputRecord stores the value of an input action, the associated confidence level and the timestamp of acquisition"""
-
-    val: float
-    confidence: float
-    timestamp: float
+from .policies import ActionInputRecord
 
 
 class GameActionsMap:

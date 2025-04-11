@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from ...sources.controller import ControllerInput
-from ...utils import ConfigurationHandler
+from copilot.sources.controller import ControllerInput
+from copilot.utils import ConfigurationHandler
+
 from .action_input import ActionInput
 from .game_action import GameAction
 

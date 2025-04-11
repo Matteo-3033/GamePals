@@ -2,6 +2,8 @@ import logging
 
 from .input_entry import InputEntry
 from .policy import BinaryPolicy
+from .policy_binary_democracy import PolicyBinaryDemocracy
+from .policy_role import PolicyRole
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +29,6 @@ class PolicyBinarySupervisionByPilot(BinaryPolicy):
 
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
-        from .. import PolicyRole
-        from .policy_binary_democracy import PolicyBinaryDemocracy
-
         if next((
                 entry
                 for entry in entries

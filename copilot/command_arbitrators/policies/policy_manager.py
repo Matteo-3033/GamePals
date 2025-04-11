@@ -1,9 +1,10 @@
 import logging
 from dataclasses import dataclass
 
-from ...agents import Actor, ActorID, HumanActor, SWAgentActor
-from ...agents.actions import GameAction
-from ...utils.configuration_handler import ConfigurationHandler
+from copilot.agents import Actor, ActorID, HumanActor, SWAgentActor
+from copilot.agents.actions import GameAction
+from copilot.utils.configuration_handler import ConfigurationHandler
+
 from .input_entry import PolicyRole
 from .policy import Policy
 from .policy_continuous_or import PolicyContinuousOR

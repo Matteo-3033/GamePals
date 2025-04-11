@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Any, Optional, Type
 from .utils import get_all_concrete_subclasses
 
 if TYPE_CHECKING:
-    from ..agents.actions import GameAction
-    from ..agents.sw_agent_actor import SWAgentActor
-    from ..command_arbitrators.policies import Policy, PolicyRole
-    from ..sources.controller import InputType
+    from copilot.agents.actions import GameAction
+    from copilot.agents.sw_agent_actor import SWAgentActor
+    from copilot.command_arbitrators.policies import Policy, PolicyRole
+    from copilot.sources.controller import InputType
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +64,9 @@ class ConfigurationHandler:
         """
         Loads the configuration from config into more specific dictionaries.
         """
-        from ..command_arbitrators.policies import PolicyName
+        from copilot.command_arbitrators.policies import PolicyName
 
         # TODO: Configuration Validation should go here
-
         # TODO: fix gameactions to be enum values and not strings
 
         self._confidence_levels: dict[int, dict["GameAction", float]] = defaultdict(
@@ -195,7 +194,7 @@ class ConfigurationHandler:
 
     def get_necessary_agents(self) -> set[Type["SWAgentActor"]]:
         """Returns the list of SWAgentActors that are required by the config"""
-        from ..agents.sw_agent_actor import SWAgentActor
+        from copilot.agents.sw_agent_actor import SWAgentActor
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
         required_agent_classes = {
