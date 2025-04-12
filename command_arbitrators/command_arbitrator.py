@@ -1,6 +1,7 @@
 import logging
 from typing import Type
 
+from doom import DoomAction
 from ..agents import Actor, ActorID
 from ..agents.actions import ActionConversionDelegate, ActionInput, GameAction
 from ..agents.observer import ActorData, ActorObserver, MessageData
@@ -101,6 +102,7 @@ class CommandArbitrator(ActorObserver):
         Merges the Input Entries for the given Input Type, based on the specified Policy Type.
         It then returns the resulting ControllerInput
         """
+
         policy_info = self.policy_manager.get_policy(action)
         policy = policy_info.policy_type
 
@@ -140,4 +142,10 @@ class CommandArbitrator(ActorObserver):
                 action_input
             )
 
-        return [ControllerInput(type=inputs[0], val=action_input.val)]
+        if len(inputs) > 1 and inputs[0] in VirtualControllerProvider.STICKS: # It's a stick, with split axis. Pick according to value
+            idx = 0 if action_input.val >= 0 else 1
+        else:
+            idx = 0 # Pick the first mapped input if it's not a stick
+
+
+        return [ControllerInput(type=inputs[idx], val=action_input.val)]

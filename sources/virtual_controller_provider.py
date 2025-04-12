@@ -31,6 +31,7 @@ class VirtualControllerProvider:
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
 
         if c_input.type in self.STICKS:
+            logger.info("Received input %s", c_input)
             if c_input.type in self.RIGHT_STICK:  # Right Stick
                 if c_input.type in self.RIGHT_STICK_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
@@ -51,7 +52,7 @@ class VirtualControllerProvider:
                 )
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
-            if c_input.val == 1: # Probably need to change it to > 0.5
+            if abs(c_input.val) > 0.7: # Probably need to change it to > 0.7
                 self.gamepad.press_button(self.BTN_TO_VGBUTTON[c_input.type])
             else:
                 self.gamepad.release_button(self.BTN_TO_VGBUTTON[c_input.type])

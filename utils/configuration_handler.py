@@ -204,7 +204,7 @@ class ConfigurationHandler:
         user_idx: int,
         action: "GameAction",
     ) -> list["InputType"] | None:
-        """Returns the InputType that the user user_idx needs to press to perform the given action"""
+        """Returns the InputType(s) that the user user_idx needs to press to perform the given action"""
         return self._action_to_user_input_map.get(user_idx, dict()).get(action, None)
 
     def game_input_to_action(self, input_type: "InputType") -> Optional["GameAction"]:

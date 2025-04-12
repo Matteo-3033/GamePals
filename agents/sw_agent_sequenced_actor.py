@@ -18,10 +18,9 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
 
     def __init__(
         self,
-        game_state: GameStateListener,
-        pilot: Actor,
+        game_state: GameStateListener
     ) -> None:
-        super().__init__(game_state, pilot)
+        super().__init__(game_state)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
 

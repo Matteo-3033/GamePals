@@ -116,6 +116,7 @@ class PhysicalControllerListener:
                 time.sleep(self.CHECK_GAMEPAD_INTERVAL)
 
         while self.running and self.gamepad is not None:
+            events = list()
             try:
                 if self.gamepad is not None:
                     events = self.gamepad.read()
@@ -129,6 +130,7 @@ class PhysicalControllerListener:
 
                 observed = self.event_to_input(event)
                 if observed:
+                    logger.info("Sending input %s", observed)
                     self.notify_all(observed)
 
     def event_to_input(self, event) -> ControllerInput | None:
@@ -139,7 +141,7 @@ class PhysicalControllerListener:
         input_types = self.INPUT_TYPES_MAP[event.code]
 
         if len(input_types) == 1:
-            idx = 1
+            idx = 0
         else: # It's a stick, with split axis
             idx = 0 if event.state >= 0 else 1
 
@@ -174,7 +176,7 @@ class PhysicalControllerListener:
         return self.gamepad_id
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
-    INPUT_TYPES_MAP = {
+    INPUT_TYPES_MAP : dict[str, list[InputType]]  = {
         "BTN_SOUTH": [InputType.BTN_A],
         "BTN_EAST": [InputType.BTN_B],
         "BTN_NORTH": [InputType.BTN_Y],

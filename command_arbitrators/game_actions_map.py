@@ -27,7 +27,7 @@ class GameActionsMap:
         timestamp: float | None = None,
     ) -> None:
         """
-        Updates the entry of the value for an input_type.
+        Updates the entry of the value for an action.
 
         If timestamp is not specified, it uses current time.
         """
