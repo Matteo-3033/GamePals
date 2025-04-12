@@ -130,7 +130,7 @@ class PhysicalControllerListener:
 
                 observed = self.event_to_input(event)
                 if observed:
-                    logger.info("Sending input %s", observed)
+                    logger.debug("Sending input %s", observed)
                     self.notify_all(observed)
 
     def event_to_input(self, event) -> ControllerInput | None:
