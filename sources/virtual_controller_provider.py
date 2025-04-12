@@ -32,7 +32,7 @@ class VirtualControllerProvider:
 
         if c_input.type in self.STICKS:
             if c_input.type in self.RIGHT_STICK:  # Right Stick
-                if c_input.type == InputType.STICK_RIGHT_Y:
+                if c_input.type in self.RIGHT_STICK_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
                 else:
                     self.right_stick_values = (c_input.val, self.right_stick_values[1])
@@ -41,7 +41,7 @@ class VirtualControllerProvider:
                     y_value_float=self.right_stick_values[1],
                 )
             elif c_input.type in self.LEFT_STICK:  # Left Stick
-                if c_input.type == InputType.STICK_LEFT_Y:
+                if c_input.type in self.LEFT_STICK_Y:
                     self.left_stick_values = (self.left_stick_values[0], c_input.val)
                 else:
                     self.left_stick_values = (c_input.val, self.left_stick_values[1])
@@ -51,7 +51,7 @@ class VirtualControllerProvider:
                 )
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
-            if c_input.val == 1:
+            if c_input.val == 1: # Probably need to change it to > 0.5
                 self.gamepad.press_button(self.BTN_TO_VGBUTTON[c_input.type])
             else:
                 self.gamepad.release_button(self.BTN_TO_VGBUTTON[c_input.type])
@@ -75,6 +75,9 @@ class VirtualControllerProvider:
 
     def reset_controls(self):
         """Releases all buttons (except sticks) of the Virtual Controller"""
+
+        assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
+
         time.sleep(
             0.5
         )  # This looks unnecessary, but it's needed for it to work even when the level is reset
@@ -118,12 +121,10 @@ class VirtualControllerProvider:
     # Arrays of InputTypes that can be used to check the category of the Input Type
     DPADS = [InputType.DIR_PAD_X, InputType.DIR_PAD_Y]
     TRIGGERS = [InputType.TRIGGER_LEFT, InputType.TRIGGER_RIGHT]
-    LEFT_STICK = [
-        InputType.STICK_LEFT_X,
-        InputType.STICK_LEFT_Y,
-    ]
-    RIGHT_STICK = [
-        InputType.STICK_RIGHT_X,
-        InputType.STICK_RIGHT_Y,
-    ]
+    LEFT_STICK_X = [InputType.STICK_LEFT_X_POS, InputType.STICK_LEFT_X_NEG]
+    LEFT_STICK_Y = [InputType.STICK_LEFT_Y_POS, InputType.STICK_LEFT_Y_NEG]
+    RIGHT_STICK_X = [InputType.STICK_RIGHT_X_POS, InputType.STICK_RIGHT_X_NEG]
+    RIGHT_STICK_Y = [InputType.STICK_RIGHT_Y_POS, InputType.STICK_RIGHT_Y_NEG]
+    LEFT_STICK = LEFT_STICK_X + LEFT_STICK_Y
+    RIGHT_STICK = RIGHT_STICK_X + RIGHT_STICK_Y
     STICKS = LEFT_STICK + RIGHT_STICK

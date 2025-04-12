@@ -17,12 +17,16 @@ class InputType(StrEnum):
     THUMB_LEFT = "Thumb_Left"  # Values are {0, 1}
     DIR_PAD_X = "DirPad_X"  # Values are {-1, 0, 1}
     DIR_PAD_Y = "DirPad_Y"  # Values are {-1, 0, 1}
-    TRIGGER_RIGHT = "Trigger_Right"  # Values are in [0, 255]
-    TRIGGER_LEFT = "Trigger_Left"  # Values are in [0, 255]
-    STICK_RIGHT_X = "Stick_Right_X"  # Values are in [-32768, 32767]
-    STICK_RIGHT_Y = "Stick_Right_Y"  # Values are in [-32768, 32767]
-    STICK_LEFT_X = "Stick_Left_X"  # Values are in [-32768, 32767]
-    STICK_LEFT_Y = "Stick_Left_Y"  # Values are in [-32768, 32767]
+    TRIGGER_RIGHT = "Trigger_Right"  # Values are in int[0, 255] or float[0, 1]
+    TRIGGER_LEFT = "Trigger_Left"  # Values are in int[0, 255] or float[0, 1]
+    STICK_RIGHT_X_POS = "Stick_Right_X_Pos"  # Values are in int[0, 32767] or float[0, 1]
+    STICK_RIGHT_X_NEG = "Stick_Right_X_Neg"  # Values are in int[-32768, -1] or float[-1, 0)
+    STICK_RIGHT_Y_POS = "Stick_Right_Y_Pos"  # Values are in int[0, 32767] or float[0, 1]
+    STICK_RIGHT_Y_NEG = "Stick_Right_Y_Neg"  # Values are in int[-32768, -1] or float[-1, 0)
+    STICK_LEFT_X_POS = "Stick_Left_X_Pos"  # Values are in int[0, 32767] or float[0, 1]
+    STICK_LEFT_X_NEG = "Stick_Left_X_Neg"  # Values are in int[-32768, -1] or float[-1, 0)
+    STICK_LEFT_Y_POS = "Stick_Left_Y_Pos"  # Values are in int[0, 32767] or float[0, 1]
+    STICK_LEFT_Y_NEG = "Stick_Left_Y_Neg"  # Values are in int[-32768, -1] or float[-1, 0)
     BTN_BACK = "Back"  # Values are {0, 1}
     BTN_START = "Start"  # Values are {0, 1}
 
@@ -35,10 +39,14 @@ class InputType(StrEnum):
             case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
                 return 255
             case (
-                InputType.STICK_LEFT_X
-                | InputType.STICK_RIGHT_X
-                | InputType.STICK_LEFT_Y
-                | InputType.STICK_RIGHT_Y
+                InputType.STICK_LEFT_X_POS
+                | InputType.STICK_LEFT_X_NEG
+                | InputType.STICK_LEFT_Y_POS
+                | InputType.STICK_LEFT_Y_NEG
+                | InputType.STICK_RIGHT_X_POS
+                | InputType.STICK_RIGHT_X_NEG
+                | InputType.STICK_RIGHT_Y_POS
+                | InputType.STICK_RIGHT_Y_NEG
             ):
                 return 32767
             case _:
