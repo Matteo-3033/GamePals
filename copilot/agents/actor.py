@@ -1,7 +1,8 @@
 import uuid
 from abc import ABC, abstractmethod
 
-from ..sources.controller import ControllerInput
+from copilot.sources.controller import ControllerInput
+
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
@@ -17,7 +18,7 @@ class Actor(ABC):
     """
 
     def __init__(self):
-        from ..utils.configuration_handler import ConfigurationHandler
+        from copilot.utils.configuration_handler import ConfigurationHandler
 
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []

@@ -3,6 +3,8 @@ import math
 
 from .input_entry import InputEntry
 from .policy import BinaryPolicy
+from .policy_continuous_sum import PolicyContinuousSum
+from .policy_role import PolicyRole
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +30,6 @@ class PolicyContinuousSupervisionByPilot(BinaryPolicy):
 
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
-        from .. import PolicyRole
-        from .policy_continuous_sum import PolicyContinuousSum
-
         for entry in entries:
 
             if entry.actor_role == PolicyRole.PILOT and not math.isclose(

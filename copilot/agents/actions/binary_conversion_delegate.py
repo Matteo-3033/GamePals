@@ -1,6 +1,7 @@
 import logging
 
-from ...sources.controller import ControllerInput, InputType
+from copilot.sources.controller import ControllerInput, InputType
+
 from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput
 from .game_action import GameAction

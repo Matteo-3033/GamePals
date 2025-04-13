@@ -1,19 +1,17 @@
 from dataclasses import dataclass
-from enum import StrEnum
 
-from ...agents import ActorID
-from ..game_actions_map import ActionInputRecord
+from copilot.agents import ActorID
+
+from .policy_role import PolicyRole
 
 
-class PolicyRole(StrEnum):
-    """
-    Enumerator for the Policy Roles. An Actor can register for an input specifying its Role.
-    The Role is supposed to be used to allow for more complex Policies to be produced.
-    """
+@dataclass
+class ActionInputRecord:
+    """ActionInputRecord stores the value of an input action, the associated confidence level and the timestamp of acquisition"""
 
-    PILOT = "Pilot"
-    COPILOT = "Copilot"
-
+    val: float
+    confidence: float
+    timestamp: float
 
 @dataclass
 class InputEntry:
