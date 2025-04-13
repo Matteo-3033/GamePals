@@ -27,7 +27,6 @@ class ConfigurationHandler:
 
     It implements a Singleton pattern.
 
-    TODO: eventually split x and y axis into positive and negative
     TODO: configure meta-commands
     """
 
@@ -86,20 +85,18 @@ class ConfigurationHandler:
             defaultdict(list)
         )
 
-    TGameClass = TypeVar("TGameClass", bound=GameAction)
-
     @staticmethod
-    def _get_game_specific_class(
-        class_name: str, super_class: Type[TGameClass]
-    ) -> Optional[Type[TGameClass]]:
+    def _get_game_specific_class(class_name: str) -> Optional[Type[GameAction]]:
         """Loads a game specific class, given the class name and the superclass"""
-        subclasses = get_all_concrete_subclasses(super_class)
-        class_type: Optional[Type] = next(
-            (cl for cl in subclasses if cl.__name__ == class_name),
-            None,
+        subclasses = get_all_concrete_subclasses(GameAction)
+        filtered_subclasses = list(
+            filter(lambda cl: cl.__name__ == class_name, subclasses)
         )
 
-        return class_type
+        if len(filtered_subclasses) == 0:
+            return None
+
+        return filtered_subclasses[0]
 
     def _load_config_from_dicts(
         self,
@@ -110,17 +107,20 @@ class ConfigurationHandler:
         """
         Loads the configuration from config into more specific dictionaries.
         """
-        from ..agents.actions import GameAction
-        from ..command_arbitrators.policies import PolicyName
+        from copilot.agents.actions import GameAction
+        from copilot.command_arbitrators.policies import PolicyName
 
         # TODO: Configuration Validation should go here
 
         self._initialize_config()
 
-        game_action_name = game_config.get("game", dict()).get("action_name", None)
-        game_action_type: Optional[Type[GameAction]] = self._get_game_specific_class(
-            game_action_name, GameAction
+        game_action_name: str | None = game_config.get("game", None).get(
+            "action_name", None
         )
+        if not game_action_name:
+            raise ValueError("Invalid game configuration: missing 'game.action_name'")
+
+        game_action_type = self._get_game_specific_class(game_action_name)
 
         if not game_action_type:
             logger.error("Couldn't find the specified Game Action name")
@@ -128,7 +128,7 @@ class ConfigurationHandler:
 
         self._game_action_type = game_action_type
 
-        for action in assistance_config.get("action", []):
+        for action in assistance_config.get("action", list()):
             action_enum = self._game_action_type(action["name"])
             for i, human in enumerate(action.get("humans", list())):
                 human_idx = human.get("idx", i)
