@@ -93,9 +93,6 @@ class ConfigurationHandler:
         from copilot.agents.actions import GameAction
 
         subclasses = get_all_concrete_subclasses(GameAction)
-
-        logger.info("Game Action options found: %s", subclasses)
-
         filtered_subclasses = list(
             filter(lambda cl: cl.__name__ == class_name, subclasses)
         )
@@ -178,7 +175,9 @@ class ConfigurationHandler:
                 self._registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", list()):
-            if agent["name"] not in self._required_agents and agent.get("active", True):
+            if agent["name"] not in self._required_agents and agent.get(
+                "active", False
+            ):
                 self._required_agents.add(agent["name"])
 
             self._agents_params[agent["name"]] = agent["params"]
@@ -241,7 +240,6 @@ class ConfigurationHandler:
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
 
-        logger.info("Game Action options found: %s", agent_classes)
         required_agent_classes = {
             cls for cls in agent_classes if cls.get_name() in self._required_agents
         }
@@ -253,12 +251,12 @@ class ConfigurationHandler:
 
     def get_agent_role(self, agent_name: str, action: GameAction) -> PolicyRole:
         """Returns the Role that agent_name covers for the specified action"""
-        found = self._agent_policy_roles[(action, agent_name)]
+        found = self._agent_policy_roles.get((action, agent_name), None)
         return found if found else self.DEFAULTS["AGENT_ROLE"]
 
     def get_human_role(self, user_idx: int, action: GameAction) -> PolicyRole:
         """Returns the Role that user_idx covers for the specified action"""
-        found = self._user_policy_roles[(action, user_idx)]
+        found = self._user_policy_roles.get((action, user_idx), None)
         return found if found else self.DEFAULTS["HUMAN_ROLE"]
 
     def get_game_action_type(self) -> Type[GameAction]:
