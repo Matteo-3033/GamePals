@@ -22,4 +22,4 @@ dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["copilot"]
-include = ["copilot/copilot/*"]
+include = ["copilot/*"]
