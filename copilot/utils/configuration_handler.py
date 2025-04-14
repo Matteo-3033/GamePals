@@ -169,7 +169,7 @@ class ConfigurationHandler:
                 ].value
 
         for action, inputs in game_config.get("actions", dict()).items():
-            action = self._game_action_type(action["name"])
+            action = self._game_action_type(action)
             inputs = [InputType(inp) for inp in inputs]
             self._action_to_game_input_map[action] = inputs
 
