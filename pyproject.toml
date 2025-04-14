@@ -21,5 +21,5 @@ dependencies = [
 dev = ["pytest"]
 
 [tool.setuptools.packages.find]
-where = ["copilot/copilot"]
+where = ["copilot"]
 include = ["copilot/copilot/*"]
