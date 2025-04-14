@@ -95,6 +95,8 @@ class ConfigurationHandler:
             filter(lambda cl: cl.__name__ == class_name, subclasses)
         )
 
+        logger.info("Game Action options found: %s", filtered_subclasses)
+
         if len(filtered_subclasses) == 0:
             return None
 
