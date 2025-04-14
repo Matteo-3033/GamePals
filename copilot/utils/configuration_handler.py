@@ -90,6 +90,8 @@ class ConfigurationHandler:
     @staticmethod
     def _get_game_specific_class(class_name: str) -> Optional[Type[GameAction]]:
         """Loads a game specific class, given the class name and the superclass"""
+        from copilot.agents.actions import GameAction
+
         subclasses = get_all_concrete_subclasses(GameAction)
 
         logger.info("Game Action options found: %s", subclasses)
