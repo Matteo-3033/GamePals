@@ -35,10 +35,10 @@ class ConfigurationHandler:
     _instance: Optional[ConfigurationHandler] = None
 
     def __new__(
-            cls,
-            game_config: dict[str, Any] | None = None,
-            agents_config: dict[str, Any] | None = None,
-            assistance_config: dict[str, Any] | None = None,
+        cls,
+        game_config: dict[str, Any] | None = None,
+        agents_config: dict[str, Any] | None = None,
+        assistance_config: dict[str, Any] | None = None,
     ) -> ConfigurationHandler:
         """Returns the singleton instance. If it's the first time calling this, config.example dicts should be passed"""
 
@@ -79,12 +79,12 @@ class ConfigurationHandler:
         self._user_input_to_action_map: dict[int, dict[InputType, GameAction]] = (
             defaultdict(dict)
         )
-        self._action_to_user_input_map: dict[
-            int, dict[GameAction, list[InputType]]
-        ] = defaultdict(dict)
+        self._action_to_user_input_map: dict[int, dict[GameAction, list[InputType]]] = (
+            defaultdict(dict)
+        )
         self._game_input_to_action_map: dict[InputType, GameAction] = defaultdict()
-        self._action_to_game_input_map: dict[GameAction, list[InputType]] = (
-            defaultdict(list)
+        self._action_to_game_input_map: dict[GameAction, list[InputType]] = defaultdict(
+            list
         )
 
     @staticmethod
@@ -100,17 +100,16 @@ class ConfigurationHandler:
             filter(lambda cl: cl.__name__ == class_name, subclasses)
         )
 
-
         if len(filtered_subclasses) == 0:
             return None
 
         return filtered_subclasses[0]
 
     def _load_config_from_dicts(
-            self,
-            game_config: dict[str, Any],
-            agents_config: dict[str, Any],
-            assistance_config: dict[str, Any],
+        self,
+        game_config: dict[str, Any],
+        agents_config: dict[str, Any],
+        assistance_config: dict[str, Any],
     ) -> None:
         """
         Loads the configuration from config.example into more specific dictionaries.
@@ -130,9 +129,9 @@ class ConfigurationHandler:
         game_action_type = self._get_game_specific_class(game_action_name)
 
         if not game_action_type:
-            self._game_action_type = None
-            logger.error("Couldn't find the specified Game Action name: %s", game_action_name)
-            return
+            raise ValueError(
+                "Couldn't find the specified Game Action name: %s", game_action_name
+            )
 
         self._game_action_type = game_action_type
 
@@ -143,7 +142,9 @@ class ConfigurationHandler:
                 human_role = human.get("role", self.DEFAULTS["HUMAN_ROLE"])
 
                 self._user_actions[human_idx].append(action_enum)
-                self._user_policy_roles[(action_enum, human_idx)] = PolicyRole(human_role)
+                self._user_policy_roles[(action_enum, human_idx)] = PolicyRole(
+                    human_role
+                )
                 controls = human.get("controls", list())
                 controls = [InputType(control) for control in controls]
 
@@ -158,7 +159,9 @@ class ConfigurationHandler:
             for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
                 self._required_agents.add(agent["name"])
-                self._agent_policy_roles[(action_enum, agent["name"])] = PolicyRole(agent_role)
+                self._agent_policy_roles[(action_enum, agent["name"])] = PolicyRole(
+                    agent_role
+                )
 
             if action["name"] in game_config.get("actions", dict()):
                 self._policy_types[action_enum] = PolicyName[
@@ -175,9 +178,7 @@ class ConfigurationHandler:
                 self._registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", list()):
-            if agent["name"] not in self._required_agents and agent.get(
-                    "active", True
-            ):
+            if agent["name"] not in self._required_agents and agent.get("active", True):
                 self._required_agents.add(agent["name"])
 
             self._agents_params[agent["name"]] = agent["params"]
@@ -202,9 +203,9 @@ class ConfigurationHandler:
         return self._registered_inputs
 
     def user_input_to_action(
-            self,
-            user_idx: int,
-            input_type: InputType,
+        self,
+        user_idx: int,
+        input_type: InputType,
     ) -> Optional[GameAction]:
         """Returns the GameAction that the user user_idx intends to do when pressing the given input_type"""
         return self._user_input_to_action_map.get(user_idx, dict()).get(
@@ -212,9 +213,9 @@ class ConfigurationHandler:
         )
 
     def action_to_user_input(
-            self,
-            user_idx: int,
-            action: GameAction,
+        self,
+        user_idx: int,
+        action: GameAction,
     ) -> list[InputType] | None:
         """Returns the InputType(s) that the user user_idx needs to press to perform the given action"""
         return self._action_to_user_input_map.get(user_idx, dict()).get(action, None)
@@ -224,8 +225,8 @@ class ConfigurationHandler:
         return self._game_input_to_action_map.get(input_type, None)
 
     def action_to_game_input(
-            self,
-            action: GameAction,
+        self,
+        action: GameAction,
     ) -> list[InputType] | None:
         """Returns the InputType that the game associates with the given action"""
         return self._action_to_game_input_map.get(action, None)
