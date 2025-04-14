@@ -124,7 +124,8 @@ class ConfigurationHandler:
         game_action_type = self._get_game_specific_class(game_action_name)
 
         if not game_action_type:
-            logger.error("Couldn't find the specified Game Action name")
+            self._game_action_type = None
+            logger.error("Couldn't find the specified Game Action name: %s", game_action_name)
             return
 
         self._game_action_type = game_action_type
