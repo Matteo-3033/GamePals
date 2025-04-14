@@ -91,11 +91,13 @@ class ConfigurationHandler:
     def _get_game_specific_class(class_name: str) -> Optional[Type[GameAction]]:
         """Loads a game specific class, given the class name and the superclass"""
         subclasses = get_all_concrete_subclasses(GameAction)
+
+        logger.info("Game Action options found: %s", subclasses)
+
         filtered_subclasses = list(
             filter(lambda cl: cl.__name__ == class_name, subclasses)
         )
 
-        logger.info("Game Action options found: %s", filtered_subclasses)
 
         if len(filtered_subclasses) == 0:
             return None
@@ -235,6 +237,8 @@ class ConfigurationHandler:
         from copilot.agents.sw_agent_actor import SWAgentActor
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
+
+        logger.info("Game Action options found: %s", agent_classes)
         required_agent_classes = {
             cls for cls in agent_classes if cls.get_name() in self._required_agents
         }
