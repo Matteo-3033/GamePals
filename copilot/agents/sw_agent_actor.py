@@ -25,7 +25,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
 
     @classmethod
     def get_name(cls) -> str:
-        """Returns the name of the SW Agent, with which the Agent is identified in the config"""
+        """Returns the name of the SW Agent, with which the Agent is identified in the config.example"""
         return cls.__name__
 
     def start(self) -> None:

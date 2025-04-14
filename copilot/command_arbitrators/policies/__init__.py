@@ -24,6 +24,6 @@ __all__ = [
     "PolicyManager",
     "InputEntry",
     "PolicyRole",
-    "ActionInputRecord"
+    "ActionInputRecord",
     "PolicyName",
 ]

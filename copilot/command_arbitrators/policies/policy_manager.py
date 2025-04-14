@@ -59,7 +59,7 @@ class PolicyManager:
             actors_number = len(policy_entry.actors)
 
             # Finds the Role of the Actor in the Config, for that specific action. It's over-complicated because we
-            # currently don't have a unique way to identify actors in the config (for humans we use index, for agents we use name)
+            # currently don't have a unique way to identify actors in the config.example (for humans we use index, for agents we use name)
             if isinstance(actor, HumanActor):
                 role = self.config_handler.get_human_role(
                     user_idx=actor.get_index(), action=action

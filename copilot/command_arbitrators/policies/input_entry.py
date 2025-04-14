@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 from copilot.agents import ActorID
-
 from .policy_role import PolicyRole
 
 
@@ -12,6 +11,7 @@ class ActionInputRecord:
     val: float
     confidence: float
     timestamp: float
+
 
 @dataclass
 class InputEntry:
