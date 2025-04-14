@@ -38,7 +38,7 @@ class ConfigurationHandler:
         agents_config: dict[str, Any] | None = None,
         assistance_config: dict[str, Any] | None = None,
     ) -> "ConfigurationHandler":
-        """Returns the singleton instance. If it's the first time calling this, config dicts should be passed"""
+        """Returns the singleton instance. If it's the first time calling this, config.example dicts should be passed"""
 
         if game_config is None:
             game_config = {}
@@ -105,7 +105,7 @@ class ConfigurationHandler:
         assistance_config: dict[str, Any],
     ) -> None:
         """
-        Loads the configuration from config into more specific dictionaries.
+        Loads the configuration from config.example into more specific dictionaries.
         """
         from copilot.agents.actions import GameAction
         from copilot.command_arbitrators.policies import PolicyName
@@ -187,7 +187,7 @@ class ConfigurationHandler:
     def get_registered_action_inputs(self) -> set["InputType"]:
         """
         Returns all the action inputs for which there is a designated actor.
-        This allows to know which inputs are not part of the config (i.e., a button that is only used in the menu)
+        This allows to know which inputs are not part of the config.example (i.e., a button that is only used in the menu)
         """
         return self._registered_inputs
 
@@ -221,11 +221,11 @@ class ConfigurationHandler:
         return self._action_to_game_input_map.get(action, None)
 
     def get_humans_count(self) -> int:
-        """Returns the number of Human Actors specified in the config"""
+        """Returns the number of Human Actors specified in the config.example"""
         return len(self._user_actions)
 
     def get_necessary_agents(self) -> set[Type["SWAgentActor"]]:
-        """Returns the list of SWAgentActors that are required by the config"""
+        """Returns the list of SWAgentActors that are required by the config.example"""
         from copilot.agents.sw_agent_actor import SWAgentActor
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
