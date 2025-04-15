@@ -65,8 +65,8 @@ class PolicyContinuousSlope(ContinuousPolicy):
             pilot = entries[0]
             copilot = entries[1]
 
-        theta_1 = PolicyContinuousSlope._get_theta_1(pilot.input_details.confidence, p=4)
-        theta_2 = PolicyContinuousSlope._get_theta_2(pilot.input_details.confidence, p=4)
+        theta_1 = PolicyContinuousSlope._get_theta_1(pilot.input_details.confidence, p=3)
+        theta_2 = PolicyContinuousSlope._get_theta_2(pilot.input_details.confidence, p=3)
 
         alpha = PolicyContinuousSlope._calc_alpha(
             copilot.input_details.confidence,
