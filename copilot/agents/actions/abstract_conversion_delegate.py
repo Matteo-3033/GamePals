@@ -13,13 +13,14 @@ class ActionConversionDelegate(ABC):
     It is useful for actions that manage multiple inputs, such as the throttle a car.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, action: GameAction) -> None:
+        self.action = action
+
         self.config_handler = ConfigurationHandler()
 
-    @abstractmethod
     def get_action(self) -> GameAction:
         """Returns the Game Action this Delegate is responsible for"""
-        pass
+        return self.action
 
     @abstractmethod
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
@@ -29,6 +30,6 @@ class ActionConversionDelegate(ABC):
     @abstractmethod
     def convert_from_input(
         self, user_idx: int, c_input: ControllerInput
-    ) -> ActionInput | None:
+    ) -> list[ActionInput]:
         """Converts the Controller Input to an Action Input"""
         pass

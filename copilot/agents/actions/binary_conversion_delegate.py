@@ -19,13 +19,7 @@ class BinaryConversionDelegate(ActionConversionDelegate):
     """
 
     def __init__(self, action: GameAction) -> None:
-        super().__init__()
-
-        self.action = action
-
-    def get_action(self) -> GameAction:
-        """Returns the Game Action this Delegate is responsible for"""
-        return self.action
+        super().__init__(action)
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
@@ -51,7 +45,7 @@ class BinaryConversionDelegate(ActionConversionDelegate):
 
     def convert_from_input(
         self, user_idx: int, c_input: ControllerInput
-    ) -> ActionInput | None:
+    ) -> list[ActionInput]:
         """Converts the Controller Input to an Action Input"""
 
         inputs = self.config_handler.action_to_user_input(user_idx, self.action)
@@ -63,9 +57,9 @@ class BinaryConversionDelegate(ActionConversionDelegate):
         negative, positive = inputs
 
         if c_input.type == negative:
-            return ActionInput(self.action, -c_input.val)
+            return [ActionInput(self.action, -c_input.val)]
 
         if c_input.type == positive:
-            return ActionInput(self.action, c_input.val)
+            return [ActionInput(self.action, c_input.val)]
 
-        return None
+        return list()

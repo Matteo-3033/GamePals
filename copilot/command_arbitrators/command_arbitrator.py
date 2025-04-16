@@ -2,7 +2,7 @@ import logging
 from typing import Type
 
 from copilot.agents import Actor, ActorID
-from copilot.agents.actions import ActionConversionDelegate, ActionInput, GameAction
+from copilot.agents.actions import ActionConversionManager, ActionInput, GameAction
 from copilot.agents.observer import ActorData, ActorObserver, MessageData
 from copilot.sources import VirtualControllerProvider
 from copilot.sources.controller import ControllerInput
@@ -26,34 +26,16 @@ class CommandArbitrator(ActorObserver):
     def __init__(
         self,
         policies: dict[GameAction, Type[Policy]],
-        conversion_delegates: list[ActionConversionDelegate] | None = None,
+        conversion_manager: ActionConversionManager,
     ) -> None:
-        if conversion_delegates is None:
-            conversion_delegates = list()
-
         self.config_handler = ConfigurationHandler()
         self.virtual_controller = VirtualControllerProvider()
         self.actors: dict[ActorID, Actor] = dict()
         self.action_maps: dict[ActorID, GameActionsMap] = dict()
-        self.conversion_delegates = {
-            delegate.get_action(): delegate for delegate in conversion_delegates
-        }
+        self.conversion_manager = conversion_manager
 
         policy_types = policies.copy()
         self.policy_manager = PolicyManager(policy_types)
-
-        game_action = self.config_handler.get_game_action_type()
-        for action in game_action:
-            inputs = self.config_handler.action_to_game_input(action)
-
-            if not inputs:
-                logger.warning(
-                    f"{action} action: No input found for action {action}. It will be ignored."
-                )
-            elif len(inputs) > 1 and action not in self.conversion_delegates:
-                logger.warning(
-                    f"{action} action: Game actions mapped to multiple inputs should be handled by a Delegate; otherwise, only the first input will be used."
-                )
 
     def add_actor(self, actor: Actor) -> None:
         """Adds an Actor to the Architecture"""
@@ -113,7 +95,7 @@ class CommandArbitrator(ActorObserver):
 
         value = policy.merge_input_entries(input_entries)
         action_input = ActionInput(action=action, val=value)
-        c_inputs = self.action_to_inputs(action_input)
+        c_inputs = self.conversion_manager.action_to_inputs(action_input)
 
         return c_inputs
 
@@ -127,25 +109,3 @@ class CommandArbitrator(ActorObserver):
         """Notifies all Actors of the Arbitrated Input"""
         for actor in self.actors.values():
             actor.on_arbitrated_inputs(input_data)
-
-    def action_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
-        """Maps the Game Action into the Controller Input Type. Return None to ignore the input (i.e. unrecognized)"""
-
-        inputs = self.config_handler.action_to_game_input(action_input.action)
-        if not inputs:
-            return list()
-
-        if action_input.action in self.conversion_delegates:
-            # Check if the Action is handled by a Delegate
-            # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
-            return self.conversion_delegates[action_input.action].convert_to_inputs(
-                action_input
-            )
-
-        if len(inputs) > 1 and inputs[0] in VirtualControllerProvider.STICKS: # It's a stick, with split axis. Pick according to value
-            idx = 0 if action_input.val >= 0 else 1
-        else:
-            idx = 0 # Pick the first mapped input if it's not a stick
-
-
-        return [ControllerInput(type=inputs[idx], val=action_input.val)]

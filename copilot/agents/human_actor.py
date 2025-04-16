@@ -3,7 +3,7 @@ import logging
 from copilot.sources import PhysicalControllerListener
 from copilot.sources.controller import ControllerInput, ControllerObserver, InputData
 
-from .actions import ActionConversionDelegate, ActionInput, GameAction
+from .actions import ActionConversionManager, ActionInput, GameAction
 from .actor import Actor
 
 logger = logging.getLogger(__file__)
@@ -19,20 +19,16 @@ class HumanActor(Actor, ControllerObserver):
     def __init__(
         self,
         physical_controller: PhysicalControllerListener,
-        conversion_delegates: list[ActionConversionDelegate] | None = None,
+        conversion_manager: ActionConversionManager,
     ) -> None:
         super().__init__()
-        if conversion_delegates is None:
-            conversion_delegates = list()
 
         self.controller = physical_controller
         self.confidence_levels: dict[GameAction, float] = (
             self.config_handler.get_confidence_levels(self.controller.get_index())
         )
 
-        self.conversion_delegates: dict[GameAction, ActionConversionDelegate] = {
-            delegate.get_action(): delegate for delegate in conversion_delegates
-        }
+        self.conversion_manager = conversion_manager
 
         self.controller.subscribe(self)
 
@@ -61,32 +57,14 @@ class HumanActor(Actor, ControllerObserver):
     def on_controller_input(self, data: InputData) -> None:
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
 
-        # Before sending, it converts the user input into the game input
-        action_input = self.input_to_action(data.c_input)
-
-        if action_input is None:
-            return
-
-        confidence = self.confidence_levels[action_input.action]
-        self.notify_input(action_input, confidence)
-
-    def input_to_action(self, c_input: ControllerInput) -> ActionInput | None:
-        """Maps the User Input Type into the Game Action. Return None to ignore the input (i.e. unrecognized)"""
-        action = self.config_handler.user_input_to_action(
-            self.get_index(), c_input.type
+        # Before sending, it converts the user input into the game inputs
+        action_inputs = self.conversion_manager.input_to_actions(
+            self.get_index(), data.c_input
         )
 
-        if action is None:
-            return None
-
-        if action in self.conversion_delegates:
-            # Check if the Action is handled by a Delegate
-            # This is useful for Actions that are mapped to multiple inputs (eg: both triggers)
-            return self.conversion_delegates[action].convert_from_input(
-                self.get_index(), c_input
-            )
-
-        return ActionInput(action=action, val=c_input.val)
+        for action_input in action_inputs:
+            confidence = self.confidence_levels[action_input.action]
+            self.notify_input(action_input, confidence)
 
     def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         # Ignore Arbitrated Inputs at the moment
