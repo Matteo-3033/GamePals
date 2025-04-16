@@ -13,6 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 class ActionConversionManager:
+    """
+    This class is responsible for converting Game Actions to Controller Input Types and vice versa.
+
+    By default, it maps each action to the first Input Type listed in the game configuration file, and each input to its corresponding actions.
+
+    The class constructor accepts a list of ActionConversionDelegate instances that can be used to specify how the conversion should be handled for specific actions.
+    This is useful, for example, in the case of a continuous action with values ranging from -1 to 1 that needs to be mapped to two buttons: in such cases, a BinaryConversionDelegate might be used.
+    """
+
     def __init__(
         self,
         conversion_delegates: list[ActionConversionDelegate] | None = None,
