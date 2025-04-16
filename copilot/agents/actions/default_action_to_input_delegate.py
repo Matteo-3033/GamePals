@@ -10,7 +10,7 @@ from .game_action import GameAction
 logger = logging.getLogger(__name__)
 
 
-class OneToOneDelegate(ActionConversionDelegate):
+class DefaultActionToInputDelegate(ActionConversionDelegate):
     """
     Default conversion delegate that just maps any action to the first input listed in the game configuration file.
     """

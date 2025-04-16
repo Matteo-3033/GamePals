@@ -9,7 +9,7 @@ from .game_action import GameAction
 logger = logging.getLogger(__name__)
 
 
-class BinaryInputsToActionDelegate(ActionConversionDelegate):
+class ActionToBinaryInputsDelegate(ActionConversionDelegate):
     """
     A conversion delegate for actions that range from -1 to 1 and are controlled using two binary inputs.
     For example, a car’s throttle (where -1 represents deceleration and +1 represents acceleration) might be controlled using the left and right triggers: the first will be converted to -1 throttle, while the second to +1 throttle

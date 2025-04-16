@@ -6,8 +6,8 @@ from copilot.utils.configuration_handler import ConfigurationHandler
 
 from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput
+from .default_action_to_input_delegate import DefaultActionToInputDelegate
 from .game_action import GameAction
-from .one_to_one_delegate import OneToOneDelegate
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,9 @@ class ActionConversionManager:
                 )
 
             if action not in self._action_to_delegate_map:
-                self._action_to_delegate_map[action] = OneToOneDelegate(action)
+                self._action_to_delegate_map[action] = DefaultActionToInputDelegate(
+                    action
+                )
 
         self._input_to_delegate_map: dict[
             int, dict[InputType, ActionConversionDelegate]
