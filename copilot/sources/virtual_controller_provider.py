@@ -13,6 +13,8 @@ class VirtualControllerProvider:
     The VirtualControllerProvider class provides an XBOX 360 Virtual Controller, whose inputs can be requested via the execute and execute_stick methods
     """
 
+    INPUT_THRESHOLD : float = 0.7 # The float value after which the input is interpreted as a 1
+
     def __init__(self):
         self.gamepad: vg.VX360Gamepad | None = None
         self.left_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
@@ -53,7 +55,7 @@ class VirtualControllerProvider:
                 )
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
-            if abs(c_input.val) > 0.7: # Probably need to change it to > 0.7
+            if abs(c_input.val) > self.INPUT_THRESHOLD:
                 self.gamepad.press_button(self.BTN_TO_VGBUTTON[c_input.type])
             else:
                 self.gamepad.release_button(self.BTN_TO_VGBUTTON[c_input.type])

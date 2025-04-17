@@ -1,8 +1,8 @@
 __pycache__
 .mypy_cache
 
-/dist/
-/build/
-**/*.egg-info/
+dist
+build
+**.egg-info
 
 .idea/
