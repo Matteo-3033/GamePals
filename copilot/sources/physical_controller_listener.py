@@ -164,7 +164,7 @@ class PhysicalControllerListener:
                 | InputType.STICK_RIGHT_Y_POS
                 | InputType.STICK_RIGHT_Y_NEG
             ):
-                return val / 32767
+                return val / 32768
             case _:
                 return val
 
