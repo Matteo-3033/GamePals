@@ -1,12 +1,12 @@
-from copilot.sources.game import GameStateListener, GameState
+from ..sources.game import GameStateListener, GameState
 from .actions import GameAction, ActionInput, ActionInputWithConfidence
 from .actor import Actor
-from .observer import ActorData, MessageData
+from .observer import ActorData, MessageData, ActorObserver
 from .sw_agent_actor import SWAgentActor
 from ..sources import VirtualControllerProvider
 
 
-class SWAgentHoldToToggle(SWAgentActor):
+class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
     """
     SWAgentHoldToToggle is a particular type of SWAgentActor that allows to use the button associated to a certain
     action as a toggle button, instead of a hold button.
@@ -43,11 +43,12 @@ class SWAgentHoldToToggle(SWAgentActor):
                     self.notify_input(ActionInput(self.action, val=1.0), 1.0)
                 self.pressed = not self.pressed
 
+    def on_message_update(self, message_data: MessageData) -> None:
+        pass
+
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
         return list()
 
     def get_controlled_actions(self) -> list[GameAction]:
         return list()
 
-    def on_message_update(self, message_data: MessageData) -> None:
-        pass
