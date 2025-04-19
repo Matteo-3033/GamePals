@@ -44,10 +44,10 @@ class SWAgentHoldToToggle(SWAgentActor):
                 self.pressed = not self.pressed
 
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
-        pass
+        return list()
 
     def get_controlled_actions(self) -> list[GameAction]:
-        pass
+        return list()
 
     def on_message_update(self, message_data: MessageData) -> None:
         pass
