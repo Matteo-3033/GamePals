@@ -32,7 +32,9 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
             return list()
 
         if (
-            len(inputs) > 1 and inputs[0] in VirtualControllerProvider.STICKS
+                len(inputs) > 1
+                and inputs[0] in VirtualControllerProvider.STICKS
+                and inputs[1] in VirtualControllerProvider.STICKS
         ):  # It's a stick, with split axis. Pick according to value
             idx = 0 if action_input.val >= 0 else 1
         else:
@@ -41,7 +43,7 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
         return [ControllerInput(type=inputs[idx], val=action_input.val)]
 
     def convert_from_input(
-        self, user_idx: int, c_input: ControllerInput
+            self, user_idx: int, c_input: ControllerInput
     ) -> list[ActionInput]:
         """Converts the Controller Input to an Action Input"""
 

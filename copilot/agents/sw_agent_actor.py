@@ -5,10 +5,9 @@ from copilot.sources.game import GameState, GameStateListener, GameStateObserver
 
 from .actions import ActionInput, ActionInputWithConfidence
 from .actor import Actor
-from .observer import ActorObserver
 
 
-class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
+class SWAgentActor(Actor, GameStateObserver, ABC):
     """
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
@@ -46,5 +45,5 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
 
     def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
-        # Ignore Arbitrated Inputs at the moment (can be overridden by implementations)
+        # Ignore Arbitrated Inputs by default (can be overridden by implementations)
         pass
