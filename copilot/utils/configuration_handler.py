@@ -132,6 +132,15 @@ class ConfigurationHandler:
 
         self._game_action_type = game_action_type
 
+        for action, inputs in game_config.get("actions", dict()).items():
+            action = self._game_action_type(action)
+            inputs = [InputType(inp) for inp in inputs]
+            self._action_to_game_input_map[action] = inputs
+
+            for game_input in inputs:
+                self._game_input_to_action_map[game_input] = action
+                self._registered_inputs.add(game_input)
+
         for action in assistance_config.get("action", list()):
             action_enum = self._game_action_type(action["name"])
             for i, human in enumerate(action.get("humans", list())):
@@ -142,7 +151,9 @@ class ConfigurationHandler:
                 self._user_policy_roles[(action_enum, human_idx)] = PolicyRole(
                     human_role
                 )
-                controls = human.get("controls", list())
+                controls = human.get("controls", None)
+                if controls is None:
+                    controls = self._action_to_game_input_map.get(action_enum, list())
                 controls = [InputType(control) for control in controls]
 
                 self._confidence_levels[human_idx][action_enum] = human["confidence"]
@@ -164,15 +175,6 @@ class ConfigurationHandler:
                 self._policy_types[action_enum] = PolicyName[
                     action.get("policy", self.DEFAULTS["POLICY"])
                 ].value
-
-        for action, inputs in game_config.get("actions", dict()).items():
-            action = self._game_action_type(action)
-            inputs = [InputType(inp) for inp in inputs]
-            self._action_to_game_input_map[action] = inputs
-
-            for game_input in inputs:
-                self._game_input_to_action_map[game_input] = action
-                self._registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", list()):
             if agent["name"] not in self._required_agents and agent.get(
