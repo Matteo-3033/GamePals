@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 
-from inputs import DeviceManager, GamePad, devices
+from inputs import DeviceManager, GamePad, devices, WIN
 
 from .controller import ControllerInput, ControllerObserver, InputData, InputType
 
@@ -25,6 +25,24 @@ class RefreshableDeviceManager(DeviceManager):
     def update_gamepads(self) -> None:
         self.gamepads: list[GamePad] = list()
         self._detect_gamepads()
+
+class AsyncGamePad:
+
+    def __init__(self, gamepad : GamePad):
+        self._gamepad = gamepad
+
+    def read(self):
+        return next(iter(self))
+
+    def __iter__(self):
+        while True:
+            if WIN:
+                self._gamepad._GamePad__check_state()
+            event = self._gamepad._do_iter()
+            if event:
+                yield event
+            else:
+                yield [] # Compared to GamePad, sends even if event is None
 
 
 class PhysicalControllerListener:
@@ -76,7 +94,7 @@ class PhysicalControllerListener:
         self.devices.update_gamepads()
 
         if self._inputs_index < len(self.devices.gamepads):
-            self.gamepad = self.devices.gamepads[self._inputs_index]
+            self.gamepad = AsyncGamePad(self.devices.gamepads[self._inputs_index])
             logger.info("Gamepad %d initialized", self._inputs_index)
             return True
 
