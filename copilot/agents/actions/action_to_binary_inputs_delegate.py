@@ -1,5 +1,6 @@
 import logging
 
+from copilot.sources import VirtualControllerProvider
 from copilot.sources.controller import ControllerInput, InputType
 
 from .abstract_conversion_delegate import ActionConversionDelegate
@@ -20,6 +21,17 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
 
     def __init__(self, action: GameAction) -> None:
         super().__init__(action)
+
+        humans_count = self.config_handler.get_humans_count()
+        self._is_using_stick: dict[int, bool] = dict()
+        for user_idx in range(humans_count):
+            inputs = self.config_handler.action_to_user_input(user_idx, self.action)
+
+            self._is_using_stick[user_idx] = (
+                inputs is not None and inputs[0] in VirtualControllerProvider.STICKS
+            )
+
+            # TODO: verify that inputs are a good combinations (eg: two binary buttons or negative and positive side of the same stick axis)
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
@@ -55,6 +67,9 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
         ), f"{self.get_action()} action expects exactly two inputs."
 
         negative, positive = inputs
+
+        if self._is_using_stick[user_idx]:
+            return [ActionInput(self.action, c_input.val)]
 
         if c_input.type == negative:
             return [ActionInput(self.action, -c_input.val)]
