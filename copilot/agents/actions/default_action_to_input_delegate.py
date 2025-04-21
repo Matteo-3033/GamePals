@@ -1,6 +1,7 @@
 import logging
 import time
 from dataclasses import dataclass
+from collections import deque
 
 from copilot.sources import VirtualControllerProvider
 from copilot.sources.controller import ControllerInput, InputType
@@ -25,45 +26,56 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
     configuration file.
     """
 
-    def __init__(self, action: GameAction) -> None:
-        super().__init__([action])
+    def __init__(self, actions: list[GameAction]) -> None:
+        super().__init__(actions)
 
-        inputs = self.config_handler.action_to_game_input(action)
-        if inputs:
-            self.latest_inputs: dict[InputType, RegisteredInputDetails] = {
-                input_type: RegisteredInputDetails(0.0, 0.0, True)
-                for input_type in inputs
-            }
-        else:
-            logger.warning(
-                f"{action} action: No input found for action {action}. It will be ignored."
-            )
+        all_inputs = set()
 
-        self.ready_inputs: list[ControllerInput] = list()
+        for action in actions:
+            inputs = self.config_handler.action_to_game_input(action)
+            if inputs:
+                all_inputs.update(inputs)
+            else:
+                logger.warning(
+                    f"{action} action: No input found for action {action}. It will be ignored."
+                )
+
+        self.latest_inputs: dict[InputType, RegisteredInputDetails] = {
+            input_type: RegisteredInputDetails(0.0, 0.0, True)
+            for input_type in all_inputs
+        }
+
+        self.ready_actions_queue = deque()
 
     def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
-        self.ready_inputs.append(c_input)
         self.latest_inputs[c_input.type] = RegisteredInputDetails(
             val=c_input.val, timestamp=time.time(), sent=False
         )
 
+        actions = self.config_handler.user_input_to_actions(user_idx, c_input.type)
+        if len(actions) > 0:
+            action = actions[0]
+            action_input = ActionInput(action=action, val=c_input.val)
+            self.ready_actions_queue.append(action_input)
+
     def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
         ready_actions: list[ActionInput] = list()
-        non_ready_inputs: list[ControllerInput] = list()
         added_actions: set[GameAction] = set()
 
-        for c_input in self.ready_inputs:
-            action = self.config_handler.user_input_to_action(user_idx, c_input.type)
+        still_in_queue = deque()
 
+        while self.ready_actions_queue:
+            action_input = self.ready_actions_queue.popleft()
+            action = action_input.action
             if action and action not in added_actions:
-                ready_actions.append(ActionInput(action=action, val=c_input.val))
+                ready_actions.append(action_input)
                 added_actions.add(action)
             else:
-                non_ready_inputs.append(c_input)
+                still_in_queue.append(action_input)
 
-        self.ready_inputs = non_ready_inputs
+        self.ready_actions_queue = still_in_queue
         return ready_actions
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:

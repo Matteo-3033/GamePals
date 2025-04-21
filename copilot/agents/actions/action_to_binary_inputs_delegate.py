@@ -19,7 +19,7 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
     """
 
     def __init__(self, action: GameAction) -> None:
-        super().__init__(action)
+        super().__init__([action])
 
     def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""

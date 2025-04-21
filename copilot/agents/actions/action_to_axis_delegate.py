@@ -21,7 +21,7 @@ class ActionToAxisDelegate(DefaultActionToInputDelegate):
     """
 
     def __init__(self, action: GameAction) -> None:
-        super().__init__(action)
+        super().__init__([action])
 
         humans_count = self.config_handler.get_humans_count()
         self._is_using_stick: dict[int, bool] = dict()
