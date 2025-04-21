@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class RegisteredInputDetails:
-    value: float
+    val: float
     timestamp: float
     sent: bool
 
@@ -29,15 +29,15 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
         super().__init__([action])
 
         inputs = self.config_handler.action_to_game_input(action)
-        if not inputs:
-            logger.warning(
-                f"{action} action: No input found for action {action}. It will be ignored."
-            )
-        else:
+        if inputs:
             self.latest_inputs: dict[InputType, RegisteredInputDetails] = {
                 input_type: RegisteredInputDetails(0.0, 0.0, True)
                 for input_type in inputs
             }
+        else:
+            logger.warning(
+                f"{action} action: No input found for action {action}. It will be ignored."
+            )
 
         self.ready_inputs: list[ControllerInput] = list()
 
@@ -45,7 +45,7 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
         """Registers that an input has occurred"""
         self.ready_inputs.append(c_input)
         self.latest_inputs[c_input.type] = RegisteredInputDetails(
-            value=c_input.val, timestamp=time.time(), sent=False
+            val=c_input.val, timestamp=time.time(), sent=False
         )
 
     def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
