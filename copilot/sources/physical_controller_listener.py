@@ -26,7 +26,7 @@ class RefreshableDeviceManager(DeviceManager):
         self.gamepads: list[GamePad] = list()
         self._detect_gamepads()
 
-class AsyncGamePad:
+class NonBlockingGamePad:
 
     def __init__(self, gamepad : GamePad):
         self._gamepad = gamepad
@@ -76,7 +76,7 @@ class PhysicalControllerListener:
         self.listener_thread: threading.Thread | None = None
 
         self._inputs_index = gamepad_number
-        self.gamepad: GamePad | None = None
+        self.gamepad: NonBlockingGamePad | None = None
 
         self.devices = RefreshableDeviceManager()
 
@@ -94,7 +94,7 @@ class PhysicalControllerListener:
         self.devices.update_gamepads()
 
         if self._inputs_index < len(self.devices.gamepads):
-            self.gamepad = AsyncGamePad(self.devices.gamepads[self._inputs_index])
+            self.gamepad = NonBlockingGamePad(self.devices.gamepads[self._inputs_index])
             logger.info("Gamepad %d initialized", self._inputs_index)
             return True
 
