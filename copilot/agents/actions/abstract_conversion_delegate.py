@@ -11,25 +11,36 @@ class ActionConversionDelegate(ABC):
     """
     Class used to convert Action Inputs to Controller Inputs and vice versa.
     It is useful for actions that manage multiple inputs, such as the throttle a car.
+
+
+    The conversion from Controller Input to Action is delayed to allow for hold/multiple buttons combinations to happen.
+    It works in two steps:
+    * Register the occurring of the input
+    * Check for any ready-to-be-converted Actions and return them
     """
 
-    def __init__(self, action: GameAction) -> None:
-        self.action = action
+    def __init__(self, actions: list[GameAction]) -> None:
+        self.actions = actions
 
         self.config_handler = ConfigurationHandler()
 
-    def get_action(self) -> GameAction:
-        """Returns the Game Action this Delegate is responsible for"""
-        return self.action
+    def get_actions(self) -> list[GameAction]:
+        """Returns the Game Actions this Delegate is responsible for"""
+        return self.actions
+
+    @abstractmethod
+    def register_input(
+            self, user_idx: int, c_input: ControllerInput
+    ) -> None:
+        """Registers that an input has occurred"""
+        pass
+
+    @abstractmethod
+    def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
+        """Returns the ready-to-be-converted Actions"""
+        pass
 
     @abstractmethod
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
-        pass
-
-    @abstractmethod
-    def convert_from_input(
-        self, user_idx: int, c_input: ControllerInput
-    ) -> list[ActionInput]:
-        """Converts the Controller Input to an Action Input"""
         pass

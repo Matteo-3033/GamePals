@@ -23,15 +23,17 @@ class ActionConversionManager:
     """
 
     def __init__(
-        self,
-        conversion_delegates: list[ActionConversionDelegate] | None = None,
+            self,
+            conversion_delegates: list[ActionConversionDelegate] | None = None,
     ) -> None:
 
         if conversion_delegates is None:
             conversion_delegates = list()
 
         self._action_to_delegate_map: dict[GameAction, ActionConversionDelegate] = {
-            delegate.get_action(): delegate for delegate in conversion_delegates
+            action: delegate
+            for delegate in conversion_delegates
+            for action in delegate.get_actions()
         }
 
         self.config_handler = ConfigurationHandler()
@@ -40,9 +42,9 @@ class ActionConversionManager:
             inputs = self.config_handler.action_to_game_input(action)
 
             if (
-                inputs
-                and len(inputs) > 1
-                and action not in self._action_to_delegate_map
+                    inputs
+                    and len(inputs) > 1
+                    and action not in self._action_to_delegate_map
             ):
                 logger.warning(
                     f"{action} action: Game actions mapped to multiple inputs should be handled by a Delegate; otherwise, only the first input will be used."
@@ -59,27 +61,38 @@ class ActionConversionManager:
 
         humans_count = self.config_handler.get_humans_count()
         for delegate in self._action_to_delegate_map.values():
-            action = delegate.get_action()
+            actions = delegate.get_actions()
+            for action in actions:
+                for user_idx in range(humans_count):
 
-            for user_idx in range(humans_count):
+                    user_inputs = self.config_handler.action_to_user_input(user_idx, action)
+                    if not user_inputs:
+                        continue
 
-                user_inputs = self.config_handler.action_to_user_input(user_idx, action)
-                if not user_inputs:
-                    continue
-
-                for user_input in user_inputs:
-                    self._input_to_delegate_map[user_idx][user_input] = delegate
+                    for user_input in user_inputs:
+                        self._input_to_delegate_map[user_idx][user_input] = delegate
 
     def input_to_actions(
-        self, user_idx: int, c_input: ControllerInput
+            self, user_idx: int, c_input: ControllerInput | None
     ) -> list[ActionInput]:
-        """Maps the User Input Type into the corresponding Game Actions."""
-        if c_input.type not in self._input_to_delegate_map[user_idx]:
-            return list()
+        """
+        Registers the new User Input into the Delegates (if c_input is not None),
+        then collects ready Action Inputs from all Delegates of the specified user_idx.
+        """
 
-        return self._input_to_delegate_map[user_idx][c_input.type].convert_from_input(
-            user_idx, c_input
-        )
+        if c_input:
+            # Register the new input in the corresponding Delegate
+            if c_input.type in self._input_to_delegate_map[user_idx]:
+                delegate = self._input_to_delegate_map[user_idx][c_input.type]
+                delegate.register_input(user_idx, c_input)
+
+        # Ask all Delegates for any Action ready to be executed
+        actions: list[ActionInput] = list()
+
+        for delegate in self._input_to_delegate_map[user_idx].values():
+            actions.extend(delegate.get_ready_actions(user_idx))
+
+        return actions
 
     def action_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Maps the Game Action into a list of Controller Input Types to activate."""
