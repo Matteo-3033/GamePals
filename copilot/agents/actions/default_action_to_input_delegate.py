@@ -25,8 +25,6 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
     configuration file.
     """
 
-    HOLD_THRESHOLD = 0  # seconds
-
     def __init__(self, action: GameAction) -> None:
         super().__init__([action])
 
@@ -41,22 +39,11 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
                 for input_type in inputs
             }
 
-        self.ready_inputs: list[tuple[InputType, float]] = list()
-        self.send_zero: bool = False
+        self.ready_inputs: list[ControllerInput] = list()
 
     def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
-        latest_input_for_type = self.latest_inputs[c_input.type]
-
-        # If it receives a zero input (release), it should send the previous non-zero input (press)
-        # If the input comes from an axis, it should always be sent
-        if (
-            c_input.val == 0.0
-            and latest_input_for_type.value != 0.0
-            or c_input.type in VirtualControllerProvider.AXIS_INPUTS
-        ):
-            self.ready_inputs.append((c_input.type, latest_input_for_type.value))
-
+        self.ready_inputs.append(c_input)
         self.latest_inputs[c_input.type] = RegisteredInputDetails(
             value=c_input.val, timestamp=time.time(), sent=False
         )
@@ -64,23 +51,19 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
     def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
         ready_actions: list[ActionInput] = list()
-        current_time = time.time()
+        non_ready_inputs: list[ControllerInput] = list()
+        added_actions: set[GameAction] = set()
 
-        # Also send all inputs after a THRESHOLD amount of time
-        for input_type, details in self.latest_inputs.items():
-            if (
-                not details.sent
-                and current_time - details.timestamp > self.HOLD_THRESHOLD
-            ):
-                self.ready_inputs.append((input_type, details.value))
-                details.sent = True
+        for c_input in self.ready_inputs:
+            action = self.config_handler.user_input_to_action(user_idx, c_input.type)
 
-        for input_type, value in self.ready_inputs:
-            action = self.config_handler.user_input_to_action(user_idx, input_type)
-            if action:
-                ready_actions.append(ActionInput(action=action, val=value))
+            if action and action not in added_actions:
+                ready_actions.append(ActionInput(action=action, val=c_input.val))
+                added_actions.add(action)
+            else:
+                non_ready_inputs.append(c_input)
 
-        self.ready_inputs = list()
+        self.ready_inputs = non_ready_inputs
         return ready_actions
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:

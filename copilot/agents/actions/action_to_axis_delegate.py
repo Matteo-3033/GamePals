@@ -1,8 +1,8 @@
 import logging
 
-from copilot.sources import VirtualControllerProvider
-from copilot.sources.controller import ControllerInput, InputType
-from . import DefaultActionToInputDelegate
+from ...sources import VirtualControllerProvider
+from ...sources.controller import ControllerInput, InputType
+from .default_action_to_input_delegate import DefaultActionToInputDelegate
 
 from .action_input import ActionInput
 from .game_action import GameAction
