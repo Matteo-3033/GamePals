@@ -23,8 +23,8 @@ class ActionConversionManager:
     """
 
     def __init__(
-            self,
-            conversion_delegates: list[ActionConversionDelegate] | None = None,
+        self,
+        conversion_delegates: list[ActionConversionDelegate] | None = None,
     ) -> None:
 
         if conversion_delegates is None:
@@ -42,9 +42,9 @@ class ActionConversionManager:
             inputs = self.config_handler.action_to_game_input(action)
 
             if (
-                    inputs
-                    and len(inputs) > 1
-                    and action not in self._action_to_delegate_map
+                inputs
+                and len(inputs) > 1
+                and action not in self._action_to_delegate_map
             ):
                 logger.warning(
                     f"{action} action: Game actions mapped to multiple inputs should be handled by a Delegate; otherwise, only the first input will be used."
@@ -65,7 +65,9 @@ class ActionConversionManager:
             for action in actions:
                 for user_idx in range(humans_count):
 
-                    user_inputs = self.config_handler.action_to_user_input(user_idx, action)
+                    user_inputs = self.config_handler.action_to_user_input(
+                        user_idx, action
+                    )
                     if not user_inputs:
                         continue
 
@@ -73,7 +75,7 @@ class ActionConversionManager:
                         self._input_to_delegate_map[user_idx][user_input] = delegate
 
     def input_to_actions(
-            self, user_idx: int, c_input: ControllerInput | None
+        self, user_idx: int, c_input: ControllerInput | None
     ) -> list[ActionInput]:
         """
         Registers the new User Input into the Delegates (if c_input is not None),

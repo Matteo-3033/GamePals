@@ -29,9 +29,7 @@ class ActionConversionDelegate(ABC):
         return self.actions
 
     @abstractmethod
-    def register_input(
-            self, user_idx: int, c_input: ControllerInput
-    ) -> None:
+    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
         pass
 

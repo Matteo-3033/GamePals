@@ -58,7 +58,7 @@ class HumanActor(Actor, ControllerObserver):
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
 
         update_data = data.c_input if data else None
-
+        
         # Before sending, it converts the user input into the game inputs
         action_inputs = self.conversion_manager.input_to_actions(
             self.get_index(), update_data
