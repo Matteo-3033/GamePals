@@ -27,22 +27,32 @@ class RefreshableDeviceManager(DeviceManager):
         self._detect_gamepads()
 
 class NonBlockingGamePad:
+    """
+    This class is a wrapper for the GamePad class from the inputs package.
+    The only difference is that gamepad.read() only waits for an input event for timeout seconds, after
+    which it sends an empty list of events.
+    """
 
-    def __init__(self, gamepad : GamePad):
+    def __init__(self, gamepad : GamePad, timeout : float = 0.0):
         self._gamepad = gamepad
+        self._timeout = timeout
 
     def read(self):
         return next(iter(self))
 
     def __iter__(self):
         while True:
-            if WIN:
-                self._gamepad._GamePad__check_state()
-            event = self._gamepad._do_iter()
-            if event:
-                yield event
-            else:
-                yield [] # Compared to GamePad, sends even if event is None
+            start = time.time()
+            while True:
+                if WIN:
+                    self._gamepad._GamePad__check_state()
+
+                event = self._gamepad._do_iter()
+                if event:
+                    yield event
+                    break
+                if (time.time() - start) >= self._timeout:
+                    yield []
 
 
 class PhysicalControllerListener:
