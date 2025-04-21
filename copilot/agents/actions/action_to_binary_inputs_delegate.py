@@ -1,15 +1,15 @@
 import logging
 
-from copilot.sources.controller import ControllerInput, InputType
+from ...sources.controller import ControllerInput, InputType
+from .default_action_to_input_delegate import DefaultActionToInputDelegate
 
-from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput
 from .game_action import GameAction
 
 logger = logging.getLogger(__name__)
 
 
-class ActionToBinaryInputsDelegate(ActionConversionDelegate):
+class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
     """
     A conversion delegate for actions that range from -1 to 1 and are controlled using two binary inputs.
     For example, a car’s throttle (where -1 represents deceleration and +1 represents acceleration) might be controlled using the left and right triggers: the first will be converted to -1 throttle, while the second to +1 throttle
@@ -21,14 +21,33 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
     def __init__(self, action: GameAction) -> None:
         super().__init__(action)
 
-    def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
-        """Converts the Action Input to a Controller Input"""
+    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+        """Registers that an input has occurred"""
 
-        inputs = self.config_handler.action_to_game_input(self.get_action())
+        action = self.get_actions()[0]
+        inputs = self.config_handler.action_to_user_input(user_idx, action)
 
         assert (
             inputs and len(inputs) == 2
-        ), f"{self.get_action()} action expects exactly two inputs."
+        ), f"{action} action expects exactly two inputs."
+
+        negative, positive = inputs
+
+        if c_input.type == negative:
+            c_input.val = -c_input.val
+
+        if c_input.type in inputs:
+            super().register_input(user_idx, c_input)
+
+    def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
+        """Converts the Action Input to a Controller Input"""
+
+        action = self.get_actions()[0]
+        inputs = self.config_handler.action_to_game_input(action)
+
+        assert (
+            inputs and len(inputs) == 2
+        ), f"{action} action expects exactly two inputs."
 
         negative, positive = inputs
 
@@ -42,24 +61,3 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
             ControllerInput(InputType(negative), -action_input.val),
             ControllerInput(InputType(positive), 0),
         ]
-
-    def convert_from_input(
-        self, user_idx: int, c_input: ControllerInput
-    ) -> list[ActionInput]:
-        """Converts the Controller Input to an Action Input"""
-
-        inputs = self.config_handler.action_to_user_input(user_idx, self.action)
-
-        assert (
-            inputs and len(inputs) == 2
-        ), f"{self.get_action()} action expects exactly two inputs."
-
-        negative, positive = inputs
-
-        if c_input.type == negative:
-            return [ActionInput(self.action, -c_input.val)]
-
-        if c_input.type == positive:
-            return [ActionInput(self.action, c_input.val)]
-
-        return list()
