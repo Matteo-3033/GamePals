@@ -1,7 +1,7 @@
 import logging
 import time
 
-from . import DefaultActionToInputDelegate
+from .default_action_to_input_delegate import DefaultActionToInputDelegate, RegisteredInputDetails
 from ...sources.controller import ControllerInput
 
 from .action_input import ActionInput
@@ -23,8 +23,8 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
 
     HOLD_THRESHOLD = 0.2  # seconds
 
-    def __init__(self, toggle_action: GameAction, hold_action: GameAction) -> None:
-        super().__init__([toggle_action, hold_action])
+    def __init__(self, user_idx : int, toggle_action: GameAction, hold_action: GameAction) -> None:
+        super().__init__(user_idx, [toggle_action, hold_action])
 
         self.toggle_action = toggle_action
         self.hold_action = hold_action
@@ -38,7 +38,7 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
         self.input = list(inputs)[0]
         self._holding : bool = False
 
-    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+    def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
         latest_input = self.latest_inputs[c_input.type]
 
@@ -53,7 +53,12 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
             )
             self._holding = False
 
-    def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
+        self.latest_inputs[c_input.type] = RegisteredInputDetails(
+            val=c_input.val, timestamp=time.time(), sent=False
+        )
+
+
+    def get_ready_actions(self) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
         current_time = time.time()
         latest_input = self.latest_inputs[self.input]
@@ -66,5 +71,5 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
             self._holding = True
             return [ActionInput(action=self.hold_action, val=latest_input.val)]
 
-        return super().get_ready_actions(user_idx)
+        return super().get_ready_actions()
 

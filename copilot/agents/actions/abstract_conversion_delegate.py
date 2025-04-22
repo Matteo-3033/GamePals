@@ -19,22 +19,26 @@ class ActionConversionDelegate(ABC):
     * Check for any ready-to-be-converted Actions and return them
     """
 
-    def __init__(self, actions: list[GameAction]) -> None:
+    def __init__(self, user_idx : int, actions: list[GameAction]) -> None:
+        self.user_idx = user_idx
         self.actions = actions
 
         self.config_handler = ConfigurationHandler()
+
+    def get_user_idx(self) -> int:
+        return self.user_idx
 
     def get_actions(self) -> list[GameAction]:
         """Returns the Game Actions this Delegate is responsible for"""
         return self.actions
 
     @abstractmethod
-    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+    def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
         pass
 
     @abstractmethod
-    def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
+    def get_ready_actions(self) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
         pass
 

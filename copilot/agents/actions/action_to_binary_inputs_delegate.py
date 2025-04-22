@@ -18,14 +18,14 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
     The first input is considered the negative input, and the second one is considered the positive input.
     """
 
-    def __init__(self, action: GameAction) -> None:
-        super().__init__([action])
+    def __init__(self, user_idx : int, action: GameAction) -> None:
+        super().__init__(user_idx, [action])
 
-    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+    def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
 
         action = self.get_actions()[0]
-        inputs = self.config_handler.action_to_user_input(user_idx, action)
+        inputs = self.config_handler.action_to_user_input(self.user_idx, action)
 
         assert (
             inputs and len(inputs) == 2
@@ -37,7 +37,7 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
             c_input.val = -c_input.val
 
         if c_input.type in inputs:
-            super().register_input(user_idx, c_input)
+            super().register_input(c_input)
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""

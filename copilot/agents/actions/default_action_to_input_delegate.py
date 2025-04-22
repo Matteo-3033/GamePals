@@ -26,45 +26,49 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
     configuration file.
     """
 
-    def __init__(self, actions: list[GameAction]) -> None:
-        super().__init__(actions)
+    def __init__(self, user_idx : int, actions: list[GameAction]) -> None:
+        super().__init__(user_idx, actions)
 
-        all_inputs = set()
+        all_user_inputs : set[InputType] = set()
 
         for action in actions:
-            inputs = self.config_handler.action_to_game_input(action)
-            if inputs:
-                all_inputs.update(inputs)
-            else:
+            game_inputs = self.config_handler.action_to_game_input(action)
+            if not game_inputs:
                 logger.warning(
-                    f"{action} action: No input found for action {action}. It will be ignored."
+                    f"{action} action: No game input found for action {action}. It will be ignored."
                 )
+            user_inputs = self.config_handler.action_to_user_input(self.user_idx, action)
+            if user_inputs:
+                all_user_inputs.update(user_inputs)
 
         self.latest_inputs: dict[InputType, RegisteredInputDetails] = {
             input_type: RegisteredInputDetails(0.0, 0.0, True)
-            for input_type in all_inputs
+            for input_type in all_user_inputs
         }
 
-        self.ready_actions_queue = deque()
+        self.ready_actions_queue : deque[ActionInput] = deque()
 
-    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+    def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
+        if c_input.type not in self.latest_inputs:
+            logger.warning(f"Input type {c_input.type} is not recognized by its delegate")
+
         self.latest_inputs[c_input.type] = RegisteredInputDetails(
             val=c_input.val, timestamp=time.time(), sent=False
         )
 
-        actions = self.config_handler.user_input_to_actions(user_idx, c_input.type)
+        actions = self.config_handler.user_input_to_actions(self.user_idx, c_input.type)
         if len(actions) > 0:
             action = actions[0]
             action_input = ActionInput(action=action, val=c_input.val)
             self.ready_actions_queue.append(action_input)
 
-    def get_ready_actions(self, user_idx: int) -> list[ActionInput]:
+    def get_ready_actions(self) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
         ready_actions: list[ActionInput] = list()
         added_actions: set[GameAction] = set()
 
-        still_in_queue = deque()
+        still_in_queue : deque[ActionInput] = deque()
 
         while self.ready_actions_queue:
             action_input = self.ready_actions_queue.popleft()
@@ -81,7 +85,7 @@ class DefaultActionToInputDelegate(ActionConversionDelegate):
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
 
-        inputs = self.config_handler.action_to_game_input(self.get_actions()[0])
+        inputs = self.config_handler.action_to_game_input(action_input.action)
         if not inputs:
             return list()
 

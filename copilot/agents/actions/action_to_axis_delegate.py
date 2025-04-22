@@ -20,8 +20,8 @@ class ActionToAxisDelegate(DefaultActionToInputDelegate):
     The game configuration should map the action to the negative and positive axes of the stick accordingly.
     """
 
-    def __init__(self, action: GameAction) -> None:
-        super().__init__([action])
+    def __init__(self, user_idx : int, action: GameAction) -> None:
+        super().__init__(user_idx, [action])
 
         humans_count = self.config_handler.get_humans_count()
         self._is_using_stick: dict[int, bool] = dict()
@@ -34,11 +34,11 @@ class ActionToAxisDelegate(DefaultActionToInputDelegate):
 
             # TODO: verify that inputs are a good combinations (eg: two binary buttons or negative and positive side of the same stick axis)
 
-    def register_input(self, user_idx: int, c_input: ControllerInput) -> None:
+    def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
 
         action = self.get_actions()[0]
-        inputs = self.config_handler.action_to_user_input(user_idx, action)
+        inputs = self.config_handler.action_to_user_input(self.user_idx, action)
 
         assert (
             inputs and len(inputs) == 2
@@ -46,11 +46,11 @@ class ActionToAxisDelegate(DefaultActionToInputDelegate):
 
         negative, positive = inputs
 
-        if c_input.type == negative and not self._is_using_stick[user_idx]:
+        if c_input.type == negative and not self._is_using_stick[self.user_idx]:
             c_input.val = -c_input.val
 
-        if c_input.type in inputs or self._is_using_stick[user_idx]:
-            super().register_input(user_idx, c_input)
+        if c_input.type in inputs or self._is_using_stick[self.user_idx]:
+            super().register_input(c_input)
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
