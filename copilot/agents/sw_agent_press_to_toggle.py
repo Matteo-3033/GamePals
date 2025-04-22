@@ -6,7 +6,7 @@ from .observer import ActorData, ActorObserver, MessageData
 from .sw_agent_actor import SWAgentActor
 
 
-class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
+class SWAgentPressToToggle(SWAgentActor, ActorObserver):
     """
     SWAgentHoldToToggle is a particular type of SWAgentActor that allows to use the button associated to a certain
     action as a toggle button, instead of a hold button.
@@ -17,21 +17,34 @@ class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
     def __init__(
         self,
         game_state: GameStateListener,
-        action: GameAction,
         pilot: Actor | None = None,
     ) -> None:
         super().__init__(game_state)
+
+        actions = self.get_controlled_actions()
+
+        assert (
+            len(actions) == 1
+        ), f"SWAgentPressToToggle agent can only control one action. Found {len(actions)}"
+
         self.last_input_timestamp: float = 0
-        self.action = action
         self.pressed = False
         self.pilot = pilot
 
         if self.pilot is not None:
             self.pilot.subscribe(self)
 
+    @property
+    def action(self) -> GameAction:
+        return self.get_controlled_actions()[0]
+
+    @property
+    def enabled(self) -> bool:
+        return self.pilot is not None
+
     def _should_toggle(self) -> bool:
         """Returns true if the hold to toggle mechanic should be performed"""
-        return self.pilot is not None
+        return self.enabled
 
     def on_input_update(self, actor_data: ActorData) -> None:
         if self._should_toggle() and actor_data.data.action == self.action:
@@ -41,12 +54,17 @@ class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
     def on_message_update(self, message_data: MessageData) -> None:
         pass
 
+    def on_game_state_update(self, game_state: GameState) -> None:
+        if not self.enabled:
+            return
+
+        if not self.pressed:
+            self.notify_input(ActionInput(action=self.action, val=0.0), confidence=1.0)
+        else:
+            super().on_game_state_update(game_state)
+
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
-        return [
-            ActionInputWithConfidence(
-                self.action, val=int(self.pressed), confidence=1.0
-            )
-        ]
+        return [ActionInputWithConfidence(self.action, val=1.0, confidence=1.0)]
 
     def get_controlled_actions(self) -> list[GameAction]:
         return list()
