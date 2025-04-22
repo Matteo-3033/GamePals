@@ -8,18 +8,16 @@ from .sw_agent_actor import SWAgentActor
 
 class SWAgentPressToToggle(SWAgentActor, ActorObserver):
     """
-    SWAgentHoldToToggle is a particular type of SWAgentActor that allows to use the button associated to a certain
-    action as a toggle button, instead of a hold button.
+    SWAgentPressToToggle is a particular type of SWAgentActor that allows to use the button associated to a certain
+    action as a toggle button.
 
     The pilot is the Actor that controls the command.
     """
 
     def __init__(
-        self,
-        game_state: GameStateListener,
-        pilot: Actor | None = None,
+        self, game_state: GameStateListener, pilot: Actor | None = None, **kwargs
     ) -> None:
-        super().__init__(game_state)
+        super().__init__(game_state, **kwargs)
 
         actions = self.get_controlled_actions()
 
@@ -48,7 +46,7 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
 
     def on_input_update(self, actor_data: ActorData) -> None:
         if self._should_toggle() and actor_data.data.action == self.action:
-            if actor_data.data.val > VirtualControllerProvider.INPUT_THRESHOLD:
+            if abs(actor_data.data.val) > VirtualControllerProvider.INPUT_THRESHOLD:
                 self.pressed = not self.pressed
 
     def on_message_update(self, message_data: MessageData) -> None:
