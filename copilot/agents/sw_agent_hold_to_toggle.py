@@ -35,20 +35,18 @@ class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
 
     def on_input_update(self, actor_data: ActorData) -> None:
         if self._should_toggle() and actor_data.data.action == self.action:
-            if (
-                actor_data.data.val > VirtualControllerProvider.INPUT_THRESHOLD
-            ):  # Start Running
-                if self.pressed:
-                    self.notify_input(ActionInput(self.action, val=0.0), 1.0)
-                else:
-                    self.notify_input(ActionInput(self.action, val=1.0), 1.0)
+            if actor_data.data.val > VirtualControllerProvider.INPUT_THRESHOLD:
                 self.pressed = not self.pressed
 
     def on_message_update(self, message_data: MessageData) -> None:
         pass
 
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
-        return list()
+        return [
+            ActionInputWithConfidence(
+                self.action, val=int(self.pressed), confidence=1.0
+            )
+        ]
 
     def get_controlled_actions(self) -> list[GameAction]:
         return list()
