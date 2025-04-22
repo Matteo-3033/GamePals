@@ -8,10 +8,13 @@ from .sw_agent_actor import SWAgentActor
 
 class SWAgentPressToToggle(SWAgentActor, ActorObserver):
     """
-    SWAgentPressToToggle is a particular type of SWAgentActor that allows to use the button associated to a certain
-    action as a toggle button.
+    SWAgentPressToToggle is a specific type of SWAgentActor that allows the use of a button associated with a certain action as a toggle.
 
-    The pilot is the Actor that controls the command.
+    When the button is pressed, the agent will begin pressing the corresponding action button. When it is pressed again, the agent will release it.
+
+    Classes that inherit from this class can override the compute_actions method to customize the agent's behavior after the button has been pressed once.
+
+    If no pilot is specified, the agent will not perform any actions. However, it will still subscribe to game state events, and its subclasses can still trigger actions based on the game state, just like a regular SWAgentActor.
     """
 
     def __init__(
@@ -53,15 +56,15 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
         pass
 
     def on_game_state_update(self, game_state: GameState) -> None:
-        if not self.enabled:
-            return
-
-        if not self.pressed:
+        if self.enabled and not self.pressed:
             self.notify_input(ActionInput(action=self.action, val=0.0), confidence=1.0)
-        else:
+        else:  # If the agent is not enabled (no pilot specified) the super method is called as normal
             super().on_game_state_update(game_state)
 
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
+        if not self.enabled:
+            return list()
+
         return [ActionInputWithConfidence(self.action, val=1.0, confidence=1.0)]
 
     def get_controlled_actions(self) -> list[GameAction]:
