@@ -4,7 +4,10 @@ from .action_input import ActionInput, ActionInputWithConfidence
 from .action_to_axis_delegate import ActionToAxisDelegate
 from .action_to_binary_inputs_delegate import ActionToBinaryInputsDelegate
 from .default_action_to_input_delegate import DefaultActionToInputDelegate
+from .double_function_delegate import DoubleFunctionDelegate
 from .game_action import GameAction
+from .three_for_two_delegate import ThreeForTwoDelegate
+
 
 __all__ = [
     "ActionConversionDelegate",
@@ -15,4 +18,7 @@ __all__ = [
     "ActionInputWithConfidence",
     "GameAction",
     "ActionConversionManager",
+    "DoubleFunctionDelegate",
+    "ThreeForTwoDelegate",
 ]
+

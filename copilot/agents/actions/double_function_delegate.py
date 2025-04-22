@@ -1,7 +1,10 @@
 import logging
 import time
 
-from .default_action_to_input_delegate import DefaultActionToInputDelegate, RegisteredInputDetails
+from .default_action_to_input_delegate import (
+    DefaultActionToInputDelegate,
+    RegisteredInputDetails,
+)
 from ...sources.controller import ControllerInput
 
 from .action_input import ActionInput
@@ -23,7 +26,9 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
 
     HOLD_THRESHOLD = 0.2  # seconds
 
-    def __init__(self, user_idx : int, toggle_action: GameAction, hold_action: GameAction) -> None:
+    def __init__(
+        self, user_idx: int, toggle_action: GameAction, hold_action: GameAction
+    ) -> None:
         super().__init__(user_idx, [toggle_action, hold_action])
 
         self.toggle_action = toggle_action
@@ -36,7 +41,7 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
         ), "Both toggle_action and hold_action should be mapped to the same, single input"
 
         self.input = list(inputs)[0]
-        self._holding : bool = False
+        self._holding: bool = False
 
     def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
@@ -48,15 +53,12 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
             self.ready_actions_queue.append(
                 ActionInput(action=action, val=latest_input.val)
             )
-            self.ready_actions_queue.append(
-                ActionInput(action=action, val=0.0)
-            )
+            self.ready_actions_queue.append(ActionInput(action=action, val=0.0))
             self._holding = False
 
         self.latest_inputs[c_input.type] = RegisteredInputDetails(
             val=c_input.val, timestamp=time.time(), sent=False
         )
-
 
     def get_ready_actions(self) -> list[ActionInput]:
         """Returns the ready-to-be-converted Actions"""
@@ -72,4 +74,3 @@ class DoubleFunctionDelegate(DefaultActionToInputDelegate):
             return [ActionInput(action=self.hold_action, val=latest_input.val)]
 
         return super().get_ready_actions()
-
