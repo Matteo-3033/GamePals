@@ -1,9 +1,9 @@
-from ..sources.game import GameStateListener, GameState
-from .actions import GameAction, ActionInput, ActionInputWithConfidence
-from .actor import Actor
-from .observer import ActorData, MessageData, ActorObserver
-from .sw_agent_actor import SWAgentActor
 from ..sources import VirtualControllerProvider
+from ..sources.game import GameState, GameStateListener
+from .actions import ActionInput, ActionInputWithConfidence, GameAction
+from .actor import Actor
+from .observer import ActorData, ActorObserver, MessageData
+from .sw_agent_actor import SWAgentActor
 
 
 class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
@@ -24,13 +24,14 @@ class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
         self.last_input_timestamp: float = 0
         self.action = action
         self.pressed = False
+        self.pilot = pilot
 
-        if pilot is not None:
-            pilot.subscribe(self)
+        if self.pilot is not None:
+            self.pilot.subscribe(self)
 
     def _should_toggle(self) -> bool:
         """Returns true if the hold to toggle mechanic should be performed"""
-        return True
+        return self.pilot is not None
 
     def on_input_update(self, actor_data: ActorData) -> None:
         if self._should_toggle() and actor_data.data.action == self.action:
@@ -51,4 +52,3 @@ class SWAgentHoldToToggle(SWAgentActor, ActorObserver):
 
     def get_controlled_actions(self) -> list[GameAction]:
         return list()
-
