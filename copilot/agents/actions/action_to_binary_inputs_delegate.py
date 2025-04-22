@@ -1,5 +1,6 @@
 import logging
 
+from ...sources import VirtualControllerProvider
 from ...sources.controller import ControllerInput, InputType
 from .default_action_to_input_delegate import DefaultActionToInputDelegate
 
@@ -21,6 +22,17 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
     def __init__(self, user_idx : int, action: GameAction) -> None:
         super().__init__(user_idx, [action])
 
+        humans_count = self.config_handler.get_humans_count()
+        self._is_using_stick: dict[int, bool] = dict()
+        for user_idx in range(humans_count):
+            inputs = self.config_handler.action_to_user_input(user_idx, action)
+
+            self._is_using_stick[user_idx] = (
+                    inputs is not None and inputs[0] in VirtualControllerProvider.STICKS
+            )
+
+            # TODO: verify that inputs are a good combinations (eg: two binary buttons or negative and positive side of the same stick axis)
+
     def register_input(self, c_input: ControllerInput) -> None:
         """Registers that an input has occurred"""
 
@@ -33,10 +45,10 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
 
         negative, positive = inputs
 
-        if c_input.type == negative:
+        if c_input.type == negative and not self._is_using_stick[self.user_idx]:
             c_input.val = -c_input.val
 
-        if c_input.type in inputs:
+        if c_input.type in inputs or self._is_using_stick[self.user_idx]:
             super().register_input(c_input)
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
