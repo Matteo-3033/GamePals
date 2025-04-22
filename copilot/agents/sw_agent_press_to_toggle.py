@@ -1,5 +1,6 @@
-from ..sources import VirtualControllerProvider
-from ..sources.game import GameState, GameStateListener
+from copilot.sources import VirtualControllerProvider
+from copilot.sources.game import GameState, GameStateListener
+
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor import Actor
 from .observer import ActorData, ActorObserver, MessageData
