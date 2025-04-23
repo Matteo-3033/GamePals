@@ -51,6 +51,17 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
         if c_input.type in inputs or self._is_using_stick[self.user_idx]:
             super().register_input(c_input)
 
+        humans_count = self.config_handler.get_humans_count()
+        self._is_using_stick: dict[int, bool] = dict()
+        for user_idx in range(humans_count):
+            inputs = self.config_handler.action_to_user_input(user_idx, self.action)
+
+            self._is_using_stick[user_idx] = (
+                inputs is not None and inputs[0] in VirtualControllerProvider.STICKS
+            )
+
+            # TODO: verify that inputs are a good combinations (eg: two binary buttons or negative and positive side of the same stick axis)
+
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
 
@@ -73,3 +84,27 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
             ControllerInput(InputType(negative), -action_input.val),
             ControllerInput(InputType(positive), 0),
         ]
+
+    def convert_from_input(
+        self, user_idx: int, c_input: ControllerInput
+    ) -> list[ActionInput]:
+        """Converts the Controller Input to an Action Input"""
+
+        inputs = self.config_handler.action_to_user_input(user_idx, self.action)
+
+        assert (
+            inputs and len(inputs) == 2
+        ), f"{self.get_action()} action expects exactly two inputs."
+
+        negative, positive = inputs
+
+        if self._is_using_stick[user_idx]:
+            return [ActionInput(self.action, c_input.val)]
+
+        if c_input.type == negative:
+            return [ActionInput(self.action, -c_input.val)]
+
+        if c_input.type == positive:
+            return [ActionInput(self.action, c_input.val)]
+
+        return list()
