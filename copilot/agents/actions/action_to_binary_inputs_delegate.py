@@ -1,16 +1,16 @@
 import logging
 
-from copilot.sources import VirtualControllerProvider
-from copilot.sources.controller import ControllerInput, InputType
+from ...sources import VirtualControllerProvider
+from ...sources.controller import ControllerInput, InputType
+from .default_action_to_input_delegate import DefaultActionToInputDelegate
 
-from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput
 from .game_action import GameAction
 
 logger = logging.getLogger(__name__)
 
 
-class ActionToBinaryInputsDelegate(ActionConversionDelegate):
+class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
     """
     A conversion delegate for actions that range from -1 to 1 and are controlled using two binary inputs.
     For example, a car’s throttle (where -1 represents deceleration and +1 represents acceleration) might be controlled using the left and right triggers: the first will be converted to -1 throttle, while the second to +1 throttle
@@ -19,8 +19,37 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
     The first input is considered the negative input, and the second one is considered the positive input.
     """
 
-    def __init__(self, action: GameAction) -> None:
-        super().__init__(action)
+    def __init__(self, user_idx : int, action: GameAction) -> None:
+        super().__init__(user_idx, [action])
+
+        humans_count = self.config_handler.get_humans_count()
+        self._is_using_stick: dict[int, bool] = dict()
+        for user_idx in range(humans_count):
+            inputs = self.config_handler.action_to_user_input(user_idx, action)
+
+            self._is_using_stick[user_idx] = (
+                    inputs is not None and inputs[0] in VirtualControllerProvider.STICKS
+            )
+
+            # TODO: verify that inputs are a good combinations (eg: two binary buttons or negative and positive side of the same stick axis)
+
+    def register_input(self, c_input: ControllerInput) -> None:
+        """Registers that an input has occurred"""
+
+        action = self.get_actions()[0]
+        inputs = self.config_handler.action_to_user_input(self.user_idx, action)
+
+        assert (
+            inputs and len(inputs) == 2
+        ), f"{action} action expects exactly two inputs."
+
+        negative, positive = inputs
+
+        if c_input.type == negative and not self._is_using_stick[self.user_idx]:
+            c_input.val = -c_input.val
+
+        if c_input.type in inputs or self._is_using_stick[self.user_idx]:
+            super().register_input(c_input)
 
         humans_count = self.config_handler.get_humans_count()
         self._is_using_stick: dict[int, bool] = dict()
@@ -36,11 +65,12 @@ class ActionToBinaryInputsDelegate(ActionConversionDelegate):
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
         """Converts the Action Input to a Controller Input"""
 
-        inputs = self.config_handler.action_to_game_input(self.get_action())
+        action = self.get_actions()[0]
+        inputs = self.config_handler.action_to_game_input(action)
 
         assert (
             inputs and len(inputs) == 2
-        ), f"{self.get_action()} action expects exactly two inputs."
+        ), f"{action} action expects exactly two inputs."
 
         negative, positive = inputs
 
