@@ -15,9 +15,7 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
     """
 
-    def __init__(
-        self, game_state: GameStateListener, **kwargs
-    ) -> None:
+    def __init__(self, game_state: GameStateListener, **kwargs) -> None:
         super().__init__()
         self.game_state = game_state
         self.game_state.subscribe(self)
