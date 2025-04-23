@@ -60,14 +60,15 @@ class ActionConversionManager:
                 else:
                     delegate = DefaultActionToInputDelegate(user_idx, [action])
 
+                if action not in self._action_to_delegate_map:
+                    self._action_to_delegate_map[action] = delegate
+
                 user_inputs = self.config_handler.action_to_user_input(user_idx, action)
                 if not user_inputs:
                     continue
                 for user_input in user_inputs:
                     self._input_to_delegate_map[user_idx][user_input] = delegate
 
-                if action not in self._action_to_delegate_map:
-                    self._action_to_delegate_map[action] = delegate
 
 
     def input_to_actions(
