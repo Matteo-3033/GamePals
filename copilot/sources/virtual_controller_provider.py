@@ -35,6 +35,8 @@ class VirtualControllerProvider:
         logger.debug("Received input %s", c_input)
 
         if c_input.type in self.STICKS:
+            if c_input.val > 0 and c_input.type in self.NEGATIVE_AXIS:
+                c_input.val = - c_input.val
             if c_input.type in self.RIGHT_STICK:  # Right Stick
                 if c_input.type in self.RIGHT_STICK_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
