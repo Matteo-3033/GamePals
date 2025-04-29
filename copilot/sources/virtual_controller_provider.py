@@ -134,3 +134,10 @@ class VirtualControllerProvider:
     STICKS = LEFT_STICK + RIGHT_STICK
 
     AXIS_INPUTS = STICKS + TRIGGERS
+
+    NEGATIVE_AXIS = [
+        InputType.STICK_LEFT_X_NEG,
+        InputType.STICK_LEFT_Y_NEG,
+        InputType.STICK_RIGHT_X_NEG,
+        InputType.STICK_RIGHT_Y_NEG,
+    ]
