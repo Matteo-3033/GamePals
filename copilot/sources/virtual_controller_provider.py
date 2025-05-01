@@ -3,7 +3,12 @@ import time
 
 import vgamepad as vg
 
-from .controller import ControllerInput, InputType
+from .controller import (
+    ControllerInput,
+    InputType,
+    ControllerInputsMap,
+    ControllerInputWithConfidence,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +18,13 @@ class VirtualControllerProvider:
     The VirtualControllerProvider class provides an XBOX 360 Virtual Controller, whose inputs can be requested via the execute and execute_stick methods
     """
 
-    INPUT_THRESHOLD : float = 0.7 # The float value after which the input is interpreted as a 1
+    INPUT_THRESHOLD: float = (
+        0.7  # The float value after which the input is interpreted as a 1
+    )
 
     def __init__(self):
         self.gamepad: vg.VX360Gamepad | None = None
+        self.gamepad_state: ControllerInputsMap = ControllerInputsMap()
         self.left_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
         self.right_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
 
@@ -33,10 +41,15 @@ class VirtualControllerProvider:
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
 
         logger.debug("Received input %s", c_input)
+        self.gamepad_state.set(
+            ControllerInputWithConfidence(
+                type=c_input.type, val=c_input.val, confidence=1.0
+            )
+        )
 
         if c_input.type in self.STICKS:
             if c_input.val > 0 and c_input.type in self.NEGATIVE_AXIS:
-                c_input.val = - c_input.val
+                c_input.val = -c_input.val
             if c_input.type in self.RIGHT_STICK:  # Right Stick
                 if c_input.type in self.RIGHT_STICK_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
@@ -80,27 +93,20 @@ class VirtualControllerProvider:
         self.gamepad.update()
 
     def reset_controls(self):
-        """Releases all buttons (except sticks) of the Virtual Controller"""
+        """Releases all buttons of the Virtual Controller"""
 
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
 
         time.sleep(
             0.5
         )  # This looks unnecessary, but it's needed for it to work even when the level is reset
-        for btn in self.BTN_TO_VGBUTTON.values():
-            self.gamepad.release_button(btn)
-
-        for btn in self.DPAD_TO_VGBUTTON.values():
-            self.gamepad.release_button(btn)
-
-        self.gamepad.left_trigger_float(0.0)
-        self.gamepad.right_trigger_float(0.0)
-        self.gamepad.left_joystick_float(0.0, 0.0)
-        self.gamepad.right_joystick_float(0.0, 0.0)
-
+        self.gamepad.reset()
         self.gamepad.update()
         logger.info("Gamepad was reset")
         time.sleep(0.1)
+
+    def get_controller_state(self) -> str:
+        return str(self.gamepad_state.inputs_map)
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     BTN_TO_VGBUTTON = {

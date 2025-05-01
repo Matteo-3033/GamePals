@@ -109,3 +109,9 @@ class CommandArbitrator(ActorObserver):
         """Notifies all Actors of the Arbitrated Input"""
         for actor in self.actors.values():
             actor.on_arbitrated_inputs(input_data)
+
+    def get_virtual_controller(self):
+        return self.virtual_controller
+
+    def get_state(self) -> str:
+        return str(self.action_maps)
