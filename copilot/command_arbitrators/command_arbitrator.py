@@ -1,4 +1,5 @@
 import logging
+import json
 from typing import Type
 
 from copilot.agents import Actor, ActorID
@@ -115,4 +116,7 @@ class CommandArbitrator(ActorObserver, Loggable):
         return self.virtual_controller
 
     def get_log(self) -> str:
-        return str(self.action_maps)
+        return '\n'.join((
+            f"{self.actors[actor_id].__class__.__name__}: {action_map.actions_map}"
+            for actor_id, action_map in self.action_maps.items()
+        ))

@@ -65,7 +65,7 @@ class Logger:
 
                 file.write(f"--- Log #{idx} | {now_formatted} ({now}) | {time_since_start:.2f}s since start ---\n")
                 for loggable in self.loggables:
-                    file.write(f"{loggable.get_tag()}: {loggable.get_log()}\n")
+                    file.write(f"{loggable.get_tag()}: \n\t{loggable.get_log().replace("\n", "\n\t")}\n")
                 file.write("\n")
 
                 idx += 1
