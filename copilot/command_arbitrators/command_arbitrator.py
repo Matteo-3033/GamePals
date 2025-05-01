@@ -10,11 +10,12 @@ from copilot.utils.configuration_handler import ConfigurationHandler
 
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
+from ..logging.loggable import Loggable
 
 logger = logging.getLogger(__name__)
 
 
-class CommandArbitrator(ActorObserver):
+class CommandArbitrator(ActorObserver, Loggable):
     """
     The CommandArbitrator class is an abstract Arbitrator.
 
@@ -113,5 +114,5 @@ class CommandArbitrator(ActorObserver):
     def get_virtual_controller(self):
         return self.virtual_controller
 
-    def get_state(self) -> str:
+    def get_log(self) -> str:
         return str(self.action_maps)

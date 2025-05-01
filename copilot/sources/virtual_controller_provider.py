@@ -9,11 +9,12 @@ from .controller import (
     ControllerInputsMap,
     ControllerInputWithConfidence,
 )
+from ..logging.loggable import Loggable
 
 logger = logging.getLogger(__name__)
 
 
-class VirtualControllerProvider:
+class VirtualControllerProvider(Loggable):
     """
     The VirtualControllerProvider class provides an XBOX 360 Virtual Controller, whose inputs can be requested via the execute and execute_stick methods
     """
@@ -105,8 +106,9 @@ class VirtualControllerProvider:
         logger.info("Gamepad was reset")
         time.sleep(0.1)
 
-    def get_controller_state(self) -> str:
+    def get_log(self) -> str:
         return str(self.gamepad_state.inputs_map)
+
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     BTN_TO_VGBUTTON = {
