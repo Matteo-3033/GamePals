@@ -59,11 +59,10 @@ class Logger:
         idx = 0
         with (open(self.log_file_path, "w") as file):
             while self.running:
-                now = datetime.now()
-                now_formatted = now.strftime("%Y-%m-%d %H:%M:%S")
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 time_since_start = time.time() - self._start_time
 
-                file.write(f"--- Log #{idx} | {now_formatted} ({now}) | {time_since_start:.2f}s since start ---\n")
+                file.write(f"--- Log #{idx} | {now} ({time.time()}) | {time_since_start:.2f}s since start ---\n")
                 for loggable in self.loggables:
                     file.write(f"{loggable.get_tag()}: \n\t{loggable.get_log().replace("\n", "\n\t")}\n")
                 file.write("\n")
