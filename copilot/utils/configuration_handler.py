@@ -76,8 +76,8 @@ class ConfigurationHandler:
         self._agent_policy_roles: dict[tuple[GameAction, str], PolicyRole] = (
             defaultdict()
         )
-        self._user_input_to_action_map: dict[int, dict[InputType, list[GameAction]]] = defaultdict(
-            lambda: defaultdict(list)
+        self._user_input_to_action_map: dict[int, dict[InputType, list[GameAction]]] = (
+            defaultdict(lambda: defaultdict(list))
         )
         self._action_to_user_input_map: dict[int, dict[GameAction, list[InputType]]] = (
             defaultdict(dict)
@@ -156,10 +156,14 @@ class ConfigurationHandler:
                     controls = self._action_to_game_input_map.get(action_enum, list())
                 controls = [InputType(control) for control in controls]
 
-                self._confidence_levels[human_idx][action_enum] = human["confidence"]
+                self._confidence_levels[human_idx][action_enum] = human.get(
+                    "confidence", 1.0
+                )
 
                 for control in controls:
-                    self._user_input_to_action_map[human_idx][control].append(action_enum)
+                    self._user_input_to_action_map[human_idx][control].append(
+                        action_enum
+                    )
 
                 if len(controls) > 0:
                     self._action_to_user_input_map[human_idx][action_enum] = controls
@@ -209,9 +213,7 @@ class ConfigurationHandler:
         input_type: InputType,
     ) -> list[GameAction]:
         """Returns the GameAction(s) that the user user_idx intends to do when pressing the given input_type"""
-        return self._user_input_to_action_map.get(user_idx, dict()).get(
-            input_type, []
-        )
+        return self._user_input_to_action_map.get(user_idx, dict()).get(input_type, [])
 
     def action_to_user_input(
         self,
