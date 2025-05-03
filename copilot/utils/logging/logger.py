@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from copilot.logging.loggable import Loggable
+from .loggable import Loggable
 
 logger = logging.getLogger(__name__)
 

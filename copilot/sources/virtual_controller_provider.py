@@ -1,15 +1,17 @@
+import json
 import logging
 import time
-import json
+
 import vgamepad as vg
+
+from copilot.utils.logging import Loggable
 
 from .controller import (
     ControllerInput,
-    InputType,
     ControllerInputsMap,
     ControllerInputWithConfidence,
+    InputType,
 )
-from ..logging.loggable import Loggable
 
 logger = logging.getLogger(__name__)
 
@@ -107,10 +109,12 @@ class VirtualControllerProvider(Loggable):
         time.sleep(0.1)
 
     def get_log(self) -> str:
-        return '\n'.join((
-            f"{input_type}: {input_map}"
-            for input_type, input_map in self.gamepad_state.inputs_map.items()
-        ))
+        return "\n".join(
+            (
+                f"{input_type}: {input_map}"
+                for input_type, input_map in self.gamepad_state.inputs_map.items()
+            )
+        )
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     BTN_TO_VGBUTTON = {
