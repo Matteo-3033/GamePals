@@ -17,33 +17,39 @@ class Logger:
     """
 
     INTERVAL_BETWEEN_LOGS = 1.0  # seconds
+    LOGS_DIR = "logs"
 
     def __init__(
         self, loggables: List[Loggable], log_file_path: str | None = None
     ) -> None:
-        # If file already exists, fall back to default path to avoid accidental override
-        if log_file_path:
-            if os.path.exists(log_file_path):
-                logger.warning(
-                    f"File '{log_file_path}' already exists. Using default '{self._get_default_log_file_path()}' instead."
-                )
-                log_file_path = self._get_default_log_file_path()
-        else:
+        if not log_file_path:
             log_file_path = self._get_default_log_file_path()
 
+        log_path = Path(log_file_path)
+        if log_path.parts[0] != self.LOGS_DIR:
+            log_path = Path(self.LOGS_DIR) / log_path
+
+        # If file already exists, fall back to default path to avoid accidental override
+        if os.path.exists(log_path):
+            logger.warning(
+                f"File '{log_file_path}' already exists. Using default '{self._get_default_log_file_path()}' instead."
+            )
+            log_path = Path(Logger.LOGS_DIR) / self._get_default_log_file_path()
+
         self.loggables = loggables
-        self.log_file_path: str = log_file_path
         self.running: bool = False
         self._thread: threading.Thread | None = None
         self._start_time: float = 0.0
 
         # Eventually create the log folder
-        log_path = Path(self.log_file_path)
+
+        self.log_path = log_path
+
         log_path.parent.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def _get_default_log_file_path() -> str:
-        return datetime.now().strftime("log/%Y-%m-%d_%H-%M-%S.log")
+        return datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log")
 
     def start(self) -> None:
         if self._thread is None or not self._thread.is_alive():
@@ -59,7 +65,7 @@ class Logger:
 
     def _logging_loop(self):
         idx = 0
-        with open(self.log_file_path, "w") as file:
+        with open(self.log_path, "w") as file:
             while self.running:
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 time_since_start = time.time() - self._start_time
