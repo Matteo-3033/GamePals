@@ -1,10 +1,10 @@
+import logging
 import os
-from datetime import datetime
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import List
-import logging
 
 from copilot.logging.loggable import Loggable
 
@@ -16,15 +16,17 @@ class Logger:
     Logger is the class that handles writing the state of the copilot architecture on a log file
     """
 
+    INTERVAL_BETWEEN_LOGS = 1.0  # seconds
+
     def __init__(
-            self,
-            loggables : List[Loggable],
-            log_file_path: str | None = None
+        self, loggables: List[Loggable], log_file_path: str | None = None
     ) -> None:
         # If file already exists, fall back to default path to avoid accidental override
         if log_file_path:
             if os.path.exists(log_file_path):
-                logger.warning(f"File '{log_file_path}' already exists. Using default '{self._get_default_log_file_path()}' instead.")
+                logger.warning(
+                    f"File '{log_file_path}' already exists. Using default '{self._get_default_log_file_path()}' instead."
+                )
                 log_file_path = self._get_default_log_file_path()
         else:
             log_file_path = self._get_default_log_file_path()
@@ -57,15 +59,19 @@ class Logger:
 
     def _logging_loop(self):
         idx = 0
-        with (open(self.log_file_path, "w") as file):
+        with open(self.log_file_path, "w") as file:
             while self.running:
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 time_since_start = time.time() - self._start_time
 
-                file.write(f"--- Log #{idx} | {now} ({time.time()}) | {time_since_start:.2f}s since start ---\n")
+                file.write(
+                    f"--- Log #{idx} | {now} ({time.time()}) | {time_since_start:.2f}s since start ---\n"
+                )
                 for loggable in self.loggables:
-                    file.write(f"{loggable.get_tag()}: \n\t{loggable.get_log().replace("\n", "\n\t")}\n")
+                    file.write(
+                        f"{loggable.get_tag()}: \n\t{loggable.get_log().replace("\n", "\n\t")}\n"
+                    )
                 file.write("\n")
 
                 idx += 1
-                time.sleep(1)
+                time.sleep(self.INTERVAL_BETWEEN_LOGS)
