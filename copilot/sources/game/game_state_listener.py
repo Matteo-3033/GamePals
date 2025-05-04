@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 
+from copilot.utils.logging import Loggable
+
 from .game_state import GameState
 from .game_state_observer import GameStateObserver
 
 
-class GameStateListener(ABC):
+class GameStateListener(ABC, Loggable):
     """
     GameStateListener is the Superclass for any Game State listener classes.
 

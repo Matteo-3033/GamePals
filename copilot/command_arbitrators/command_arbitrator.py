@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Type
 
@@ -7,6 +8,7 @@ from copilot.agents.observer import ActorData, ActorObserver, MessageData
 from copilot.sources import VirtualControllerProvider
 from copilot.sources.controller import ControllerInput
 from copilot.utils.configuration_handler import ConfigurationHandler
+from copilot.utils.logging import Loggable
 
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager
@@ -14,7 +16,7 @@ from .policies import InputEntry, Policy, PolicyManager
 logger = logging.getLogger(__name__)
 
 
-class CommandArbitrator(ActorObserver):
+class CommandArbitrator(ActorObserver, Loggable):
     """
     The CommandArbitrator class is an abstract Arbitrator.
 
@@ -109,3 +111,14 @@ class CommandArbitrator(ActorObserver):
         """Notifies all Actors of the Arbitrated Input"""
         for actor in self.actors.values():
             actor.on_arbitrated_inputs(input_data)
+
+    def get_virtual_controller(self):
+        return self.virtual_controller
+
+    def get_log(self) -> str:
+        return "\n".join(
+            (
+                f"{self.actors[actor_id].__class__.__name__}: {action_map.actions_map}"
+                for actor_id, action_map in self.action_maps.items()
+            )
+        )
