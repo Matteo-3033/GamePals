@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 import threading
 import time
 from datetime import datetime
@@ -70,13 +71,16 @@ class Logger:
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 time_since_start = time.time() - self._start_time
 
-                file.write(
-                    f"--- Log #{idx} | {now} ({time.time()}) | {time_since_start:.2f}s since start ---\n"
+                new_log = dict(
+                    idx=idx,
+                    time=now,
+                    timestamp=time.time(),
+                    since_start=time_since_start,
                 )
                 for loggable in self.loggables:
-                    file.write(
-                        f"{loggable.get_tag()}: \n\t{loggable.get_log().replace("\n", "\n\t")}\n"
-                    )
+                    new_log[loggable.get_tag()] = loggable.get_json()
+
+                file.write(json.dumps(new_log))
                 file.write("\n")
 
                 idx += 1

@@ -1,6 +1,8 @@
 import json
 import logging
 import time
+from dataclasses import asdict
+from typing import Any
 
 import vgamepad as vg
 
@@ -108,13 +110,11 @@ class VirtualControllerProvider(Loggable):
         logger.info("Gamepad was reset")
         time.sleep(0.1)
 
-    def get_log(self) -> str:
-        return "\n".join(
-            (
-                f"{input_type}: {input_map}"
-                for input_type, input_map in self.gamepad_state.inputs_map.items()
-            )
-        )
+    def get_json(self) -> dict[str, Any]:
+        data = dict()
+        for input_type, input_map in self.gamepad_state.inputs_map.items():
+            data[input_type] = asdict(input_map)
+        return data
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     BTN_TO_VGBUTTON = {

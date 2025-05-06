@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import Type
+from dataclasses import asdict
+from typing import Type, Any
 
 from copilot.agents import Actor, ActorID
 from copilot.agents.actions import ActionConversionManager, ActionInput, GameAction
@@ -115,10 +116,13 @@ class CommandArbitrator(ActorObserver, Loggable):
     def get_virtual_controller(self):
         return self.virtual_controller
 
-    def get_log(self) -> str:
-        return "\n".join(
-            (
-                f"{self.actors[actor_id].__class__.__name__}: {action_map.actions_map}"
-                for actor_id, action_map in self.action_maps.items()
-            )
-        )
+    def get_json(self) -> dict[str, Any]:
+        data = dict()
+        for actor_id, action_map in self.action_maps.items():
+            actor_name = self.actors[actor_id].__class__.__name__
+            actions_dict = {
+                game_action: asdict(action_input_record)
+                for game_action, action_input_record in action_map.actions_map.items()
+            }
+            data[actor_name] = actions_dict
+        return data

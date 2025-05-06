@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Any
 
 
 class Loggable:
@@ -10,7 +11,7 @@ class Loggable:
         return cls.__name__
 
     @abstractmethod
-    def get_log(self) -> str:
-        """The log of the class"""
+    def get_json(self) -> dict[str, Any]:
+        """The json to log"""
         pass
 
