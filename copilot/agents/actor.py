@@ -1,5 +1,5 @@
-import uuid
 import logging
+import uuid
 from abc import ABC, abstractmethod
 
 from copilot.sources.controller import ControllerInput
@@ -10,6 +10,7 @@ from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
 
 logger = logging.getLogger(__name__)
+
 
 class Actor(ABC):
     """
@@ -38,7 +39,9 @@ class Actor(ABC):
         """Notifies all the subscribers with an ActionInputWithConfidence object"""
         data = ActorData(
             self.id,
-            ActionInputWithConfidence(actor_data.action, actor_data.val, confidence),
+            ActionInputWithConfidence(
+                actor_data.action, float(actor_data.val), float(confidence)
+            ),
         )
         for subscriber in self.subscribers:
             subscriber.on_input_update(data)
