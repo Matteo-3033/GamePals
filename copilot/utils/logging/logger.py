@@ -1,6 +1,6 @@
+import json
 import logging
 import os
-import json
 import threading
 import time
 from datetime import datetime
@@ -27,6 +27,11 @@ class Logger:
             log_file_path = self._get_default_log_file_path()
 
         log_path = Path(log_file_path)
+        if log_path.suffix != ".ndjson":
+            logger.warning(
+                f"Suggested log file extension is '.ndjson'. Consider renaming."
+            )
+
         if log_path.parts[0] != self.LOGS_DIR:
             log_path = Path(self.LOGS_DIR) / log_path
 
