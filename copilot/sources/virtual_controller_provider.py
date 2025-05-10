@@ -111,9 +111,9 @@ class VirtualControllerProvider(Loggable):
         time.sleep(0.1)
 
     def get_json(self) -> dict[str, Any]:
-        data = dict()
+        data: dict[str, Any] = dict()
         for input_type, input_map in self.gamepad_state.inputs_map.items():
-            data[input_type] = asdict(input_map)
+            data[input_type.value] = asdict(input_map)
         return data
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
