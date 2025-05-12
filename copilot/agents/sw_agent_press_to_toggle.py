@@ -41,24 +41,27 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
         return self.get_controlled_actions()[0]
 
     @property
-    def enabled(self) -> bool:
+    def toggle_enabled(self) -> bool:
         """Returns true if the toggle agent is enabled (i.e. has a pilot)"""
         return self.pilot is not None
 
-    def _should_toggle(self) -> bool:
-        """Returns true if the hold to toggle mechanic should be performed"""
-        return self.enabled
+    def _should_toggle(self, actor_data: ActorData) -> bool:
+        """Returns true if the hold to toggle mechanic should be performed when the pilot presses the button"""
+        return abs(actor_data.data.val) > VirtualControllerProvider.INPUT_THRESHOLD
 
     def on_input_update(self, actor_data: ActorData) -> None:
-        if self._should_toggle() and actor_data.data.action == self.action:
-            if abs(actor_data.data.val) > VirtualControllerProvider.INPUT_THRESHOLD:
-                self.pressed = not self.pressed
+        if (
+            self.toggle_enabled
+            and actor_data.data.action == self.action
+            and self._should_toggle(actor_data)
+        ):
+            self.pressed = not self.pressed
 
     def on_message_update(self, message_data: MessageData) -> None:
         pass
 
     def on_game_state_update(self, game_state: GameState) -> None:
-        if self.enabled and not self.pressed:
+        if self.toggle_enabled and not self.pressed:
             self.notify_input(ActionInput(action=self.action, val=0.0), confidence=1.0)
         else:
             # If the agent is not enabled (no pilot specified) the super method is called as normal
@@ -66,7 +69,7 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
             super().on_game_state_update(game_state)
 
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
-        if not self.enabled:
+        if not self.toggle_enabled:
             return list()
 
         return [ActionInputWithConfidence(self.action, val=1.0, confidence=1.0)]
