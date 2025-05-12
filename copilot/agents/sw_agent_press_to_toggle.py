@@ -42,6 +42,7 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
 
     @property
     def enabled(self) -> bool:
+        """Returns true if the toggle agent is enabled (i.e. has a pilot)"""
         return self.pilot is not None
 
     def _should_toggle(self) -> bool:
@@ -59,7 +60,9 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
     def on_game_state_update(self, game_state: GameState) -> None:
         if self.enabled and not self.pressed:
             self.notify_input(ActionInput(action=self.action, val=0.0), confidence=1.0)
-        else:  # If the agent is not enabled (no pilot specified) the super method is called as normal
+        else:
+            # If the agent is not enabled (no pilot specified) the super method is called as normal
+            # Subclasses can override this method to perform actions based on the game state even if the toggle is not enabled
             super().on_game_state_update(game_state)
 
     def compute_actions(self, game_state: GameState) -> list[ActionInputWithConfidence]:
