@@ -46,7 +46,7 @@ class Actor(ABC):
         data = ActorData(
             self.id,
             ActionInputWithConfidence(
-                action_input.action, action_input.val, confidence
+                action_input.action, float(action_input.val), float(confidence)
             ),
         )
         for subscriber in self.subscribers:
