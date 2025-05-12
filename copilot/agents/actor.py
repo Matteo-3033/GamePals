@@ -35,16 +35,26 @@ class Actor(ABC):
         """Adds a new subscriber to the list"""
         self.subscribers.append(subscriber)
 
-    def notify_input(self, actor_data: ActionInput, confidence: float) -> None:
+    def notify_input(self, action_input: ActionInput, confidence: float) -> None:
         """Notifies all the subscribers with an ActionInputWithConfidence object"""
+        if not self._filter_input(action_input):
+            logger.debug(
+                f"Input {action_input.action} with value {action_input.val} filtered by {self.id}"
+            )
+            return
+
         data = ActorData(
             self.id,
             ActionInputWithConfidence(
-                actor_data.action, float(actor_data.val), float(confidence)
+                action_input.action, action_input.val, confidence
             ),
         )
         for subscriber in self.subscribers:
             subscriber.on_input_update(data)
+
+    def _filter_input(self, action_input: ActionInput) -> bool:
+        """Filters the input data before notifying the subscribers"""
+        return True
 
     def notify_message(self, message: str) -> None:
         """Notifies all subscribers with a MessageData object"""
