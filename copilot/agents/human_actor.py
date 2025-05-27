@@ -50,9 +50,16 @@ class HumanActor(Actor, ControllerObserver):
 
         self.controller.start_listening()
 
+    def get_controllable_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is able to control"""
+        # All actions are controllable by a human
+        return [action for action in self.config_handler.get_game_action_type()]
+
     def get_controlled_actions(self) -> list[GameAction]:
-        """Returns the list of Game Actions that the Actor is controlling."""
-        return self.config_handler.get_controlled_actions(self.controller.get_index())
+        """Returns the list of Game Actions that the Actor is actually controlling"""
+        controllable = self.get_controllable_actions()
+        controlled = self.config_handler.get_user_controlled_actions(self.controller.get_index())
+        return list(set(controllable).intersection(controlled))
 
     def on_controller_update(self, data: InputData | None) -> None:
         """Receives an Input from the Controller and notifies it with the associated confidence level"""

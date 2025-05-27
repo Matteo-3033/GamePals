@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from copilot.sources.controller import ControllerInput
 from copilot.sources.game import GameState, GameStateListener, GameStateObserver
 
-from .actions import ActionInput, ActionInputWithConfidence
+from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor import Actor
 
 
@@ -45,3 +45,13 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
         """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
         # Ignore Arbitrated Inputs by default (can be overridden by implementations)
         pass
+
+    def get_controller_inputs(self) -> list[ControllerInput]:
+        return self.config_handler.get_agent_controlled_actions(self.get_name())
+
+
+    def get_controlled_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is actually controlling"""
+        controllable = self.get_controllable_actions()
+        controlled = self.config_handler.get_agent_controlled_actions(self.get_name())
+        return list(set(controllable).intersection(controlled))

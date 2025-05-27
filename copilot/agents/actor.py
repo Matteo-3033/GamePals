@@ -68,8 +68,13 @@ class Actor(ABC):
         pass
 
     @abstractmethod
-    def get_controlled_actions(self) -> list[GameAction]:
+    def get_controllable_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is able to control"""
+        pass
+
+    @abstractmethod
+    def get_controlled_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is actually controlling"""
         pass
 
     @abstractmethod

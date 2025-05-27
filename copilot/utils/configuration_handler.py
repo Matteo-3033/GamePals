@@ -64,6 +64,7 @@ class ConfigurationHandler:
             lambda: defaultdict(lambda: 1.0)
         )
         self._user_actions: dict[int, list[GameAction]] = defaultdict(list)
+        self._agent_actions: dict[str, list[GameAction]] = defaultdict(list)
         self._policy_types: dict[GameAction, Type[Policy]] = defaultdict()
         self._registered_inputs: set[InputType] = set()
         self._required_agents: set[str] = set()
@@ -170,6 +171,7 @@ class ConfigurationHandler:
 
             for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
+                self._agent_actions[agent["name"]].append(action_enum)
                 self._required_agents.add(agent["name"])
                 self._agent_policy_roles[(action_enum, agent["name"])] = PolicyRole(
                     agent_role
@@ -196,9 +198,13 @@ class ConfigurationHandler:
         """Returns the confidence level associated with every GameAction, for a specific HumanActor"""
         return self._confidence_levels.get(user_idx, dict())
 
-    def get_controlled_actions(self, user_idx: int) -> list[GameAction]:
+    def get_user_controlled_actions(self, user_idx: int) -> list[GameAction]:
         """Returns the list of game actions that a certain HumanActor is responsible for"""
         return self._user_actions.get(user_idx, list())
+
+    def get_agent_controlled_actions(self, agent_name: str) -> list[GameAction]:
+        """Returns the list of game actions that a certain Software Agent is responsible for"""
+        return self._agent_actions.get(agent_name, list())
 
     def get_registered_action_inputs(self) -> set[InputType]:
         """

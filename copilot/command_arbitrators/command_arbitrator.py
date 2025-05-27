@@ -3,7 +3,7 @@ import logging
 from dataclasses import asdict
 from typing import Type, Any
 
-from copilot.agents import Actor, ActorID
+from copilot.agents import Actor, ActorID, HumanActor
 from copilot.agents.actions import ActionConversionManager, ActionInput, GameAction
 from copilot.agents.observer import ActorData, ActorObserver, MessageData
 from copilot.sources import VirtualControllerProvider
@@ -59,6 +59,7 @@ class CommandArbitrator(ActorObserver, Loggable):
         """Receives Input and Confidence Level from one of its Actors"""
         executed_action = actor_data.data.action
 
+        # Check if actor is capable of doing the action
         if (
             executed_action
             not in self.actors[actor_data.actor_id].get_controlled_actions()
