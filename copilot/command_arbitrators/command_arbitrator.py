@@ -58,15 +58,13 @@ class CommandArbitrator(ActorObserver, Loggable):
     def on_input_update(self, actor_data: ActorData) -> None:
         """Receives Input and Confidence Level from one of its Actors"""
         executed_action = actor_data.data.action
+        actor = self.actors[actor_data.actor_id]
 
         # Check if actor is capable of doing the action
-        if (
-            executed_action
-            not in self.actors[actor_data.actor_id].get_controlled_actions()
-        ):
+        if executed_action not in actor.get_controlled_actions():
             logger.warning(
                 "Actor %s is not registered to execute action %s",
-                self.actors[actor_data.actor_id].__class__.__name__,
+                actor.__class__.__name__,
                 executed_action,
             )
             return
