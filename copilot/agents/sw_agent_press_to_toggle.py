@@ -18,9 +18,12 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
     If no pilot is specified, the agent will not perform any actions. However, it will still subscribe to game state events, and its subclasses can still trigger actions based on the game state, just like a regular SWAgentActor.
     """
 
-
     def __init__(
-        self, game_state: GameStateListener, pilot: Actor | None = None, **kwargs
+        self,
+        game_state: GameStateListener,
+        pilot: Actor | None = None,
+        start_pressed: bool = False,
+        **kwargs,
     ) -> None:
         super().__init__(game_state, **kwargs)
 
@@ -31,7 +34,7 @@ class SWAgentPressToToggle(SWAgentActor, ActorObserver):
         ), f"SWAgentPressToToggle agent can only control one action. Found {len(actions)}"
 
         self.last_input_timestamp: float = 0
-        self.pressed = False
+        self.pressed = start_pressed
         self.pilot = pilot
 
         if self.pilot is not None:
