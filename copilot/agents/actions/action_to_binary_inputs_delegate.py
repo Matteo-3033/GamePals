@@ -58,8 +58,8 @@ class ActionToBinaryInputsDelegate(DefaultActionToInputDelegate):
             # If the non-release input is still pressed from earlier, send it again (or it wouldn't happen)
             if c_input.type == negative and self.latest_inputs[positive].val == 1:
                 super().register_input(ControllerInput(type=positive, val=1.0))
-            elif c_input.type == positive and self.latest_inputs[negative].val == 1:
-                super().register_input(ControllerInput(type=negative, val=1.0))
+            elif c_input.type == positive and self.latest_inputs[negative].val == -1:
+                super().register_input(ControllerInput(type=negative, val=-1.0))
 
 
     def convert_to_inputs(self, action_input: ActionInput) -> list[ControllerInput]:
