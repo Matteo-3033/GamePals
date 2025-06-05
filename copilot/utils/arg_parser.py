@@ -37,6 +37,8 @@ class ArgParser:
             required=True,
         )
 
+        parser.add_argument("-o", "--output", type=str, help="Output file for logging")
+
         self._add_arguments(parser)
 
         self.args = parser.parse_args()
@@ -56,6 +58,9 @@ class ArgParser:
     def get_assistance_config_dict(self) -> dict[str, Any]:
         config: dict[str, Any] = tomllib.load(self.args.assistance_config)
         return config
+
+    def get_output_file(self) -> str | None:
+        return self.args.output
 
     def init_config_handler(self) -> "ConfigurationHandler":
         return ConfigurationHandler(

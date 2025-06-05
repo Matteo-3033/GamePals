@@ -17,11 +17,8 @@ class SWAgentSequencedActor(SWAgentActor, ABC):
     The sequence inputs are sent to its subscribers based on the specified delays.
     """
 
-    def __init__(
-        self,
-        game_state: GameStateListener
-    ) -> None:
-        super().__init__(game_state)
+    def __init__(self, game_state: GameStateListener, **kwargs) -> None:
+        super().__init__(game_state, **kwargs)
         self.current_sequence: list[ActionInputWithConfidenceAndDelay] = []
         self.last_input_timestamp: float = 0
 

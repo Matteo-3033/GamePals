@@ -17,6 +17,9 @@ class ControllerObserver(ABC):
     """
 
     @abstractmethod
-    def on_controller_input(self, data: InputData) -> None:
-        """Receives Inputs from the Input Source"""
+    def on_controller_update(self, data: InputData | None) -> None:
+        """
+        Receives Inputs from the Input Source.
+        If no inputs are registered, the update is sent with data = None
+        """
         pass

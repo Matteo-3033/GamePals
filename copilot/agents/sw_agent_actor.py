@@ -3,12 +3,11 @@ from abc import ABC, abstractmethod
 from copilot.sources.controller import ControllerInput
 from copilot.sources.game import GameState, GameStateListener, GameStateObserver
 
-from .actions import ActionInput, ActionInputWithConfidence
+from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor import Actor
-from .observer import ActorObserver
 
 
-class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
+class SWAgentActor(Actor, GameStateObserver, ABC):
     """
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
@@ -16,9 +15,7 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
     In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
     """
 
-    def __init__(
-        self, game_state: GameStateListener, **kwargs
-    ) -> None:
+    def __init__(self, game_state: GameStateListener, **kwargs) -> None:
         super().__init__()
         self.game_state = game_state
         self.game_state.subscribe(self)
@@ -46,5 +43,15 @@ class SWAgentActor(Actor, GameStateObserver, ActorObserver, ABC):
 
     def on_arbitrated_inputs(self, input_data: ControllerInput) -> None:
         """Receives the final Inputs produced by the Command Arbitrator and sent to the Game"""
-        # Ignore Arbitrated Inputs at the moment (can be overridden by implementations)
+        # Ignore Arbitrated Inputs by default (can be overridden by implementations)
         pass
+
+    def get_controller_inputs(self) -> list[ControllerInput]:
+        return self.config_handler.get_agent_controlled_actions(self.get_name())
+
+
+    def get_controlled_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is actually controlling"""
+        controllable = self.get_controllable_actions()
+        controlled = self.config_handler.get_agent_controlled_actions(self.get_name())
+        return list(set(controllable).intersection(controlled))

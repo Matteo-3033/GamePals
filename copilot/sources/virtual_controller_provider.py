@@ -1,20 +1,35 @@
+import json
 import logging
 import time
+from dataclasses import asdict
+from typing import Any
 
 import vgamepad as vg
 
-from .controller import ControllerInput, InputType
+from copilot.utils.logging import Loggable
+
+from .controller import (
+    ControllerInput,
+    ControllerInputsMap,
+    ControllerInputWithConfidence,
+    InputType,
+)
 
 logger = logging.getLogger(__name__)
 
 
-class VirtualControllerProvider:
+class VirtualControllerProvider(Loggable):
     """
     The VirtualControllerProvider class provides an XBOX 360 Virtual Controller, whose inputs can be requested via the execute and execute_stick methods
     """
 
+    INPUT_THRESHOLD: float = (
+        0.7  # The float value after which the input is interpreted as a 1
+    )
+
     def __init__(self):
         self.gamepad: vg.VX360Gamepad | None = None
+        self.gamepad_state: ControllerInputsMap = ControllerInputsMap()
         self.left_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
         self.right_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
 
@@ -30,8 +45,16 @@ class VirtualControllerProvider:
 
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
 
+        logger.debug("Received input %s", c_input)
+        self.gamepad_state.set(
+            ControllerInputWithConfidence(
+                type=c_input.type, val=c_input.val, confidence=1.0
+            )
+        )
+
         if c_input.type in self.STICKS:
-            logger.debug("Received input %s", c_input)
+            if c_input.val > 0 and c_input.type in self.NEGATIVE_AXIS:
+                c_input.val = -c_input.val
             if c_input.type in self.RIGHT_STICK:  # Right Stick
                 if c_input.type in self.RIGHT_STICK_Y:
                     self.right_stick_values = (self.right_stick_values[0], c_input.val)
@@ -52,7 +75,7 @@ class VirtualControllerProvider:
                 )
 
         if c_input.type in self.BTN_TO_VGBUTTON:  # Press-Release Buttons
-            if abs(c_input.val) > 0.7: # Probably need to change it to > 0.7
+            if abs(c_input.val) > self.INPUT_THRESHOLD:
                 self.gamepad.press_button(self.BTN_TO_VGBUTTON[c_input.type])
             else:
                 self.gamepad.release_button(self.BTN_TO_VGBUTTON[c_input.type])
@@ -75,27 +98,23 @@ class VirtualControllerProvider:
         self.gamepad.update()
 
     def reset_controls(self):
-        """Releases all buttons (except sticks) of the Virtual Controller"""
+        """Releases all buttons of the Virtual Controller"""
 
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
 
         time.sleep(
             0.5
         )  # This looks unnecessary, but it's needed for it to work even when the level is reset
-        for btn in self.BTN_TO_VGBUTTON.values():
-            self.gamepad.release_button(btn)
-
-        for btn in self.DPAD_TO_VGBUTTON.values():
-            self.gamepad.release_button(btn)
-
-        self.gamepad.left_trigger_float(0.0)
-        self.gamepad.right_trigger_float(0.0)
-        self.gamepad.left_joystick_float(0.0, 0.0)
-        self.gamepad.right_joystick_float(0.0, 0.0)
-
+        self.gamepad.reset()
         self.gamepad.update()
         logger.info("Gamepad was reset")
         time.sleep(0.1)
+
+    def get_json(self) -> dict[str, Any]:
+        data: dict[str, Any] = dict()
+        for input_type, input_map in self.gamepad_state.inputs_map.items():
+            data[input_type.value] = asdict(input_map)
+        return data
 
     # Map of conversions between the InputType enum and the vg.XUSB_BUTTON used by the package vgamepad
     BTN_TO_VGBUTTON = {
@@ -129,3 +148,12 @@ class VirtualControllerProvider:
     LEFT_STICK = LEFT_STICK_X + LEFT_STICK_Y
     RIGHT_STICK = RIGHT_STICK_X + RIGHT_STICK_Y
     STICKS = LEFT_STICK + RIGHT_STICK
+
+    AXIS_INPUTS = STICKS + TRIGGERS
+
+    NEGATIVE_AXIS = [
+        InputType.STICK_LEFT_X_NEG,
+        InputType.STICK_LEFT_Y_NEG,
+        InputType.STICK_RIGHT_X_NEG,
+        InputType.STICK_RIGHT_Y_NEG,
+    ]

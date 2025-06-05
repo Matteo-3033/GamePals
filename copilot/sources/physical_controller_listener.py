@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 
-from inputs import DeviceManager, GamePad, devices
+from inputs import DeviceManager, GamePad, devices, WIN
 
 from .controller import ControllerInput, ControllerObserver, InputData, InputType
 
@@ -27,6 +27,35 @@ class RefreshableDeviceManager(DeviceManager):
         self._detect_gamepads()
 
 
+class NonBlockingGamePad:
+    """
+    This class is a wrapper for the GamePad class from the inputs package.
+    The only difference is that gamepad.read() only waits for an input event for timeout seconds, after
+    which it sends an empty list of events.
+    """
+
+    def __init__(self, gamepad: GamePad, timeout: float = 0.0):
+        self._gamepad = gamepad
+        self._timeout = timeout
+
+    def read(self):
+        return next(iter(self))
+
+    def __iter__(self):
+        while True:
+            start = time.time()
+            while True:
+                if WIN:
+                    self._gamepad._GamePad__check_state()
+
+                event = self._gamepad._do_iter()
+                if event:
+                    yield event
+                    break
+                if (time.time() - start) >= self._timeout:
+                    yield []
+
+
 class PhysicalControllerListener:
     """
     The PhysicalControllerListener class listens to the inputs of a Physical Controller and
@@ -36,6 +65,7 @@ class PhysicalControllerListener:
     """
 
     CHECK_GAMEPAD_INTERVAL = 2.5  # seconds
+    MAX_WAIT_FOR_INPUT = 1 / 30  # seconds
 
     def __init__(self, gamepad_number: int, late_init: bool = False) -> None:
         """
@@ -58,7 +88,7 @@ class PhysicalControllerListener:
         self.listener_thread: threading.Thread | None = None
 
         self._inputs_index = gamepad_number
-        self.gamepad: GamePad | None = None
+        self.gamepad: NonBlockingGamePad | None = None
 
         self.devices = RefreshableDeviceManager()
 
@@ -76,7 +106,7 @@ class PhysicalControllerListener:
         self.devices.update_gamepads()
 
         if self._inputs_index < len(self.devices.gamepads):
-            self.gamepad = self.devices.gamepads[self._inputs_index]
+            self.gamepad = NonBlockingGamePad(self.devices.gamepads[self._inputs_index], self.MAX_WAIT_FOR_INPUT)
             logger.info("Gamepad %d initialized", self._inputs_index)
             return True
 
@@ -87,12 +117,12 @@ class PhysicalControllerListener:
         """Adds a subscriber to the list of subscribers"""
         self.subscribers.append(subscriber)
 
-    def notify_all(self, c_input: ControllerInput) -> None:
+    def notify_all(self, c_input: ControllerInput | None) -> None:
         """Notifies all subscribers of an input, wrapped in an InputData object"""
-        data = InputData(c_input)
+        data = InputData(c_input) if c_input else None
         # logger.info("Sending data %s", data)
         for subscriber in self.subscribers:
-            subscriber.on_controller_input(data)
+            subscriber.on_controller_update(data)
 
     def start_listening(self) -> None:
         """Starts listening to the physical controller inputs and notifying its subscribers"""
@@ -124,6 +154,10 @@ class PhysicalControllerListener:
                 logger.error("Error while getting gamepad events: %s", e)
                 continue
 
+            if len(events) == 0:
+                self.notify_all(None)
+                continue
+
             for event in events:
                 if event.ev_type == "Sync":
                     continue
@@ -142,7 +176,7 @@ class PhysicalControllerListener:
 
         if len(input_types) == 1:
             idx = 0
-        else: # It's a stick, with split axis
+        else:  # It's a stick, with split axis
             idx = 0 if event.state >= 0 else 1
 
         input_value = self.normalize(input_types[idx], event.state)
@@ -155,16 +189,16 @@ class PhysicalControllerListener:
             case InputType.TRIGGER_RIGHT | InputType.TRIGGER_LEFT:
                 return val / 255
             case (
-                InputType.STICK_LEFT_X_POS
-                | InputType.STICK_LEFT_X_NEG
-                | InputType.STICK_LEFT_Y_POS
-                | InputType.STICK_LEFT_Y_NEG
-                | InputType.STICK_RIGHT_X_POS
-                | InputType.STICK_RIGHT_X_NEG
-                | InputType.STICK_RIGHT_Y_POS
-                | InputType.STICK_RIGHT_Y_NEG
+            InputType.STICK_LEFT_X_POS
+            | InputType.STICK_LEFT_X_NEG
+            | InputType.STICK_LEFT_Y_POS
+            | InputType.STICK_LEFT_Y_NEG
+            | InputType.STICK_RIGHT_X_POS
+            | InputType.STICK_RIGHT_X_NEG
+            | InputType.STICK_RIGHT_Y_POS
+            | InputType.STICK_RIGHT_Y_NEG
             ):
-                return val / 32767
+                return val / 32768
             case _:
                 return val
 
@@ -176,7 +210,7 @@ class PhysicalControllerListener:
         return self.gamepad_id
 
     # Map of conversions between "inputs" (the package) identifiers and the InputType enum.
-    INPUT_TYPES_MAP : dict[str, list[InputType]]  = {
+    INPUT_TYPES_MAP: dict[str, list[InputType]] = {
         "BTN_SOUTH": [InputType.BTN_A],
         "BTN_EAST": [InputType.BTN_B],
         "BTN_NORTH": [InputType.BTN_Y],
