@@ -11,7 +11,7 @@ class Loggable:
         return cls.__name__
 
     @abstractmethod
-    def get_json(self) -> dict[str, Any]:
+    def get_json(self) -> dict[str, Any] | list[Any]:
         """The json to log"""
         pass
 
