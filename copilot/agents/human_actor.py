@@ -32,6 +32,8 @@ class HumanActor(Actor, ControllerObserver):
 
         self.controller.subscribe(self)
 
+        logger.info(f"HumanActor with idx = {self.get_index()} has id = {self.id}")
+
     def get_index(self) -> int:
         """Returns the index with which the HumanActor is identified in the configuration"""
         return self.controller.get_index()
