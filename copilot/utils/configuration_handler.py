@@ -64,6 +64,7 @@ class ConfigurationHandler:
             lambda: defaultdict(lambda: 1.0)
         )
         self._user_actions: dict[int, list[GameAction]] = defaultdict(list)
+        self._agent_actions: dict[str, list[GameAction]] = defaultdict(list)
         self._policy_types: dict[GameAction, Type[Policy]] = defaultdict()
         self._registered_inputs: set[InputType] = set()
         self._required_agents: set[str] = set()
@@ -76,8 +77,8 @@ class ConfigurationHandler:
         self._agent_policy_roles: dict[tuple[GameAction, str], PolicyRole] = (
             defaultdict()
         )
-        self._user_input_to_action_map: dict[int, dict[InputType, GameAction]] = (
-            defaultdict(dict)
+        self._user_input_to_action_map: dict[int, dict[InputType, list[GameAction]]] = (
+            defaultdict(lambda: defaultdict(list))
         )
         self._action_to_user_input_map: dict[int, dict[GameAction, list[InputType]]] = (
             defaultdict(dict)
@@ -132,6 +133,15 @@ class ConfigurationHandler:
 
         self._game_action_type = game_action_type
 
+        for action, inputs in game_config.get("actions", dict()).items():
+            action = self._game_action_type(action)
+            inputs = [InputType(inp) for inp in inputs]
+            self._action_to_game_input_map[action] = inputs
+
+            for game_input in inputs:
+                self._game_input_to_action_map[game_input] = action
+                self._registered_inputs.add(game_input)
+
         for action in assistance_config.get("action", list()):
             action_enum = self._game_action_type(action["name"])
             for i, human in enumerate(action.get("humans", list())):
@@ -142,19 +152,26 @@ class ConfigurationHandler:
                 self._user_policy_roles[(action_enum, human_idx)] = PolicyRole(
                     human_role
                 )
-                controls = human.get("controls", list())
+                controls = human.get("controls", None)
+                if controls is None:
+                    controls = self._action_to_game_input_map.get(action_enum, list())
                 controls = [InputType(control) for control in controls]
 
-                self._confidence_levels[human_idx][action_enum] = human["confidence"]
+                self._confidence_levels[human_idx][action_enum] = human.get(
+                    "confidence", 1.0
+                )
 
                 for control in controls:
-                    self._user_input_to_action_map[human_idx][control] = action_enum
+                    self._user_input_to_action_map[human_idx][control].append(
+                        action_enum
+                    )
 
                 if len(controls) > 0:
                     self._action_to_user_input_map[human_idx][action_enum] = controls
 
             for agent in action.get("agents", list()):
                 agent_role = agent.get("role", self.DEFAULTS["AGENT_ROLE"])
+                self._agent_actions[agent["name"]].append(action_enum)
                 self._required_agents.add(agent["name"])
                 self._agent_policy_roles[(action_enum, agent["name"])] = PolicyRole(
                     agent_role
@@ -164,15 +181,6 @@ class ConfigurationHandler:
                 self._policy_types[action_enum] = PolicyName[
                     action.get("policy", self.DEFAULTS["POLICY"])
                 ].value
-
-        for action, inputs in game_config.get("actions", dict()).items():
-            action = self._game_action_type(action)
-            inputs = [InputType(inp) for inp in inputs]
-            self._action_to_game_input_map[action] = inputs
-
-            for game_input in inputs:
-                self._game_input_to_action_map[game_input] = action
-                self._registered_inputs.add(game_input)
 
         for agent in assistance_config.get("agent", list()):
             if agent["name"] not in self._required_agents and agent.get(
@@ -190,9 +198,13 @@ class ConfigurationHandler:
         """Returns the confidence level associated with every GameAction, for a specific HumanActor"""
         return self._confidence_levels.get(user_idx, dict())
 
-    def get_controlled_actions(self, user_idx: int) -> list[GameAction]:
+    def get_user_controlled_actions(self, user_idx: int) -> list[GameAction]:
         """Returns the list of game actions that a certain HumanActor is responsible for"""
         return self._user_actions.get(user_idx, list())
+
+    def get_agent_controlled_actions(self, agent_name: str) -> list[GameAction]:
+        """Returns the list of game actions that a certain Software Agent is responsible for"""
+        return self._agent_actions.get(agent_name, list())
 
     def get_registered_action_inputs(self) -> set[InputType]:
         """
@@ -201,15 +213,13 @@ class ConfigurationHandler:
         """
         return self._registered_inputs
 
-    def user_input_to_action(
+    def user_input_to_actions(
         self,
         user_idx: int,
         input_type: InputType,
-    ) -> Optional[GameAction]:
-        """Returns the GameAction that the user user_idx intends to do when pressing the given input_type"""
-        return self._user_input_to_action_map.get(user_idx, dict()).get(
-            input_type, None
-        )
+    ) -> list[GameAction]:
+        """Returns the GameAction(s) that the user user_idx intends to do when pressing the given input_type"""
+        return self._user_input_to_action_map.get(user_idx, dict()).get(input_type, [])
 
     def action_to_user_input(
         self,

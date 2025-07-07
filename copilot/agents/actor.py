@@ -1,11 +1,15 @@
+import logging
 import uuid
 from abc import ABC, abstractmethod
 
 from copilot.sources.controller import ControllerInput
+from copilot.utils.configuration_handler import ConfigurationHandler
 
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor_id import ActorID
 from .observer import ActorData, ActorObserver, MessageData
+
+logger = logging.getLogger(__name__)
 
 
 class Actor(ABC):
@@ -18,7 +22,6 @@ class Actor(ABC):
     """
 
     def __init__(self):
-        from copilot.utils.configuration_handler import ConfigurationHandler
 
         self.id = ActorID(str(uuid.uuid4()))
         self.subscribers: list[ActorObserver] = []
@@ -32,14 +35,26 @@ class Actor(ABC):
         """Adds a new subscriber to the list"""
         self.subscribers.append(subscriber)
 
-    def notify_input(self, actor_data: ActionInput, confidence: float) -> None:
+    def notify_input(self, action_input: ActionInput, confidence: float) -> None:
         """Notifies all the subscribers with an ActionInputWithConfidence object"""
+        if not self._filter_input(action_input):
+            logger.debug(
+                f"Input {action_input.action} with value {action_input.val} filtered by {self.id}"
+            )
+            return
+
         data = ActorData(
             self.id,
-            ActionInputWithConfidence(actor_data.action, actor_data.val, confidence),
+            ActionInputWithConfidence(
+                action_input.action, float(action_input.val), float(confidence)
+            ),
         )
         for subscriber in self.subscribers:
             subscriber.on_input_update(data)
+
+    def _filter_input(self, action_input: ActionInput) -> bool:
+        """Filters the input data before notifying the subscribers"""
+        return True
 
     def notify_message(self, message: str) -> None:
         """Notifies all subscribers with a MessageData object"""
@@ -53,8 +68,13 @@ class Actor(ABC):
         pass
 
     @abstractmethod
-    def get_controlled_actions(self) -> list[GameAction]:
+    def get_controllable_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is able to control"""
+        pass
+
+    @abstractmethod
+    def get_controlled_actions(self) -> list[GameAction]:
+        """Returns the list of Game Actions that the Actor is actually controlling"""
         pass
 
     @abstractmethod

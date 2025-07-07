@@ -33,7 +33,7 @@ class PolicyContinuousSupervisionByPilot(BinaryPolicy):
         for entry in entries:
 
             if entry.actor_role == PolicyRole.PILOT and not math.isclose(
-                entry.input_details.val, 0.0, abs_tol=1e-3
+                entry.input_details.val, 0.0, abs_tol=1e-2
             ):
                 return entry.input_details.val
 
