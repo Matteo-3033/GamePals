@@ -12,11 +12,12 @@ class ActionConversionDelegate(ABC):
     Class used to convert Action Inputs to Controller Inputs and vice versa.
     It is useful for actions that manage multiple inputs, such as the throttle a car.
 
-
     The conversion from Controller Input to Action is delayed to allow for hold/multiple buttons combinations to happen.
     It works in two steps:
     * Register the occurring of the input
     * Check for any ready-to-be-converted Actions and return them
+
+    The conversion from Action to Controller Input happens in a single step, using convert_to_inputs
     """
 
     def __init__(self, user_idx : int, actions: list[GameAction]) -> None:

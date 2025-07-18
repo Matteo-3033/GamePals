@@ -18,7 +18,10 @@ class ActorData:
 
 @dataclass
 class MessageData:
-    """The wrapper class of the String Data sent to an Actor Observer"""
+    """
+    The wrapper class of the String Data sent to an Actor Observer.
+    It can be used to send meta-commands and other messages to ActorObservers.
+    """
 
     actor_id: ActorID
     message: str

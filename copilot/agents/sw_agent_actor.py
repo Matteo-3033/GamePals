@@ -12,7 +12,7 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
     SWAgentActor is a particular type of Actor that represents a Software Agent.
 
     The inputs it produces are generated based on the current Game State, whose updates it receives.
-    In particular, the Agent produces Actions, which will eventually be converted to Game Inputs by the arbitrator.
+    In particular, the Agent produces Actions, which will eventually be converted to Game Inputs after the arbitration.
     """
 
     def __init__(self, game_state: GameStateListener, **kwargs) -> None:
@@ -48,7 +48,6 @@ class SWAgentActor(Actor, GameStateObserver, ABC):
 
     def get_controller_inputs(self) -> list[ControllerInput]:
         return self.config_handler.get_agent_controlled_actions(self.get_name())
-
 
     def get_controlled_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is actually controlling"""
