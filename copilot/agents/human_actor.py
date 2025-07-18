@@ -28,7 +28,7 @@ class HumanActor(Actor, ControllerObserver):
             self.config_handler.get_confidence_levels(self.controller.get_index())
         )
 
-        self.conversion_manager : ActionConversionManager = conversion_manager
+        self.conversion_manager: ActionConversionManager = conversion_manager
 
         self.controller.subscribe(self)
 
@@ -60,14 +60,16 @@ class HumanActor(Actor, ControllerObserver):
     def get_controlled_actions(self) -> list[GameAction]:
         """Returns the list of Game Actions that the Actor is actually controlling"""
         controllable = self.get_controllable_actions()
-        controlled = self.config_handler.get_user_controlled_actions(self.controller.get_index())
+        controlled = self.config_handler.get_user_controlled_actions(
+            self.controller.get_index()
+        )
         return list(set(controllable).intersection(controlled))
 
     def on_controller_update(self, data: InputData | None) -> None:
         """Receives an Input from the Controller and notifies it with the associated confidence level"""
 
         update_data = data.c_input if data else None
-        
+
         # Before sending, it converts the user input into the game inputs
         action_inputs = self.conversion_manager.input_to_actions(
             self.get_index(), update_data

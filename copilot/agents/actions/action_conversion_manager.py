@@ -69,8 +69,6 @@ class ActionConversionManager:
                 for user_input in user_inputs:
                     self._input_to_delegate_map[user_idx][user_input] = delegate
 
-
-
     def input_to_actions(
         self, user_idx: int, c_input: ControllerInput | None
     ) -> list[ActionInput]:

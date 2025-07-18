@@ -16,7 +16,7 @@ class Actor(ABC):
     """
     Actor represents a generic subject of the Architecture.
 
-    It's a source of Inputs and Messages, but also reads Inputs and Messages of other Actors.
+    It's a source of Inputs and Messages (e.g. MetaCommands), but also reads Inputs and Messages of other Actors.
 
     An Actor is uniquely identified by its actor ActorID.
     """
