@@ -13,7 +13,7 @@ class PolicyContinuousSupervisionByPilot(BinaryPolicy):
     """
     PolicyBinarySupervisionByPilot is a Binary Policy that:
      * if a Pilot suggests value 1, produces 1
-     * otherwise, it decides democratically the result of the merge (equivalent to PolicyBinaryDemocracy.
+     * otherwise, it decides democratically the result of the merge (equivalent to PolicyBinaryDemocracy).
 
     The democratic decision is based on the confidence level of the actors.
 
@@ -31,7 +31,6 @@ class PolicyContinuousSupervisionByPilot(BinaryPolicy):
     @staticmethod
     def merge_input_entries(entries: list[InputEntry]) -> float:
         for entry in entries:
-
             if entry.actor_role == PolicyRole.PILOT and not math.isclose(
                 entry.input_details.val, 0.0, abs_tol=1e-2
             ):
