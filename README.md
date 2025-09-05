@@ -82,15 +82,3 @@ This will create two folders: `dist/` and `copilot.egg-info/`. Inside the dist/ 
 ```bash
 pip install <path to the whl file>
 ```
-
-Alternatively, the library can be installed directly from the GitLab repository using the following command:
-
-```bash
-pip install git+https://gitlab.di.unimi.it/ewlab/accessibility/vgcopilot/copilot.git
-```
-
-Note that in case of updates to the library, you will need to manually reinstall it by running:
-
-```bash
-pip install --upgrade --force-reinstall --no-cache-dir git+https://gitlab.di.unimi.it/ewlab/accessibility/vgcopilot/copilot.git
-```
