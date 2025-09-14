@@ -1,8 +1,8 @@
 import logging
 from collections import defaultdict
 
-from copilot.sources.controller import ControllerInput, InputType
-from copilot.utils.configuration_handler import ConfigurationHandler
+from gamepals.sources.controller import ControllerInput, InputType
+from gamepals.utils.configuration_handler import ConfigurationHandler
 
 from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput

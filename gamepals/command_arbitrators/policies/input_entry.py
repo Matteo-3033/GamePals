@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from copilot.agents import ActorID
+from gamepals.agents import ActorID
 from .policy_role import PolicyRole
 
 

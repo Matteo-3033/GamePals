@@ -5,7 +5,7 @@ from typing import Any
 
 import vgamepad as vg
 
-from copilot.utils.logging import Loggable
+from gamepals.utils.logging import Loggable
 
 from .controller import (
     ControllerInput,

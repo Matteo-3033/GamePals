@@ -1,5 +1,5 @@
-from copilot.sources import VirtualControllerProvider
-from copilot.sources.game import GameState, GameStateListener
+from gamepals.sources import VirtualControllerProvider
+from gamepals.sources.game import GameState, GameStateListener
 
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor import Actor

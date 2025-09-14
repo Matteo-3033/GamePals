@@ -1,9 +1,9 @@
 import logging
 from dataclasses import dataclass
 
-from copilot.agents import Actor, ActorID, HumanActor, SWAgentActor
-from copilot.agents.actions import GameAction
-from copilot.utils.configuration_handler import ConfigurationHandler
+from gamepals.agents import Actor, ActorID, HumanActor, SWAgentActor
+from gamepals.agents.actions import GameAction
+from gamepals.utils.configuration_handler import ConfigurationHandler
 
 from .input_entry import PolicyRole
 from .policy import Policy

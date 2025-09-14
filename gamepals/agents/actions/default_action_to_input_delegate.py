@@ -3,8 +3,8 @@ import time
 from dataclasses import dataclass
 from collections import deque
 
-from copilot.sources import VirtualControllerProvider
-from copilot.sources.controller import ControllerInput, InputType
+from gamepals.sources import VirtualControllerProvider
+from gamepals.sources.controller import ControllerInput, InputType
 
 from .abstract_conversion_delegate import ActionConversionDelegate
 from .action_input import ActionInput

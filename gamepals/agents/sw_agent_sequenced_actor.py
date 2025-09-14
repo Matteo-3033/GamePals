@@ -1,7 +1,7 @@
 import time
 from abc import ABC, abstractmethod
 
-from copilot.sources.game import GameState, GameStateListener
+from gamepals.sources.game import GameState, GameStateListener
 
 from .actions import ActionInputWithConfidence
 from .actor import Actor

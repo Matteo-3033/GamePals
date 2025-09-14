@@ -1,7 +1,7 @@
 import logging
 
-from copilot.sources import PhysicalControllerListener
-from copilot.sources.controller import ControllerInput, ControllerObserver, InputData
+from gamepals.sources import PhysicalControllerListener
+from gamepals.sources.controller import ControllerInput, ControllerObserver, InputData
 
 from .actions import ActionConversionManager, ActionInput, GameAction
 from .actor import Actor

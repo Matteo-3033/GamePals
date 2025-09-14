@@ -1,6 +1,6 @@
 from enum import Enum
 
-from copilot.utils import get_all_concrete_subclasses
+from gamepals.utils import get_all_concrete_subclasses
 
 from .input_entry import ActionInputRecord, InputEntry
 from .policy import Policy

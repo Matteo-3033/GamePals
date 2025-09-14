@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from copilot.sources.controller import ControllerInput
-from copilot.sources.game import GameState, GameStateListener, GameStateObserver
+from gamepals.sources.controller import ControllerInput
+from gamepals.sources.game import GameState, GameStateListener, GameStateObserver
 
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor import Actor

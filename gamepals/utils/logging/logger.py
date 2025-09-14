@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Logger:
     """
-    Logger is the class that handles writing the state of the copilot architecture on a log file
+    Logger is the class that handles writing the state of the gamepals architecture on a log file
     """
 
     INTERVAL_BETWEEN_LOGS = 1.0  # seconds

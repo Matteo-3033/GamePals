@@ -2,13 +2,13 @@ import logging
 from dataclasses import asdict
 from typing import Any, Type
 
-from copilot.agents import Actor, ActorID
-from copilot.agents.actions import ActionConversionManager, ActionInput, GameAction
-from copilot.agents.observer import ActorData, ActorObserver, MessageData
-from copilot.sources import VirtualControllerProvider
-from copilot.sources.controller import ControllerInput
-from copilot.utils.configuration_handler import ConfigurationHandler
-from copilot.utils.logging import Loggable
+from gamepals.agents import Actor, ActorID
+from gamepals.agents.actions import ActionConversionManager, ActionInput, GameAction
+from gamepals.agents.observer import ActorData, ActorObserver, MessageData
+from gamepals.sources import VirtualControllerProvider
+from gamepals.sources.controller import ControllerInput
+from gamepals.utils.configuration_handler import ConfigurationHandler
+from gamepals.utils.logging import Loggable
 
 from .game_actions_map import GameActionsMap
 from .policies import InputEntry, Policy, PolicyManager

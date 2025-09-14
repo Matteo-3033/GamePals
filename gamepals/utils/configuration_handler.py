@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Any, Optional, Type
 from .utils import get_all_concrete_subclasses
 
 if TYPE_CHECKING:
-    from copilot.agents.actions import GameAction
-    from copilot.agents.sw_agent_actor import SWAgentActor
-    from copilot.command_arbitrators.policies import Policy, PolicyRole
-    from copilot.sources.controller import InputType
+    from gamepals.agents.actions import GameAction
+    from gamepals.agents.sw_agent_actor import SWAgentActor
+    from gamepals.command_arbitrators.policies import Policy, PolicyRole
+    from gamepals.sources.controller import InputType
 else:
     GameAction = Any
 
@@ -91,7 +91,7 @@ class ConfigurationHandler:
     @staticmethod
     def _get_game_specific_class(class_name: str) -> Optional[Type[GameAction]]:
         """Loads a game specific class, given the class name and the superclass"""
-        from copilot.agents.actions import GameAction
+        from gamepals.agents.actions import GameAction
 
         subclasses = get_all_concrete_subclasses(GameAction)
         filtered_subclasses = list(
@@ -112,8 +112,8 @@ class ConfigurationHandler:
         """
         Loads the configuration from config.example into more specific dictionaries.
         """
-        from copilot.command_arbitrators.policies import PolicyName, PolicyRole
-        from copilot.sources.controller import InputType
+        from gamepals.command_arbitrators.policies import PolicyName, PolicyRole
+        from gamepals.sources.controller import InputType
 
         # TODO: Configuration Validation should go here
 
@@ -246,7 +246,7 @@ class ConfigurationHandler:
 
     def get_necessary_agents(self) -> set[Type[SWAgentActor]]:
         """Returns the list of SWAgentActors that are required by the config.example"""
-        from copilot.agents.sw_agent_actor import SWAgentActor
+        from gamepals.agents.sw_agent_actor import SWAgentActor
 
         agent_classes = get_all_concrete_subclasses(cls=SWAgentActor)
 

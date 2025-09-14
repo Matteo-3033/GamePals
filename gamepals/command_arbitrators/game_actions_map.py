@@ -1,6 +1,6 @@
 import time
 
-from copilot.agents.actions import ActionInput, ActionInputWithConfidence, GameAction
+from gamepals.agents.actions import ActionInput, ActionInputWithConfidence, GameAction
 
 from .policies import ActionInputRecord
 

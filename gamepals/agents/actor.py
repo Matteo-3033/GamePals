@@ -2,8 +2,8 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 
-from copilot.sources.controller import ControllerInput
-from copilot.utils.configuration_handler import ConfigurationHandler
+from gamepals.sources.controller import ControllerInput
+from gamepals.utils.configuration_handler import ConfigurationHandler
 
 from .actions import ActionInput, ActionInputWithConfidence, GameAction
 from .actor_id import ActorID

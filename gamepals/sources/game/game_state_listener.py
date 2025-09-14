@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from copilot.utils.logging import Loggable
+from gamepals.utils.logging import Loggable
 
 from .game_state import GameState
 from .game_state_observer import GameStateObserver
