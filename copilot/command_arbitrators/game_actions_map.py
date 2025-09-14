@@ -10,7 +10,7 @@ class GameActionsMap:
     GameActionsMap is a class that stores for each Game Action a corresponding ActionInputRecord
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.actions_map: dict[GameAction, ActionInputRecord] = {}
 
     def set(

@@ -19,7 +19,7 @@ class ControllerInputsMap:
     ControllerInputsMap is a class that stores for each Input a corresponding ControllerInputRecord
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.inputs_map = {i: ControllerInputRecord(0, 0, 0) for i in InputType}
 
     def set(

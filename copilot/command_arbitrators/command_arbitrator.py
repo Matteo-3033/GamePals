@@ -1,9 +1,8 @@
-import json
 import logging
 from dataclasses import asdict
-from typing import Type, Any
+from typing import Any, Type
 
-from copilot.agents import Actor, ActorID, HumanActor
+from copilot.agents import Actor, ActorID
 from copilot.agents.actions import ActionConversionManager, ActionInput, GameAction
 from copilot.agents.observer import ActorData, ActorObserver, MessageData
 from copilot.sources import VirtualControllerProvider
@@ -75,10 +74,10 @@ class CommandArbitrator(ActorObserver, Loggable):
         for merged_input in merge_result:
             self.execute_command(merged_input)
 
-    def on_message_update(self, data: MessageData) -> None:
+    def on_message_update(self, message_data: MessageData) -> None:
         """Receives a Message from one of its Actors"""
-        logger.info("Received Message: %s", data)
-        if "RESET" in data.message:
+        logger.info("Received Message: %s", message_data)
+        if "RESET" in message_data.message:
             self.virtual_controller.reset_controls()
 
     def _merge_by_action(self, action: GameAction) -> list[ControllerInput]:
@@ -112,7 +111,7 @@ class CommandArbitrator(ActorObserver, Loggable):
         for actor in self.actors.values():
             actor.on_arbitrated_inputs(input_data)
 
-    def get_virtual_controller(self):
+    def get_virtual_controller(self) -> VirtualControllerProvider:
         return self.virtual_controller
 
     def get_json(self) -> list[Any]:
@@ -122,9 +121,11 @@ class CommandArbitrator(ActorObserver, Loggable):
                 game_action: asdict(action_input_record)
                 for game_action, action_input_record in action_map.actions_map.items()
             }
-            data.append(dict(
-                actor_name=self.actors[actor_id].__class__.__name__,
-                actor_id=self.actors[actor_id].get_id(),
-                actions=actions_dict,
-            ))
+            data.append(
+                dict(
+                    actor_name=self.actors[actor_id].__class__.__name__,
+                    actor_id=self.actors[actor_id].get_id(),
+                    actions=actions_dict,
+                )
+            )
         return data

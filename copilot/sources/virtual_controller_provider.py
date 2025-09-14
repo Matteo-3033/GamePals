@@ -1,4 +1,3 @@
-import json
 import logging
 import time
 from dataclasses import asdict
@@ -27,7 +26,7 @@ class VirtualControllerProvider(Loggable):
         0.7  # The float value after which the input is interpreted as a 1
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.gamepad: vg.VX360Gamepad | None = None
         self.gamepad_state: ControllerInputsMap = ControllerInputsMap()
         self.left_stick_values: tuple[float, float] = (0, 0)  # (X, Y)
@@ -97,7 +96,7 @@ class VirtualControllerProvider(Loggable):
 
         self.gamepad.update()
 
-    def reset_controls(self):
+    def reset_controls(self) -> None:
         """Releases all buttons of the Virtual Controller"""
 
         assert self.gamepad is not None, "Gamepad not initialized. Call start() first."
