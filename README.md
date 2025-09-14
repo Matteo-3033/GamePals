@@ -6,13 +6,13 @@ players or software agents — into a single control stream.
 
 ## Project Structure
 
-- [**agents/**](copilot/agents) – Defines the core **Actor** classes, including **Human Actors** (physical controllers) and **Software Agent Actors** (extendable for AI-based control).
+- [**agents/**](gamepals/agents) – Defines the core **Actor** classes, including **Human Actors** (physical controllers) and **Software Agent Actors** (extendable for AI-based control).
 
-- [**command_arbitrators/**](copilot/command_arbitrators) – Implements the **Command Arbitrator**, responsible for merging inputs from multiple Actors, and a **Policy Manager** that handles arbitration policies.
+- [**command_arbitrators/**](gamepals/command_arbitrators) – Implements the **Command Arbitrator**, responsible for merging inputs from multiple Actors, and a **Policy Manager** that handles arbitration policies.
 
-- [**sources/**](copilot/sources) – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
+- [**sources/**](gamepals/sources) – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
 
-- [**utils/**](copilot/utils)– Contains utility functions, such as an **argument parser**.
+- [**utils/**](gamepals/utils)– Contains utility functions, such as an **argument parser**.
 
 This architecture is designed for flexibility, allowing seamless integration of multiple human and AI-controlled inputs
 to enhance accessibility and gameplay experiences.
@@ -47,7 +47,7 @@ The infrastructure's configuration requires 3 different configuration files:
     - For every game action, which Human Actors and Software Agent Actors are allowed to execute it and to which extent.
     - For every game action, which arbitration policy should be used to merge the actor inputs.
     - Which inputs are associated with agent's meta-commands.
-    - Eventually, special copilots that don't handle any action.
+    - Eventually, special Software Agent Actors that don't handle any action.
 
 An example for each of these files can be found in the [config](config.example) folder.
 
