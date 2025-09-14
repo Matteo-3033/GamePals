@@ -1,0 +1,14 @@
+#pragma once
+
+#define WIN32_LEAN_AND_MEAN
+#define _CRT_SECURE_NO_WARNINGS
+#include <windows.h>
+
+#include "bakkesmod/plugin/bakkesmodplugin.h"
+
+#include <string>
+#include <vector>
+#include <functional>
+#include <memory>
+
+#include "logging.h"

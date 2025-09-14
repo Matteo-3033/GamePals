@@ -1,0 +1,19 @@
+[[agent]]
+name = "ThrottleCopilot"
+actions = ["throttle"]
+
+[[agent]]
+name = "MovementCopilot"
+actions = ["steer_yaw", "pitch"]
+
+[[agent]]
+name = "JumpCopilot"
+actions = ["jump"]
+
+[[agent]]
+name = "HandbrakeCopilot"
+actions = ["handbrake"]
+
+[[agent]]
+name = "BoostCopilot"
+actions = ["boost"]

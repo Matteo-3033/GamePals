@@ -1,0 +1,81 @@
+[[action]]
+name = "throttle"
+humans = [
+    { confidence = 1.0, controls = ["Trigger_Left", "Trigger_Right"] }
+]
+agents = [
+    { name = "ThrottleCopilot", role = "Pilot" }
+]
+policy = "POLICY_CONT_SUPV_BY_PILOT"
+
+[[action]]
+name = "steer_yaw"
+humans = [
+    # { confidence = 1.0, controls = ["Stick_Left_X_Neg", "Stick_Left_X_Pos"] }
+]
+agents = [
+    { name = "MovementCopilot", role = "Copilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "pitch"
+humans = [
+    # { confidence = 1.0, controls = ["Stick_Left_Y_Pos", "Stick_Left_Y_Neg"] }
+]
+agents = [
+    { name = "MovementCopilot", role = "Copilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "jump"
+humans = [
+    # { confidence = 1.0, controls = ["A"] }
+]
+agents = [
+    { name = "JumpCopilot", role = "Copilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "handbrake"
+humans = [
+    # { confidence = 1.0, controls = ["X"] }
+]
+agents = [
+    { name = "HandbrakeCopilot", role = "Copilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "boost"
+humans = [
+    # { confidence = 1.0, controls = ["B"] }
+]
+agents = [
+    { name = "BoostCopilot", role = "Copilot" }
+]
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "focus_ball"
+humans = [
+    { confidence = 1.0, controls = ["Y"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+[[action]]
+name = "pause"
+humans = [
+    { confidence = 1.0, controls = ["Start"] }
+]
+agents = []
+policy = "POLICY_EXCLUSIVITY"
+
+
+[[agent]]
+name = "ThrottleCopilot"
+active = "True"
+params = { control = "acceleration" }   # acceleration / deacceleration / both (default)

@@ -1,0 +1,14 @@
+[game]
+name = "ROCKET LEAGUE!!!"
+action_name = "RLGameAction"
+
+[actions]
+steer_yaw = ["Stick_Left_X_Neg", "Stick_Left_X_Pos"]
+jump = ["A"]
+boost = ["B"]
+pitch = ["Stick_Left_Y_Pos", "Stick_Left_Y_Neg"]
+handbrake = ["X"]
+# roll = ["Bumper_Left", "Bumper_Right"]
+throttle = ["Trigger_Left", "Trigger_Right"]
+focus_ball = ["Y"]
+pause = ["Start"]

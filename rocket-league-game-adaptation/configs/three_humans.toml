@@ -1,0 +1,67 @@
+[[action]]
+name = "throttle"
+humans = [
+    { controls = ["Trigger_Left", "Trigger_Right"] },
+    { controls = ["Trigger_Left", "Trigger_Right"] },
+    { controls = ["Trigger_Left", "Trigger_Right"] }
+]
+policy = "POLICY_CONT_SUM"
+
+[[action]]
+name = "steer_yaw"
+humans = [
+    { controls = ["Stick_Left_X_Neg", "Stick_Left_X_Pos"] },
+    { controls = ["Stick_Left_X_Neg", "Stick_Left_X_Pos"] },
+    { controls = ["Stick_Left_X_Neg", "Stick_Left_X_Pos"] }
+]
+policy = "POLICY_CONT_SUM"
+
+[[action]]
+name = "pitch"
+humans = [
+    { controls = ["Stick_Left_Y_Pos", "Stick_Left_Y_Neg"] },
+    { controls = ["Stick_Left_Y_Pos", "Stick_Left_Y_Neg"] },
+    { controls = ["Stick_Left_Y_Pos", "Stick_Left_Y_Neg"] }
+]
+policy = "POLICY_CONT_SUM"
+
+[[action]]
+name = "jump"
+humans = [
+    { controls = ["A"] },
+    { controls = ["A"] },
+    { controls = ["A"] }
+]
+policy = "POLICY_BIN_OR"
+
+[[action]]
+name = "handbrake"
+humans = [
+    { controls = ["X"] },
+    { controls = ["X"] },
+    { controls = ["X"] }
+]
+policy = "POLICY_BIN_OR"
+
+[[action]]
+name = "boost"
+humans = [
+    { controls = ["B"] },
+    { controls = ["B"] },
+    { controls = ["B"] }
+]
+policy = "POLICY_BIN_OR"
+
+[[action]]
+name = "focus_ball"
+humans = [
+    { controls = ["Y"] }
+]
+policy = "POLICY_BIN_OR"
+
+[[action]]
+name = "pause"
+humans = [
+    { controls = ["Start"] }
+]
+policy = "POLICY_BIN_OR"

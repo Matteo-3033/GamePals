@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{54cf3829-a3e9-4535-91fd-879573bc7829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{4e1a43ec-b588-4823-8be7-402867847369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fc1a484a-7552-4a76-ba6c-27087a485ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Plugin\headers">
+      <UniqueIdentifier>{61daafbd-3ebc-459a-a6ff-aab7b8f5d9cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin\src">
+      <UniqueIdentifier>{825df49f-da84-4588-aef4-f2d05f02fbca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RocketLeagueGameStateParser.h">
+      <Filter>Plugin\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Plugin\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Broadcaster.h">
+      <Filter>Plugin\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTickPacket.h">
+      <Filter>Plugin\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="Broadcaster.cpp">
+      <Filter>Plugin\src</Filter>
+    </ClCompile>
+    <ClCompile Include="RocketLeagueGameStateParser.cpp">
+      <Filter>Plugin\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTickPacket.cpp">
+      <Filter>Plugin\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
