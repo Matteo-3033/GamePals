@@ -12,7 +12,7 @@ players or software agents — into a single control stream.
 
 - [**sources/**](copilot/sources) – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
 
-- [**utils/**](copilot/utils) – Contains utility functions, such as an **argument parser**.
+- [**utils/**](copilot/utils)– Contains utility functions, such as an **argument parser**.
 
 This architecture is designed for flexibility, allowing seamless integration of multiple human and AI-controlled inputs
 to enhance accessibility and gameplay experiences.
@@ -42,7 +42,7 @@ The infrastructure's configuration requires 3 different configuration files:
 
 1. [`game.toml`](config.example/game.toml.example), which contains all the information about the game for which the infrastructure is being used.
    In particular, in this file are stored the inputs that the game recognizes and to which actions they are mapped. What is written in this file should match what the game settings look like.
-2. [`agents.toml`](config.example/agents.tomp.example), which contains all the information about the known software agents for the game. Each declared agents should explicitly report what game actions they are able to control and which parameters and commands they are able to understand.
+2. [`agents.toml`](config.example/agents.toml.example), which contains all the information about the known software agents for the game. Each declared agents should explicitly report what game actions they are able to control and which parameters and commands they are able to understand.
 3. [`assistance.toml`](config.example/assistance.toml.example), which contains all the information about how the arbitration should actually happen. In particular, this file contains:
     - For every game action, which Human Actors and Software Agent Actors are allowed to execute it and to which extent.
     - For every game action, which arbitration policy should be used to merge the actor inputs.
