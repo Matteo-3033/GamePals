@@ -17,7 +17,7 @@ players or software agents — into a single control stream.
 This architecture is designed for flexibility, allowing seamless integration of multiple human and AI-controlled inputs
 to enhance accessibility and gameplay experiences.
 
-![Framework architecture](assets/architecture.png)
+![Framework architecture](assets/gamepals.png)
 
 ## Requirements and Setup
 
