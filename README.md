@@ -6,13 +6,13 @@ players or software agents — into a single control stream.
 
 ## Project Structure
 
-- [**agents/**](gamepals/agents) – Defines the core **Actor** classes, including **Human Actors** (physical controllers) and **Software Agent Actors** (extendable for AI-based control).
+-   [**agents/**](gamepals/agents) – Defines the core **Actor** classes, including **Human Actors** (physical controllers) and **Software Agent Actors** (extendable for AI-based control).
 
-- [**command_arbitrators/**](gamepals/command_arbitrators) – Implements the **Command Arbitrator**, responsible for merging inputs from multiple Actors, and a **Policy Manager** that handles arbitration policies.
+-   [**command_arbitrators/**](gamepals/command_arbitrators) – Implements the **Command Arbitrator**, responsible for merging inputs from multiple Actors, and a **Policy Manager** that handles arbitration policies.
 
-- [**sources/**](gamepals/sources) – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
+-   [**sources/**](gamepals/sources) – Manages physical and virtual input handling, including a **Physical Controller Listener**, a **Virtual Controller Provider**, and a **Game State Listener**.
 
-- [**utils/**](gamepals/utils)– Contains utility functions, such as an **argument parser**.
+-   [**utils/**](gamepals/utils)– Contains utility functions, such as an **argument parser**.
 
 This architecture is designed for flexibility, allowing seamless integration of multiple human and AI-controlled inputs
 to enhance accessibility and gameplay experiences.
@@ -23,15 +23,15 @@ to enhance accessibility and gameplay experiences.
 
 To run the architecture successfully, the following tools and packages are required:
 
-- **Windows OS** - The architecture is currently only available for Windows.
+-   **Windows OS** - The architecture is currently only available for Windows.
 
-- A **Physical GamePad** - This can either be an Xbox Controller or a DualShock Controller (for the latter, [**DS4Windows**](https://ds4-windows.com/) is also a requirement).
+-   A **Physical GamePad** - This can either be an Xbox Controller or a DualShock Controller (for the latter, [**DS4Windows**](https://ds4-windows.com/) is also a requirement).
 
-- [**HidHide**](https://ds4-windows.com/download/hidhide/) - A tool used to hide the physical controller from the game, ensuring the game receives only inputs from a Virtual Controller.
+-   [**HidHide**](https://ds4-windows.com/download/hidhide/) - A tool used to hide the physical controller from the game, ensuring the game receives only inputs from a Virtual Controller.
 
-- [**Python 3.13**](https://www.python.org/downloads/release/python-3130/) - The latest Python version as of February 2025.
+-   [**Python 3.13**](https://www.python.org/downloads/release/python-3130/) - The latest Python version as of February 2025.
 
-- `requirements.txt` - The required Python packages can be installed using:
+-   `requirements.txt` - The required Python packages can be installed using:
     ```bash
     pip install -r requirements.txt
     ```
@@ -77,7 +77,7 @@ Once the build package is installed, run the following command to generate the b
 python -m build
 ```
 
-This will create two folders: `dist/` and `gamepals.egg-info/`. Inside the dist folder, you will find a file named `gamepals-<version>-py3-none-any.whl`, which can be used to install the package locally using pip:
+This will create two folders: `dist/` and `GamePals.egg-info/`. Inside the dist folder, you will find a file named `gamepals-<version>-py3-none-any.whl`, which can be used to install the package locally using pip:
 
 ```bash
 pip install <path to the whl file>
