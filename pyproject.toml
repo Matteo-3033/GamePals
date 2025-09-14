@@ -7,8 +7,8 @@ name = "GamePals"
 version = "1.0"
 description = "GamePals framework to enables shared control over video game instances"
 authors = [
-  { name="Matteo Manzoni", email="matteo.manzoni@unimi.it" },
-  { name="Filippo Corti", email="filippo.corti1@studenti.unimi.it" }
+  { name="Matteo Manzoni" },
+  { name="Filippo Corti" }
 ]
 readme = "README.md"
 license = { text = "MIT" }
