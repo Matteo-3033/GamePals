@@ -42,11 +42,11 @@ The infrastructure's configuration requires 3 different configuration files:
 
 1. [`game.toml`](config.example/game.toml.example), which contains all the information about the game for which the infrastructure is being used.
    In particular, in this file are stored the inputs that the game recognizes and to which actions they are mapped. What is written in this file should match what the game settings look like.
-2. [`agents.toml`](config.example/agents.toml.example), which contains all the information about the known software agents for the game. Each declared agents should explicitly report what game actions they are able to control and which parameters and commands they are able to understand.
+2. [`agents.toml`](config.example/agents.toml.example), which contains all the information about the known software agents for the game. Each declared agent should explicitly report what game actions they are able to control and which parameters and commands they are able to understand.
 3. [`assistance.toml`](config.example/assistance.toml.example), which contains all the information about how the arbitration should actually happen. In particular, this file contains:
-    - For every game action, which Human Actors and Software Agent Actors are allowed to execute it and to which extent.
+    - For every game action, which Human Actors and Software Agent Actors are allowed to execute it and to what extent.
     - For every game action, which arbitration policy should be used to merge the actor inputs.
-    - Which inputs are associated with agent's meta-commands.
+    - Which inputs are associated with the agent's meta-commands.
     - Eventually, special Software Agent Actors that don't handle any action.
 
 An example for each of these files can be found in the [config](config.example) folder.
@@ -54,7 +54,7 @@ An example for each of these files can be found in the [config](config.example) 
 ## Command Line Arguments
 
 The infrastructure requires, as command line arguments, the paths to the 3 configuration files specified in the section above.
-When writing your own implementation of the infrastructure it's suggested to create an argument parser that extends the `ArgParser` class from the infrastructure itself.
+When writing your own implementation of the infrastructure, it's suggested to create an argument parser that extends the `ArgParser` class from the infrastructure itself.
 By overriding the method `_add_arguments` you can easily introduce new command line arguments for your specific use cases.
 
 Executing the program implementing the infrastructure will look something like this:
@@ -81,16 +81,4 @@ This will create two folders: `dist/` and `GamePals.egg-info/`. Inside the dist 
 
 ```bash
 pip install <path to the whl file>
-```
-
-Alternatively, the library can be installed directly from the repository using the following command:
-
-```bash
-pip install git+https://gitlab.di.unimi.it/ewlab/accessibility/gamepals/gamepals-framework.git
-```
-
-Note that in case of updates to the package, you will need to manually reinstall it by running:
-
-```bash
-pip install --upgrade --force-reinstall --no-cache-dir git+https://gitlab.di.unimi.it/ewlab/accessibility/gamepals/gamepals-framework.git
 ```
